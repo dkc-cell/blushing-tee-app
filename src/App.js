@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, Flag, ChevronRight, CheckCircle2, BarChart3, BookOpen } from 'lucide-react';
 
 const COLORS = {
@@ -30,7 +30,6 @@ export default function App() {
   const [savedCourses, setSavedCourses] = useState([]);
   const [showSaveCourseModal, setShowSaveCourseModal] = useState(false);
   const [inputCourseName, setInputCourseName] = useState('');
-  const [roundDate] = useState(() => new Date().toISOString().slice(0, 10));
   
   const [drive, setDrive] = useState('');
   const [approaches, setApproaches] = useState(0);
@@ -50,6 +49,29 @@ export default function App() {
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
 
+
+  // Load rounds from localStorage on app startup
+  useEffect(() => {
+    try {
+      const savedRounds = localStorage.getItem('blushingTeeRounds');
+      if (savedRounds) {
+        const parsedRounds = JSON.parse(savedRounds);
+        setRounds(parsedRounds);
+      }
+    } catch (error) {
+      console.error('Error loading rounds from localStorage:', error);
+    }
+  }, []);
+
+  // Save rounds to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('blushingTeeRounds', JSON.stringify(rounds));
+    } catch (error) {
+      console.error('Error saving rounds to localStorage:', error);
+    }
+  }, [rounds]);
+
   const totalShots = (drive ? 1 : 0) + approaches + chips + putts;
   const totalWithPenalties = totalShots + penalties.water + penalties.lost + penalties.ob;
   
@@ -57,7 +79,12 @@ export default function App() {
   const getCurrentYardage = () => customYardages[currentHole] || HOLE_YARDAGES[currentHole - 1];
 
   const stats = {
-    fairwaysHit: rounds.length > 0 ? Math.round((rounds.flatMap(r => r.holes).filter(h => h.fairwayHit).length / rounds.flatMap(r => r.holes).filter(h => h.par > 3).length) * 100) : 0,
+    fairwaysHit: rounds.length > 0 ? (() => {
+      const allHoles = rounds.flatMap(r => r.holes);
+      const fairwayHoles = allHoles.filter(h => h.par > 3);
+      const fairwaysHit = allHoles.filter(h => h.fairwayHit && h.par > 3).length;
+      return fairwayHoles.length > 0 ? Math.round((fairwaysHit / fairwayHoles.length) * 100) : 0;
+    })() : 0,
     avgPutts: rounds.flatMap(r => r.holes).length > 0 ? (rounds.flatMap(r => r.holes).reduce((sum, h) => sum + h.putts, 0) / rounds.flatMap(r => r.holes).length).toFixed(1) : 0
   };
 
@@ -65,11 +92,11 @@ export default function App() {
     const buttons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'Clear', '0', '←'];
     
     return (
-      <div className="p-5">
-        <div className="bg-cream p-5 rounded-xl mb-4 border-3 border-mistyBlue text-center text-3xl font-bold text-charcoal min-h-[60px] flex items-center justify-center">
+      <div style={{ padding: "1.25rem" }}>
+        <div style={{ backgroundColor: COLORS.cream, padding: "1.25rem", borderRadius: "0.75rem", marginBottom: "1rem", border: `3px solid ${COLORS.mistyBlue}`, textAlign: "center", fontSize: "1.875rem", fontWeight: "bold", color: COLORS.charcoal, minHeight: "60px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {value || '0'}
         </div>
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1rem" }}>
           {buttons.map(btn => (
             <button
               key={btn}
@@ -78,8 +105,7 @@ export default function App() {
                 else if (btn === '←') onBackspace();
                 else onNumberClick(btn);
               }}
-              className="p-5 text-2xl font-bold rounded-xl cursor-pointer shadow-md transition-all"
-              style={{
+              style={{ padding: "1.25rem", fontSize: "1.5rem", fontWeight: "bold", borderRadius: "0.75rem", cursor: "pointer", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", transition: "all 0.3s", border: "none",
                 backgroundColor: btn === 'Clear' || btn === '←' ? COLORS.mistyBlue : COLORS.blush,
                 color: COLORS.charcoal
               }}
@@ -91,8 +117,7 @@ export default function App() {
         <button
           onClick={onDone}
           disabled={!value || value === '0'}
-          className="w-full p-5 text-xl font-bold rounded-xl shadow-lg"
-          style={{
+          style={{ width: "100%", padding: "1.25rem", fontSize: "1.25rem", fontWeight: "bold", borderRadius: "0.75rem", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", border: "none",
             backgroundColor: (!value || value === '0') ? '#E0E0E0' : COLORS.darkTeal,
             color: (!value || value === '0') ? COLORS.charcoal : COLORS.cream,
             cursor: (!value || value === '0') ? 'not-allowed' : 'pointer'
@@ -131,7 +156,7 @@ export default function App() {
     };
     
     return (
-      <div className="flex gap-3 flex-wrap">
+      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
         {[...Array(max)].map((_, i) => {
           const isSelected = i < value;
           const bgColor = getColor(i);
@@ -141,8 +166,7 @@ export default function App() {
             <button
               key={i}
               onClick={() => onChange(value === i + 1 ? i : i + 1)}
-              className="w-14 h-14 rounded-full text-2xl font-bold shadow-md cursor-pointer transition-all"
-              style={{
+              style={{ width: "3.5rem", height: "3.5rem", borderRadius: "50%", fontSize: "1.5rem", fontWeight: "bold", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", cursor: "pointer", transition: "all 0.3s",
                 backgroundColor: isSelected ? COLORS.cream : bgColor,
                 color: isSelected ? COLORS.charcoal : textColor,
                 border: `3px solid ${bgColor}`
@@ -217,14 +241,27 @@ export default function App() {
       return;
     }
     
+    // Get local date (not UTC)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const currentDate = `${year}-${month}-${day}`;
+    
+    alert(`Round being saved with date: ${currentDate} (Local time: ${today.toLocaleString()})`);
+    console.log('Completing round with date:', currentDate);
+    console.log('Local date object:', today);
+    console.log('UTC date:', today.toISOString().slice(0, 10));
+    
     const newRound = {
-      date: roundDate,
+      date: currentDate,
       holes: currentRound,
       courseName: inputCourseName || 'Unnamed Course',
       customPars,
       customYardages
     };
     
+    console.log('New round object:', newRound);
     setRounds([...rounds, newRound]);
     setCurrentScreen('roundComplete');
   };
@@ -1411,7 +1448,7 @@ export default function App() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <div style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
-                              {new Date(round.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                              {new Date(round.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                             </div>
                             <div style={{ color: COLORS.charcoal, fontSize: '16px', fontWeight: '600' }}>
                               {round.courseName || 'Unnamed Course'} • {round.holes.length} holes
@@ -1480,7 +1517,7 @@ export default function App() {
                   ✕
                 </button>
                 <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0' }}>
-                  {new Date(selectedRound.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  {new Date(selectedRound.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </h3>
                 <p style={{ color: COLORS.mistyBlue, fontSize: '16px', margin: 0 }}>
                   {selectedRound.courseName || 'Unnamed Course'}
