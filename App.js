@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, Flag, ChevronRight, CheckCircle2, BarChart3, BookOpen } from 'lucide-react';
 
 const COLORS = {
@@ -30,7 +30,6 @@ export default function App() {
   const [savedCourses, setSavedCourses] = useState([]);
   const [showSaveCourseModal, setShowSaveCourseModal] = useState(false);
   const [inputCourseName, setInputCourseName] = useState('');
-  const [roundDate] = useState(() => new Date().toISOString().slice(0, 10));
   
   const [drive, setDrive] = useState('');
   const [approaches, setApproaches] = useState(0);
@@ -50,6 +49,29 @@ export default function App() {
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
 
+
+  // Load rounds from localStorage on app startup
+  useEffect(() => {
+    try {
+      const savedRounds = localStorage.getItem('blushingTeeRounds');
+      if (savedRounds) {
+        const parsedRounds = JSON.parse(savedRounds);
+        setRounds(parsedRounds);
+      }
+    } catch (error) {
+      console.error('Error loading rounds from localStorage:', error);
+    }
+  }, []);
+
+  // Save rounds to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('blushingTeeRounds', JSON.stringify(rounds));
+    } catch (error) {
+      console.error('Error saving rounds to localStorage:', error);
+    }
+  }, [rounds]);
+
   const totalShots = (drive ? 1 : 0) + approaches + chips + putts;
   const totalWithPenalties = totalShots + penalties.water + penalties.lost + penalties.ob;
   
@@ -57,7 +79,12 @@ export default function App() {
   const getCurrentYardage = () => customYardages[currentHole] || HOLE_YARDAGES[currentHole - 1];
 
   const stats = {
-    fairwaysHit: rounds.length > 0 ? Math.round((rounds.flatMap(r => r.holes).filter(h => h.fairwayHit).length / rounds.flatMap(r => r.holes).filter(h => h.par > 3).length) * 100) : 0,
+    fairwaysHit: rounds.length > 0 ? (() => {
+      const allHoles = rounds.flatMap(r => r.holes);
+      const fairwayHoles = allHoles.filter(h => h.par > 3);
+      const fairwaysHit = allHoles.filter(h => h.fairwayHit && h.par > 3).length;
+      return fairwayHoles.length > 0 ? Math.round((fairwaysHit / fairwayHoles.length) * 100) : 0;
+    })() : 0,
     avgPutts: rounds.flatMap(r => r.holes).length > 0 ? (rounds.flatMap(r => r.holes).reduce((sum, h) => sum + h.putts, 0) / rounds.flatMap(r => r.holes).length).toFixed(1) : 0
   };
 
@@ -214,14 +241,27 @@ export default function App() {
       return;
     }
     
+    // Get local date (not UTC)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const currentDate = `${year}-${month}-${day}`;
+    
+    alert(`Round being saved with date: ${currentDate} (Local time: ${today.toLocaleString()})`);
+    console.log('Completing round with date:', currentDate);
+    console.log('Local date object:', today);
+    console.log('UTC date:', today.toISOString().slice(0, 10));
+    
     const newRound = {
-      date: roundDate,
+      date: currentDate,
       holes: currentRound,
       courseName: inputCourseName || 'Unnamed Course',
       customPars,
       customYardages
     };
     
+    console.log('New round object:', newRound);
     setRounds([...rounds, newRound]);
     setCurrentScreen('roundComplete');
   };
@@ -1408,7 +1448,7 @@ export default function App() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <div style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
-                              {new Date(round.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                              {new Date(round.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                             </div>
                             <div style={{ color: COLORS.charcoal, fontSize: '16px', fontWeight: '600' }}>
                               {round.courseName || 'Unnamed Course'} • {round.holes.length} holes
@@ -1477,7 +1517,7 @@ export default function App() {
                   ✕
                 </button>
                 <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0' }}>
-                  {new Date(selectedRound.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  {new Date(selectedRound.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </h3>
                 <p style={{ color: COLORS.mistyBlue, fontSize: '16px', margin: 0 }}>
                   {selectedRound.courseName || 'Unnamed Course'}
