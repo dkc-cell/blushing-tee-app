@@ -1,0 +1,124 @@
+/* Splash Screen Container */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOutScreen 0.5s ease-in-out 3.5s forwards;
+}
+
+/* Splash Container - holds both screens */
+.splash-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  max-width: 85vw;
+  max-height: 85vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Logo - First Screen */
+.logo-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeInOut 2s ease-in-out forwards;
+}
+
+.logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Tagline - Second Screen */
+.tagline-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  animation: fadeInTagline 2s ease-in-out 2s forwards;
+}
+
+.tagline-image {
+  width: 90%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Logo fade in and out (0-2 seconds) */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+/* Tagline fade in (2-4 seconds) */
+@keyframes fadeInTagline {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade Out Entire Splash Screen (starts at 3.5s) */
+@keyframes fadeOutScreen {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .splash-container {
+    width: 400px;
+    height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .splash-container {
+    width: 300px;
+    height: 300px;
+  }
+}
