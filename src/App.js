@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Flag, ChevronRight, CheckCircle2, BarChart3, BookOpen } from 'lucide-react';
+import logo from './assets/images/Blushing_Birdie_Logo.png';
+import tagline from './assets/images/Blushing_Birdie_Tagline.png';
+import './SplashScreen.css';
 
 const COLORS = {
   blush: '#F4A8B9',
@@ -21,6 +24,10 @@ const HOLE_PARS = [4, 4, 3, 5, 4, 3, 4, 5, 4, 4, 4, 3, 5, 4, 3, 4, 5, 4];
 const HOLE_YARDAGES = [350, 380, 160, 490, 360, 145, 400, 520, 370, 340, 390, 170, 510, 350, 155, 380, 500, 385];
 
 export default function App() {
+  // Splash screen state
+  const [showSplash, setShowSplash] = useState(true);
+
+  // All existing state
   const [currentScreen, setCurrentScreen] = useState('home');
   const [currentHole, setCurrentHole] = useState(1);
   const [rounds, setRounds] = useState([]);
@@ -49,6 +56,15 @@ export default function App() {
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
 
+
+  // Splash screen effect - hide after 4 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Load rounds from localStorage on app startup
   useEffect(() => {
@@ -87,6 +103,33 @@ export default function App() {
     })() : 0,
     avgPutts: rounds.flatMap(r => r.holes).length > 0 ? (rounds.flatMap(r => r.holes).reduce((sum, h) => sum + h.putts, 0) / rounds.flatMap(r => r.holes).length).toFixed(1) : 0
   };
+
+  // If splash screen is showing, render only the splash screen
+  if (showSplash) {
+    return (
+      <div className="splash-screen">
+        <div className="splash-container">
+          {/* Logo - First Screen (2 seconds) */}
+          <div className="logo-screen">
+            <img 
+              src={logo} 
+              alt="Blushing Birdie" 
+              className="logo-image"
+            />
+          </div>
+
+          {/* Tagline - Second Screen (appears after 2 seconds) */}
+          <div className="tagline-screen">
+            <img 
+              src={tagline} 
+              alt="confidence, one swing at a time" 
+              className="tagline-image"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const NumberPad = ({ onNumberClick, onBackspace, onClear, onDone, value }) => {
     const buttons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'Clear', '0', '←'];
