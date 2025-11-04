@@ -61,7 +61,6 @@ export default function App() {
   const [newCourseName, setNewCourseName] = useState('');
   const [newCoursePars, setNewCoursePars] = useState({});
   const [newCourseYardages, setNewCourseYardages] = useState({});
-  const [courseCreationHole, setCourseCreationHole] = useState(1);
 
  // New modal states
   const [showCourseSelectionModal, setShowCourseSelectionModal] = useState(false);
