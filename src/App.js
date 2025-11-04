@@ -5,6 +5,7 @@ import tagline from './assets/images/Blushing_Birdie_Tagline.png';
 import './SplashScreen.css';
 
 const COLORS = {
+
   blush: '#F4A8B9',
   mistyBlue: '#ACC8C8',
   darkTeal: '#103E43',
@@ -13,11 +14,11 @@ const COLORS = {
 };
 
 const ENCOURAGING_QUOTES = [
-  "Every swing is a step forward 🩷",
-  "Breathe in the moment, enjoy the game 🩷",
+  "Every swing is a step forward 💗",
+  "Breathe in the moment, enjoy the game 💗",
   "Progress over perfection ✨",
   "You're exactly where you need to be 🌿",
-  "Celebrate the small wins today 🩷"
+  "Celebrate the small wins today 💗"
 ];
 
 const HOLE_PARS = [4, 4, 3, 5, 4, 3, 4, 5, 4, 4, 4, 3, 5, 4, 3, 4, 5, 4];
@@ -55,6 +56,19 @@ export default function App() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
+  
+  // Course creation state
+  const [newCourseName, setNewCourseName] = useState('');
+  const [newCoursePars, setNewCoursePars] = useState({});
+  const [newCourseYardages, setNewCourseYardages] = useState({});
+  const [courseCreationHole, setCourseCreationHole] = useState(1);
+
+ // New modal states
+  const [showCourseSelectionModal, setShowCourseSelectionModal] = useState(false);
+  const [showManageCoursesModal, setShowManageCoursesModal] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
+  const [showYardageModalForHole, setShowYardageModalForHole] = useState(null);
+
 
 
   // Splash screen effect - hide after 4 seconds
@@ -74,8 +88,14 @@ export default function App() {
         const parsedRounds = JSON.parse(savedRounds);
         setRounds(parsedRounds);
       }
+      
+      const savedCoursesData = localStorage.getItem('blushingTeeCourses');
+      if (savedCoursesData) {
+        const parsedCourses = JSON.parse(savedCoursesData);
+        setSavedCourses(parsedCourses);
+      }
     } catch (error) {
-      console.error('Error loading rounds from localStorage:', error);
+      console.error('Error loading data from localStorage:', error);
     }
   }, []);
 
@@ -87,6 +107,15 @@ export default function App() {
       console.error('Error saving rounds to localStorage:', error);
     }
   }, [rounds]);
+  
+  // Save courses to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('blushingTeeCourses', JSON.stringify(savedCourses));
+    } catch (error) {
+      console.error('Error saving courses to localStorage:', error);
+    }
+  }, [savedCourses]);
 
   const totalShots = (drive ? 1 : 0) + approaches + chips + putts;
   const totalWithPenalties = totalShots + penalties.water + penalties.lost + penalties.ob;
@@ -309,28 +338,60 @@ export default function App() {
     setCurrentScreen('roundComplete');
   };
 
-  const saveCourse = (name) => {
+  const saveCourse = (name, parsData = {}, yardagesData = {}, isEdit = false, courseId = null) => {
     if (!name.trim()) {
       alert('Please enter a course name');
       return;
     }
     
+    // Check if course name already exists (but allow if editing the same course)
+    const existingCourse = savedCourses.find(c => 
+      c.name.toLowerCase() === name.trim().toLowerCase() && 
+      (!isEdit || c.id !== courseId)
+    );
+    
+    if (existingCourse) {
+      const shouldOverwrite = window.confirm(
+        `A course named "${name.trim()}" already exists. Would you like to overwrite it?`
+      );
+      
+      if (!shouldOverwrite) {
+        return;
+      }
+      
+      // Remove the old course
+      setSavedCourses(savedCourses.filter(c => c.id !== existingCourse.id));
+    }
+    
     const courseData = {
-      id: Date.now(),
+      id: isEdit && courseId ? courseId : Date.now(),
       name: name.trim(),
       pars: {},
       yardages: {}
     };
     
+    // Use provided data or fall back to current customPars/customYardages
+    const sourcePars = Object.keys(parsData).length > 0 ? parsData : customPars;
+    const sourceYardages = Object.keys(yardagesData).length > 0 ? yardagesData : customYardages;
+    
     for (let i = 1; i <= 18; i++) {
-      courseData.pars[i] = customPars[i] || HOLE_PARS[i - 1];
-      courseData.yardages[i] = customYardages[i] || HOLE_YARDAGES[i - 1];
+      courseData.pars[i] = sourcePars[i] || HOLE_PARS[i - 1];
+      courseData.yardages[i] = sourceYardages[i] || HOLE_YARDAGES[i - 1];
     }
     
-    setSavedCourses([...savedCourses, courseData]);
+    if (isEdit) {
+      // Update existing course
+      setSavedCourses(savedCourses.map(c => c.id === courseId ? courseData : c));
+      alert(`"${name.trim()}" has been updated!`);
+    } else {
+      // Add new course
+      setSavedCourses([...savedCourses.filter(c => c.id !== existingCourse?.id), courseData]);
+      alert(`"${name.trim()}" has been saved!`);
+    }
+    
     setShowSaveCourseModal(false);
     setInputCourseName('');
-    alert(`"${name.trim()}" has been saved!`);
+    setEditingCourse(null);
   };
 
   const calcStats = (holes) => {
@@ -454,47 +515,271 @@ export default function App() {
               <div style={{ color: COLORS.darkTeal, fontSize: '40px', fontWeight: 'bold' }}>{stats.avgPutts}</div>
             </div>
           </div>
-          {savedCourses.length > 0 && (
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ color: COLORS.darkTeal, fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>
-                ⛳ Your Courses
+
+   {/* Course Selection Modal */}
+        {showCourseSelectionModal && (
+          <div 
+            style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              backgroundColor: 'rgba(0,0,0,0.5)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              zIndex: 2000,
+              padding: '20px'
+            }}
+            onClick={() => setShowCourseSelectionModal(false)}
+          >
+            <div 
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '24px', 
+                padding: '32px',
+                maxWidth: '500px',
+                width: '100%',
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', marginTop: 0, marginBottom: '24px', textAlign: 'center' }}>
+                Select a Course
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {savedCourses.map(course => (
+              
+              {savedCourses.length > 0 ? (
+                <>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                    {savedCourses.map(course => (
+                      <button
+                        key={course.id}
+                        onClick={() => {
+                          setCustomPars(course.pars);
+                          setCustomYardages(course.yardages);
+                          setInputCourseName(course.name);
+                          setCurrentHole(1);
+                          setShowCourseSelectionModal(false);
+                          setCurrentScreen('logRound');
+                        }}
+                        style={{
+                          width: '100%',
+                          backgroundColor: COLORS.cream,
+                          border: `2px solid ${COLORS.mistyBlue}`,
+                          borderRadius: '12px',
+                          padding: '16px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <div style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
+                          {course.name}
+                        </div>
+                        <div style={{ color: COLORS.charcoal, fontSize: '14px' }}>
+                          18 holes • Click to select
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div style={{ borderTop: `2px solid ${COLORS.mistyBlue}33`, paddingTop: '16px' }}>
+                    <button
+                      onClick={() => {
+                        setCustomPars({});
+                        setCustomYardages({});
+                        setInputCourseName('');
+                        setCurrentHole(1);
+                        setShowCourseSelectionModal(false);
+                        setCurrentScreen('logRound');
+                      }}
+                      style={{
+                        width: '100%',
+                        backgroundColor: COLORS.blush,
+                        color: COLORS.charcoal,
+                        padding: '16px',
+                        borderRadius: '12px',
+                        border: 'none',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Enter Manually (Use Default Course)
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '16px' }}>⛳</div>
+                  <p style={{ color: COLORS.charcoal, marginBottom: '24px' }}>
+                    No saved courses yet. You can create one in Course Management or enter manually.
+                  </p>
                   <button
-                    key={course.id}
                     onClick={() => {
-                      setCustomPars(course.pars);
-                      setCustomYardages(course.yardages);
-                      setInputCourseName(course.name);
+                      setCustomPars({});
+                      setCustomYardages({});
+                      setInputCourseName('');
+                      setCurrentHole(1);
+                      setShowCourseSelectionModal(false);
                       setCurrentScreen('logRound');
                     }}
                     style={{
                       width: '100%',
-                      backgroundColor: '#FFFFFF',
-                      border: `2px solid ${COLORS.mistyBlue}`,
-                      borderRadius: '12px',
+                      backgroundColor: COLORS.blush,
+                      color: COLORS.charcoal,
                       padding: '16px',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-                      transition: 'all 0.2s'
+                      borderRadius: '12px',
+                      border: 'none',
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
                     }}
                   >
-                    <div style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
-                      {course.name}
-                    </div>
-                    <div style={{ color: COLORS.mistyBlue, fontSize: '14px' }}>
-                      Tap to start round with this course
-                    </div>
+                    Enter Manually
                   </button>
-                ))}
-              </div>
+                </div>
+              )}
+              
+              <button
+                onClick={() => setShowCourseSelectionModal(false)}
+                style={{
+                  width: '100%',
+                  marginTop: '16px',
+                  padding: '12px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  backgroundColor: COLORS.mistyBlue,
+                  color: COLORS.charcoal,
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
             </div>
-          )}
+          </div>
+        )}
+    
+ {/* Manage Courses Modal */}
+        {showManageCoursesModal && (
+          <div 
+            style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              backgroundColor: 'rgba(0,0,0,0.5)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              zIndex: 2000,
+              padding: '20px'
+            }}
+            onClick={() => setShowManageCoursesModal(false)}
+          >
+            <div 
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '24px', 
+                padding: '32px',
+                maxWidth: '400px',
+                width: '100%',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', marginTop: 0, marginBottom: '24px', textAlign: 'center' }}>
+                Course Management
+              </h3>
+              
+              <button
+                onClick={() => {
+                  setNewCourseName('');
+                  setNewCoursePars({});
+                  setNewCourseYardages({});
+                  setEditingCourse(null);
+                  setShowManageCoursesModal(false);
+                  setCurrentScreen('createCourse');
+                }}
+                style={{
+                  width: '100%',
+                  background: `linear-gradient(90deg, ${COLORS.blush} 0%, ${COLORS.blush}CC 100%)`,
+                  color: COLORS.charcoal,
+                  padding: '20px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px'
+                }}
+              >
+                <span style={{ fontSize: '24px' }}>➕</span>
+                Create New Course
+              </button>
+              
+              {savedCourses.length > 0 && (
+                <button
+                  onClick={() => {
+                    setShowManageCoursesModal(false);
+                    setCurrentScreen('manageCourses');
+                  }}
+                  style={{
+                    width: '100%',
+                    background: `linear-gradient(90deg, ${COLORS.mistyBlue}4D 0%, #FFFFFF 100%)`,
+                    color: COLORS.charcoal,
+                    padding: '20px',
+                    borderRadius: '12px',
+                    border: `2px solid ${COLORS.mistyBlue}`,
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px'
+                  }}
+                >
+                  <span style={{ fontSize: '24px' }}>✏️</span>
+                  Edit Existing Course
+                </button>
+              )}
+              
+              <button
+                onClick={() => setShowManageCoursesModal(false)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  backgroundColor: COLORS.mistyBlue,
+                  color: COLORS.charcoal,
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button
-              onClick={() => setCurrentScreen('logRound')}
+              onClick={() => setShowCourseSelectionModal(true)}
               style={{
                 width: '100%',
                 background: `linear-gradient(90deg, ${COLORS.mistyBlue} 0%, ${COLORS.mistyBlue}CC 100%)`,
@@ -518,7 +803,7 @@ export default function App() {
               <ChevronRight style={{ width: '24px', height: '24px', color: COLORS.darkTeal }} />
             </button>
             <button
-              onClick={() => setCurrentScreen('manageCourses')}
+              onClick={() => setShowManageCoursesModal(true)}
               style={{
                 width: '100%',
                 background: `linear-gradient(90deg, ${COLORS.blush}4D 0%, #FFFFFF 100%)`,
@@ -1289,9 +1574,9 @@ export default function App() {
               <div style={{ backgroundColor: COLORS.cream, padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
                 <p style={{ color: COLORS.charcoal, fontSize: '14px', margin: 0 }}>
                   <strong>What will be saved:</strong><br/>
-                  • Par for each hole<br/>
-                  • Yardage for each hole<br/>
-                  • Course name
+                  â€¢ Par for each hole<br/>
+                  â€¢ Yardage for each hole<br/>
+                  â€¢ Course name
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
@@ -1494,7 +1779,7 @@ export default function App() {
                               {new Date(round.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                             </div>
                             <div style={{ color: COLORS.charcoal, fontSize: '16px', fontWeight: '600' }}>
-                              {round.courseName || 'Unnamed Course'} • {round.holes.length} holes
+                              {round.courseName || 'Unnamed Course'} â€¢ {round.holes.length} holes
                             </div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
@@ -1557,7 +1842,7 @@ export default function App() {
                     color: COLORS.charcoal
                   }}
                 >
-                  ✕
+                  âœ•
                 </button>
                 <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0' }}>
                   {new Date(selectedRound.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -1613,7 +1898,7 @@ export default function App() {
                             Hole {hole.hole}
                           </span>
                           <span style={{ color: COLORS.mistyBlue, fontSize: '14px', marginLeft: '8px' }}>
-                            Par {hole.par} • {hole.yardage} yds
+                            Par {hole.par} â€¢ {hole.yardage} yds
                           </span>
                         </div>
                         <div style={{ textAlign: 'right' }}>
@@ -1625,7 +1910,7 @@ export default function App() {
                       </div>
                       
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px', color: COLORS.charcoal }}>
-                        <div><strong>Drive:</strong> {hole.drive === 'middle' ? '✨ Fairway' : hole.drive.charAt(0).toUpperCase() + hole.drive.slice(1)}</div>
+                        <div><strong>Drive:</strong> {hole.drive === 'middle' ? 'âœ¨ Fairway' : hole.drive.charAt(0).toUpperCase() + hole.drive.slice(1)}</div>
                         <div><strong>Putts:</strong> {hole.putts}</div>
                         <div><strong>Approaches:</strong> {hole.approaches}</div>
                         <div><strong>Chips:</strong> {hole.chips}</div>
@@ -1690,7 +1975,7 @@ export default function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', marginTop: 0, marginBottom: '16px' }}>
-                📥 Export Data
+                ðŸ“¥ Export Data
               </h3>
               <p style={{ color: COLORS.charcoal, fontSize: '16px', marginBottom: '24px' }}>
                 Export your round data to CSV. Leave dates empty to export all rounds.
@@ -1737,10 +2022,10 @@ export default function App() {
               <div style={{ backgroundColor: COLORS.cream, padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
                 <p style={{ color: COLORS.charcoal, fontSize: '14px', margin: 0 }}>
                   <strong>Export will include:</strong><br/>
-                  • Date and course name<br/>
-                  • Hole-by-hole details<br/>
-                  • Scores, putts, drives, and more<br/>
-                  • All notes and penalties
+                  â€¢ Date and course name<br/>
+                  â€¢ Hole-by-hole details<br/>
+                  â€¢ Scores, putts, drives, and more<br/>
+                  â€¢ All notes and penalties
                 </p>
               </div>
               
@@ -1789,6 +2074,482 @@ export default function App() {
     );
   }
 
+ if (currentScreen === 'manageCourses') {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '80px' }}>
+        <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
+          <button onClick={() => setCurrentScreen('home')} style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '8px' }}>← Back</button>
+          <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Manage Courses</h2>
+          <p style={{ color: COLORS.charcoal, fontSize: '18px', margin: '4px 0 0 0' }}>Edit or delete your saved courses</p>
+        </div>
+        
+        <div style={{ padding: '0 24px' }}>
+          {savedCourses.length === 0 ? (
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>⛳</div>
+              <p style={{ color: COLORS.charcoal, fontSize: '16px' }}>No saved courses yet. Create your first course to get started!</p>
+            </div>
+          ) : (
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+              <h3 style={{ color: COLORS.darkTeal, fontWeight: 'bold', fontSize: '20px', marginTop: 0, marginBottom: '16px' }}>
+                Your Saved Courses ({savedCourses.length})
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {savedCourses.map(course => (
+                  <div
+                    key={course.id}
+                    style={{
+                      backgroundColor: COLORS.cream,
+                      border: `2px solid ${COLORS.mistyBlue}`,
+                      borderRadius: '12px',
+                      padding: '16px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <div style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
+                        {course.name}
+                      </div>
+                      <div style={{ color: COLORS.charcoal, fontSize: '14px' }}>
+                        18 holes • Custom pars & yardages
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={() => {
+                          setNewCourseName(course.name);
+                          setNewCoursePars(course.pars);
+                          setNewCourseYardages(course.yardages);
+                          setEditingCourse(course);
+                          setCurrentScreen('createCourse');
+                        }}
+                        style={{
+                          backgroundColor: COLORS.mistyBlue,
+                          color: COLORS.charcoal,
+                          border: 'none',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to delete "${course.name}"?`)) {
+                            setSavedCourses(savedCourses.filter(c => c.id !== course.id));
+                          }
+                        }}
+                        style={{
+                          backgroundColor: '#FF6B6B',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+if (currentScreen === 'createCourse') {
+    // Calculate yardage totals
+    const front9Yardage = [1,2,3,4,5,6,7,8,9].reduce((sum, hole) => {
+      return sum + (newCourseYardages[hole] || HOLE_YARDAGES[hole - 1]);
+    }, 0);
+    
+    const back9Yardage = [10,11,12,13,14,15,16,17,18].reduce((sum, hole) => {
+      return sum + (newCourseYardages[hole] || HOLE_YARDAGES[hole - 1]);
+    }, 0);
+    
+    const totalYardage = front9Yardage + back9Yardage;
+    const isEditing = editingCourse !== null;
+    
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '120px' }}>
+        <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 100 }}>
+          <button 
+            onClick={() => {
+              setCurrentScreen(isEditing ? 'manageCourses' : 'home');
+              setEditingCourse(null);
+            }}
+            style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}
+          >
+            ← Back
+          </button>
+          
+          <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: '0 0 16px 0' }}>
+            {isEditing ? 'Edit Course' : 'Create New Course'}
+          </h2>
+          
+          <div style={{ marginBottom: '0' }}>
+            <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}>
+              Course Name
+            </label>
+            <input
+              type="text"
+              value={newCourseName}
+              onChange={(e) => setNewCourseName(e.target.value)}
+              placeholder="e.g., Pine Valley Golf Club"
+              maxLength={50}
+              style={{
+                width: '100%',
+                padding: '12px',
+                fontSize: '16px',
+                border: `3px solid ${COLORS.mistyBlue}`,
+                borderRadius: '12px',
+                fontFamily: 'inherit',
+                color: COLORS.charcoal
+              }}
+            />
+          </div>
+        </div>
+
+        <div style={{ padding: '24px' }}>
+          <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.mistyBlue}33 100%)`, padding: '16px', borderRadius: '16px', marginBottom: '24px' }}>
+            <p style={{ color: COLORS.darkTeal, fontSize: '16px', textAlign: 'center', fontWeight: '500', margin: 0 }}>
+              Set the par and yardage for each hole below 💚
+            </p>
+          </div>
+
+          {/* Front 9 */}
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '20px', marginBottom: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ color: COLORS.darkTeal, fontSize: '20px', fontWeight: 'bold', marginTop: 0, marginBottom: '16px' }}>
+              Front 9
+            </h3>
+            
+            {[1,2,3,4,5,6,7,8,9].map(hole => {
+              const currentPar = newCoursePars[hole] || HOLE_PARS[hole - 1];
+              const currentYardage = newCourseYardages[hole] || HOLE_YARDAGES[hole - 1];
+              
+              return (
+                <div 
+                  key={hole}
+                  style={{ 
+                    display: 'grid',
+                    gridTemplateColumns: '60px 1fr 1fr',
+                    gap: '12px',
+                    alignItems: 'center',
+                    marginBottom: '12px',
+                    padding: '12px',
+                    backgroundColor: COLORS.cream,
+                    borderRadius: '12px'
+                  }}
+                >
+                  <div style={{ 
+                    color: COLORS.darkTeal, 
+                    fontSize: '18px', 
+                    fontWeight: 'bold',
+                    textAlign: 'center'
+                  }}>
+                    #{hole}
+                  </div>
+                  
+                  <div>
+                    <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Par</div>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {[3, 4, 5].map(par => (
+                        <button
+                          key={par}
+                          onClick={() => setNewCoursePars({...newCoursePars, [hole]: par})}
+                          style={{
+                            flex: 1,
+                            padding: '8px',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            backgroundColor: currentPar === par ? COLORS.blush : '#FFFFFF',
+                            color: COLORS.charcoal,
+                            border: `2px solid ${currentPar === par ? COLORS.blush : COLORS.mistyBlue}`,
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {par}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Yardage</div>
+                    <button
+                      onClick={() => {
+                        setShowYardageModalForHole(hole);
+                        setTempYardage(currentYardage.toString());
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        border: `2px solid ${COLORS.mistyBlue}`,
+                        borderRadius: '8px',
+                        backgroundColor: '#FFFFFF',
+                        color: COLORS.charcoal,
+                        cursor: 'pointer',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {currentYardage} yds
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+            
+            <div style={{ 
+              marginTop: '16px', 
+              padding: '12px', 
+              backgroundColor: `${COLORS.mistyBlue}33`,
+              borderRadius: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>Front 9 Total:</span>
+              <span style={{ color: COLORS.blush, fontSize: '20px', fontWeight: 'bold' }}>{front9Yardage} yds</span>
+            </div>
+          </div>
+
+          {/* Back 9 */}
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '20px', marginBottom: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ color: COLORS.darkTeal, fontSize: '20px', fontWeight: 'bold', marginTop: 0, marginBottom: '16px' }}>
+              Back 9
+            </h3>
+            
+            {[10,11,12,13,14,15,16,17,18].map(hole => {
+              const currentPar = newCoursePars[hole] || HOLE_PARS[hole - 1];
+              const currentYardage = newCourseYardages[hole] || HOLE_YARDAGES[hole - 1];
+              
+              return (
+                <div 
+                  key={hole}
+                  style={{ 
+                    display: 'grid',
+                    gridTemplateColumns: '60px 1fr 1fr',
+                    gap: '12px',
+                    alignItems: 'center',
+                    marginBottom: '12px',
+                    padding: '12px',
+                    backgroundColor: COLORS.cream,
+                    borderRadius: '12px'
+                  }}
+                >
+                  <div style={{ 
+                    color: COLORS.darkTeal, 
+                    fontSize: '18px', 
+                    fontWeight: 'bold',
+                    textAlign: 'center'
+                  }}>
+                    #{hole}
+                  </div>
+                  
+                  <div>
+                    <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Par</div>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {[3, 4, 5].map(par => (
+                        <button
+                          key={par}
+                          onClick={() => setNewCoursePars({...newCoursePars, [hole]: par})}
+                          style={{
+                            flex: 1,
+                            padding: '8px',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            backgroundColor: currentPar === par ? COLORS.blush : '#FFFFFF',
+                            color: COLORS.charcoal,
+                            border: `2px solid ${currentPar === par ? COLORS.blush : COLORS.mistyBlue}`,
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {par}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Yardage</div>
+                    <button
+                      onClick={() => {
+                        setShowYardageModalForHole(hole);
+                        setTempYardage(currentYardage.toString());
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        border: `2px solid ${COLORS.mistyBlue}`,
+                        borderRadius: '8px',
+                        backgroundColor: '#FFFFFF',
+                        color: COLORS.charcoal,
+                        cursor: 'pointer',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {currentYardage} yds
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+            
+            <div style={{ 
+              marginTop: '16px', 
+              padding: '12px', 
+              backgroundColor: `${COLORS.mistyBlue}33`,
+              borderRadius: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>Back 9 Total:</span>
+              <span style={{ color: COLORS.blush, fontSize: '20px', fontWeight: 'bold' }}>{back9Yardage} yds</span>
+            </div>
+          </div>
+
+          {/* Total Yardage */}
+          <div style={{ 
+            backgroundColor: COLORS.darkTeal, 
+            borderRadius: '16px', 
+            padding: '20px', 
+            marginBottom: '20px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: COLORS.cream, fontSize: '20px', fontWeight: 'bold' }}>Total Course Yardage:</span>
+              <span style={{ color: COLORS.blush, fontSize: '28px', fontWeight: 'bold' }}>{totalYardage} yds</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              if (!newCourseName.trim()) {
+                alert('Please enter a course name before saving');
+                return;
+              }
+              if (isEditing) {
+                saveCourse(newCourseName, newCoursePars, newCourseYardages, true, editingCourse.id);
+              } else {
+                saveCourse(newCourseName, newCoursePars, newCourseYardages);
+              }
+              setCurrentScreen('manageCourses');
+            }}
+            style={{
+              width: '100%',
+              backgroundColor: newCourseName.trim() ? COLORS.blush : '#E0E0E0',
+              color: COLORS.charcoal,
+              padding: '20px',
+              borderRadius: '16px',
+              border: 'none',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              cursor: newCourseName.trim() ? 'pointer' : 'not-allowed',
+              opacity: newCourseName.trim() ? 1 : 0.7,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px'
+            }}
+          >
+            <CheckCircle2 style={{ width: '24px', height: '24px' }} />
+            {isEditing ? 'Update Course' : 'Save Course'}
+          </button>
+        </div>
+
+        {/* NumberPad Modal for Yardage Entry */}
+        {showYardageModalForHole !== null && (
+          <div 
+            style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              backgroundColor: 'rgba(0,0,0,0.5)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              zIndex: 2000,
+              padding: '20px'
+            }}
+            onClick={() => {
+              setShowYardageModalForHole(null);
+              setTempYardage('');
+            }}
+          >
+            <div 
+              style={{ 
+                backgroundColor: '#FFFFFF', 
+                borderRadius: '24px', 
+                maxWidth: '400px',
+                width: '100%',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ padding: '24px 24px 0 24px' }}>
+                <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', marginTop: 0, marginBottom: '16px', textAlign: 'center' }}>
+                  Yardage for Hole {showYardageModalForHole}
+                </h3>
+              </div>
+              <NumberPad
+                value={tempYardage}
+                onNumberClick={(num) => {
+                  if (tempYardage.length < 3) {
+                    setTempYardage(tempYardage + num);
+                  }
+                }}
+                onBackspace={() => {
+                  setTempYardage(tempYardage.slice(0, -1));
+                }}
+                onClear={() => {
+                  setTempYardage('');
+                }}
+                onDone={() => {
+                  const yards = parseInt(tempYardage);
+                  if (yards >= 50 && yards <= 700) {
+                    setNewCourseYardages({...newCourseYardages, [showYardageModalForHole]: yards});
+                    setShowYardageModalForHole(null);
+                    setTempYardage('');
+                  } else {
+                    alert('Please enter a yardage between 50 and 700');
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+
   if (currentScreen === 'shop') {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '80px' }}>
@@ -1817,7 +2578,7 @@ export default function App() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
-                <div style={{ fontSize: '24px', minWidth: '32px' }}>🩷</div>
+                <div style={{ fontSize: '24px', minWidth: '32px' }}>💗</div>
                 <div>
                   <p style={{ color: COLORS.darkTeal, fontWeight: 'bold', margin: '0 0 4px 0', fontSize: '16px' }}>Designed for You</p>
                   <p style={{ color: COLORS.charcoal, margin: 0, fontSize: '15px' }}>Pieces that make you feel confident and comfortable on the course</p>
