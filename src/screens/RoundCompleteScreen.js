@@ -24,7 +24,6 @@ const RoundCompleteScreen = ({
   const scoreToPar = totalScore - totalPar;
   const fairwaysHit = currentRound.filter(h => h.fairwayHit && h.par > 3).length;
   const possibleFairways = currentRound.filter(h => h.par > 3).length;
-  const totalPutts = currentRound.reduce((sum, h) => sum + h.putts, 0);
   const holesWithPutts = currentRound.filter(h => Number.isFinite(h?.putts));
   const threePuttCount = holesWithPutts.filter(h => h.putts >= 3).length;
   const threePuttPercentage = holesWithPutts.length > 0 ? Math.round((threePuttCount / holesWithPutts.length) * 100) : 0;

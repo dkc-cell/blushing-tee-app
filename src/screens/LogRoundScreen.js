@@ -31,7 +31,7 @@ const LogRoundScreen = ({
     // Auto-hide celebration overlay after 4 seconds
   useEffect(() => {
     if (!celebrationKind) return;
-    const t = setTimeout(() => setCelebrationKind(null), 4000);
+    const t = setTimeout(() => setCelebrationKind(null), CELEBRATION_MS);
     return () => clearTimeout(t);
   }, [celebrationKind]);
   // Fire confetti burst when celebration starts
@@ -179,8 +179,7 @@ useEffect(() => {
 
     onRecordHole(newHoleData);
      // Celebration should be based on strokes (not penalties)
-  const CELEBRATION_MS = 4000; // you can move this to top-level later
-  const strokes = totalShots;
+    const strokes = totalShots;
 
   let kind = null;
   if (strokes === 1) kind = 'hio';
