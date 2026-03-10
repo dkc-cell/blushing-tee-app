@@ -38,7 +38,7 @@ const recentRoundCount = recentRounds.length;
       alert('No rounds found in the selected date range.');
       return;
     }
-    downloadCSV(csvContent, `blushing-tee-stats-${new Date().toISOString().slice(0, 10)}.csv`);
+    downloadCSV(csvContent, `blushing-birdie-stats-${new Date().toISOString().slice(0, 10)}.csv`);
     setShowExportModal(false);
     setExportStartDate('');
     setExportEndDate('');
@@ -116,7 +116,7 @@ const recentRoundCount = recentRounds.length;
             {/* Export Button */}
             <button
               onClick={() => setShowExportModal(true)}
-              style={{ width: '100%', backgroundColor: COLORS.darkTeal, color: COLORS.cream, padding: '16px', borderRadius: '12px', border: 'none', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '24px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
+              style={{ width: '100%', backgroundColor: `${COLORS.darkTeal}D9`, color: COLORS.cream, padding: '16px', borderRadius: '12px', border: 'none', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '24px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
             >
               📥 Export Data to CSV
             </button>
@@ -237,8 +237,10 @@ const RoundDetailModal = ({ round, isEditing, editDate, editCourse, setEditDate,
               <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0' }}>{formatDateForDisplay(round.date)}</h3>
               <p style={{ color: COLORS.mistyBlue, fontSize: '16px', margin: '0 0 16px 0' }}>{round.courseName || 'Unnamed Course'}</p>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={onStartEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: COLORS.mistyBlue, color: COLORS.charcoal, border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>✏️ Edit Info</button>
-                <button onClick={onDelete} style={{ flex: 1, padding: '10px 16px', backgroundColor: '#FF6B6B', color: '#FFFFFF', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>🗑️ Delete Round</button>
+                <button onClick={onStartEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: `${COLORS.mistyBlue}66`,
+                  color: COLORS.darkTeal, border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>✏️ Edit Info</button>
+                <button onClick={onDelete} style={{ flex: 1, padding: '10px 16px', backgroundColor: `${COLORS.blush}66`,
+                  color: '#A9444A', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>🗑️ Delete Round</button>
               </div>
             </>
           ) : (

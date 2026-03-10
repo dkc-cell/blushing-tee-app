@@ -79,7 +79,7 @@ const SelectCourseScreen = ({
           onClick={onNewCourse}
           style={{
             width: '100%',
-            background: `linear-gradient(360deg, ${COLORS.blush} 0%, ${COLORS.cream}CC 100%)`,
+            background: `linear-gradient(360deg, ${COLORS.blush}4D 0%, ${COLORS.cream}CC 100%)`,
             color: COLORS.charcoal,
             padding: '24px',
             borderRadius: '18px',
@@ -136,8 +136,10 @@ const SelectCourseScreen = ({
                 <div
                   key={course.id}
                   style={{
-                    background: `linear-gradient(360deg, ${COLORS.blush} 0%, ${COLORS.cream}CC 100%)`,
-                    border: `2px solid ${course.isFavorite ? COLORS.blush : COLORS.mistyBlue}`,
+                    background: `linear-gradient(360deg, ${COLORS.mistyBlue}80 0%, ${COLORS.mistyBlue}40 100%)`,
+                    border: `2px solid ${course.isFavorite 
+                     ? `${COLORS.blush}CC` 
+                      : `${COLORS.mistyBlue}B3`}`,
                     borderRadius: '12px',
                     padding: '16px',
                     display: 'flex',
@@ -179,7 +181,7 @@ const SelectCourseScreen = ({
                     }}>
                       {course.name}
                     </div>
-                    <div style={{ color: COLORS.mistyBlue, fontSize: '12px' }}>
+                    <div style={{ color: `${COLORS.darkTeal}99`, fontSize: '12px' }}>
                       {course.lastPlayed ? (
                         `Last played: ${new Date(course.lastPlayed + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                       ) : (

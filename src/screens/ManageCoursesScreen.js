@@ -57,16 +57,16 @@ const ManageCoursesScreen = ({
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
+                   <button
                       onClick={() => onEditCourse(course)}
                       style={{
-                        backgroundColor: COLORS.mistyBlue,
-                        color: COLORS.charcoal,
+                        backgroundColor: `${COLORS.mistyBlue}66`,
+                        color: COLORS.darkTeal,
                         border: 'none',
                         padding: '8px 12px',
                         borderRadius: '8px',
                         fontSize: '14px',
-                        fontWeight: 'bold',
+                        fontWeight: 600,
                         cursor: 'pointer'
                       }}
                     >
@@ -75,13 +75,13 @@ const ManageCoursesScreen = ({
                     <button
                       onClick={() => handleDelete(course)}
                       style={{
-                        backgroundColor: '#FF6B6B',
-                        color: '#FFFFFF',
+                        backgroundColor: '#FF6B6B33',
+                        color: '#A94A4A',
                         border: 'none',
                         padding: '8px 12px',
                         borderRadius: '8px',
                         fontSize: '14px',
-                        fontWeight: 'bold',
+                        fontWeight: 600,
                         cursor: 'pointer'
                       }}
                     >
@@ -99,7 +99,7 @@ const ManageCoursesScreen = ({
           onClick={onCreateCourse}
           style={{
             width: '100%',
-            background: `linear-gradient(90deg, ${COLORS.blush} 0%, ${COLORS.blush}CC 100%)`,
+            background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.blush}80 100%)`,
             color: COLORS.charcoal,
             padding: '20px',
             borderRadius: '16px',

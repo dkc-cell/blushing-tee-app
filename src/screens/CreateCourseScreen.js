@@ -12,6 +12,9 @@ const CreateCourseScreen = ({
   
   const [courseName, setCourseName] = useState(initialCourse?.name || '');
   const [pars, setPars] = useState(initialCourse?.pars || {});
+   // Optional: for Unofficial Handicap tracking
+  const [courseRating, setCourseRating] = useState(initialCourse?.courseRating ?? '');
+  const [slopeRating, setSlopeRating] = useState(initialCourse?.slopeRating ?? '');
   const [yardages, setYardages] = useState(initialCourse?.yardages || {});
   const [showYardageModalForHole, setShowYardageModalForHole] = useState(null);
   const [tempYardage, setTempYardage] = useState('');
@@ -26,12 +29,38 @@ const CreateCourseScreen = ({
       alert('Please enter a course name before saving');
       return;
     }
-    onSave({
-      id: initialCourse?.id,
-      name: courseName.trim(),
-      pars,
-      yardages
-    });
+    // Normalize rating & slope values
+const ratingVal =
+  courseRating === '' ? null : Number.parseFloat(courseRating);
+
+const slopeVal =
+  slopeRating === '' ? null : Number.parseInt(slopeRating, 10);
+
+// Validate Course Rating (if entered)
+if (
+  ratingVal !== null &&
+  (Number.isNaN(ratingVal) || ratingVal < 60 || ratingVal > 85)
+) {
+  alert('Please enter a valid Course Rating (usually between 60.0 and 85.0).');
+  return;
+}
+
+// Validate Slope Rating (if entered)
+if (
+  slopeVal !== null &&
+  (Number.isNaN(slopeVal) || slopeVal < 55 || slopeVal > 155)
+) {
+  alert('Please enter a valid Slope Rating (55-155).');
+  return;
+}
+     onSave({
+  id: initialCourse?.id,
+  name: courseName.trim(),
+  pars,
+  yardages,
+  courseRating: ratingVal,
+  slopeRating: slopeVal
+});
   };
 
   const renderHoleRow = (hole) => {
@@ -110,45 +139,139 @@ const CreateCourseScreen = ({
       </div>
     );
   };
-
+ 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '120px' }}>
       {/* Header */}
-      <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 100 }}>
-        <button 
-          onClick={onBack}
-          style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}
-        >
-          ← Back
-        </button>
-        
-        <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: '0 0 16px 0' }}>
-          {isEditing ? 'Edit Course' : 'Create New Course'}
-        </h2>
-        
-        <div style={{ marginBottom: '0' }}>
-          <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}>
-            Course Name
-          </label>
-          <input
-            type="text"
-            value={courseName}
-            onChange={(e) => setCourseName(e.target.value)}
-            placeholder="e.g., Pine Valley Golf Club"
-            maxLength={50}
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '16px',
-              border: `3px solid ${COLORS.mistyBlue}`,
-              borderRadius: '12px',
-              fontFamily: 'inherit',
-              color: COLORS.charcoal
-            }}
-          />
-        </div>
+<div
+  style={{
+    backgroundColor: '#FFFFFF',
+    padding: '20px 24px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100
+  }}
+>
+  <button
+    onClick={onBack}
+    style={{
+      background: 'none',
+      border: 'none',
+      color: COLORS.darkTeal,
+      fontSize: '18px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      marginBottom: '12px'
+    }}
+  >
+    ← Back
+  </button>
+
+  <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: '0 0 16px 0' }}>
+    {isEditing ? 'Edit Course' : 'Create New Course'}
+  </h2>
+
+  {/* Course Name */}
+  <div style={{ marginBottom: '0' }}>
+    <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}>
+      Course Name
+    </label>
+    <input
+      type="text"
+      value={courseName}
+      onChange={(e) => setCourseName(e.target.value)}
+      placeholder="e.g., Pine Valley Golf Club"
+      maxLength={50}
+      style={{
+        width: '100%',
+        padding: '12px',
+        fontSize: '16px',
+        border: `3px solid ${COLORS.mistyBlue}`,
+        borderRadius: '12px',
+        fontFamily: 'inherit',
+        color: COLORS.charcoal
+      }}
+    />
+  </div>
+
+  {/* Unofficial Handicap — NOW inside the white header */}
+  <div style={{ marginTop: '14px' }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        flexWrap: 'wrap',
+        gap: '8px',
+        marginBottom: '10px'
+      }}
+    >
+      <div style={{ color: COLORS.darkTeal, fontWeight: 800, fontSize: '16px' }}>
+        Unofficial Handicap (optional)
       </div>
 
+      <div style={{ color: COLORS.charcoal, fontSize: '12px', fontWeight: 600 }}>
+        Found on scorecard
+      </div>
+    </div>
+
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+      <div>
+        <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginBottom: '6px', fontWeight: 700 }}>
+          Course Rating
+        </div>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={courseRating}
+          onChange={(e) => setCourseRating(e.target.value)}
+          placeholder="e.g. 72.3"
+          style={{
+            width: '100%',
+            padding: '12px',
+            fontSize: '16px',
+            border: `3px solid ${COLORS.mistyBlue}`,
+            borderRadius: '12px',
+            fontFamily: 'inherit',
+            color: COLORS.charcoal,
+            backgroundColor: '#FFFFFF',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+
+      <div>
+        <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginBottom: '6px', fontWeight: 700 }}>
+          Slope Rating
+        </div>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={slopeRating}
+          onChange={(e) => setSlopeRating(e.target.value)}
+          placeholder="e.g. 128"
+          style={{
+            width: '100%',
+            padding: '12px',
+            fontSize: '16px',
+            border: `3px solid ${COLORS.mistyBlue}`,
+            borderRadius: '12px',
+            fontFamily: 'inherit',
+            color: COLORS.charcoal,
+            backgroundColor: '#FFFFFF',
+            boxSizing: 'border-box'
+          }}
+        />
+      </div>
+    </div>
+
+    <div style={{ marginTop: '10px', fontSize: '12px', color: COLORS.charcoal, textAlign: 'center', lineHeight: 1.4 }}>
+      Add these if you'd like the app to track an <strong>Unofficial Handicap</strong> for personal use.
+    </div>
+  </div>
+</div>
+   
       <div style={{ padding: '24px' }}>
         {/* Tip */}
         <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.mistyBlue}33 100%)`, padding: '16px', borderRadius: '16px', marginBottom: '24px' }}>

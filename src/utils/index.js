@@ -137,10 +137,12 @@ export const exportToCSV = (rounds, startDate = null, endDate = null) => {
         hole.approaches,
         hole.chips,
         hole.putts,
-        hole.penalties.water + hole.penalties.lost + hole.penalties.ob,
-        hole.fairwayHit ? 'Yes' : 'No',
-        `"${hole.notes || ''}"`
-      ].join(','))
+        ((hole.penalties?.water ? 1 : 0) +
+         (hole.penalties?.lost ? 1 : 0) +
+         (hole.penalties?.ob ? 1 : 0)),
+        hole.par > 3 ? (hole.fairwayHit ? 'Yes' : 'No') : '',
+          `"${hole.notes || ''}"`
+      ].join(','))  
     )
   ].join('\n');
   

@@ -26,6 +26,6 @@ export const ENCOURAGING_QUOTES = [
 
 // Local storage keys
 export const STORAGE_KEYS = {
-  ROUNDS: 'blushingTeeRounds',
-  COURSES: 'blushingTeeCourses'
+  ROUNDS: 'blushingBirdieRounds',
+  COURSES: 'blushingBirdieCourses'
 };

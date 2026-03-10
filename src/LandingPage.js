@@ -17,7 +17,7 @@ export default function LandingPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: 24,
+        padding: 12,
         textAlign: "center",
         fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
       }}
@@ -30,29 +30,36 @@ export default function LandingPage() {
             width: 320,
             maxWidth: "80vw",
             height: "auto",
-            marginBottom: 18,
+            marginBottom: 0,
           }}
         />
 
-        <div style={{ color: COLORS.darkTeal, fontSize: 22, marginBottom: 10 }}>
+        <div style={{ color: COLORS.darkTeal, fontSize: 22, marginBottom: 48 }}>
           Confidence, one swing at a time.
         </div>
 
-        <div
-          style={{
-            color: COLORS.charcoal,
-            opacity: 0.85,
-            fontSize: 16,
-            lineHeight: 1.6,
-          }}
-        >
-          Progress Over Perfection.
-          <br />
-          <span style={{ color: COLORS.darkTeal, fontWeight: 700 }}>
-            Launching soon.
-          </span>
-        </div>
+      <div style={{ marginTop: '24px', color: COLORS.darkTeal }}>
+  
+  <div style={{ fontSize: '18px' }}>
+    Private · Simple · Yours
+  </div>
 
+  <p
+  style={{
+    maxWidth: '520px',
+    margin: '0 auto',
+    textAlign: 'center',
+    fontSize: '18px',
+    lineHeight: '1.6',
+    fontWeight: '400'
+  }}
+>
+  Blushing Birdie is an encouraging golf round tracker
+  <br />
+  designed especially for women golfers.
+</p>
+
+</div>
         <div
           style={{
             marginTop: 22,
@@ -64,11 +71,11 @@ export default function LandingPage() {
             borderRadius: 999,
             backgroundColor: `${COLORS.mistyBlue}33`,
             color: COLORS.darkTeal,
-            fontSize: 13,
+            fontSize: 14,
             border: `1px solid ${COLORS.mistyBlue}66`,
           }}
         >
-          No accounts • No tracking • Just you
+          Launching Soon
         </div>
       </div>
     </div>

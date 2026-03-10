@@ -243,7 +243,7 @@ useEffect(() => {
                 backgroundColor: `${COLORS.mistyBlue}4D`,
                 color: COLORS.darkTeal,
                 padding: '8px 16px',
-                borderRadius: '999px',
+                borderRadius: '12px',
                 border: 'none',
                 fontSize: '16px',
                 fontWeight: '600',
@@ -431,7 +431,7 @@ useEffect(() => {
           </div>
           <div style={{ textAlign: 'right' }}>
             {totalShots > 0 && (
-              <div style={{ backgroundColor: `${COLORS.blush}33`, padding: '12px 20px', borderRadius: '999px', marginBottom: '8px' }}>
+              <div style={{ backgroundColor: `${COLORS.blush}33`, padding: '12px 20px', borderRadius: '12px', marginBottom: '8px' }}>
                 <span style={{ color: COLORS.darkTeal, fontSize: '32px', fontWeight: 'bold' }}>{totalScore}</span>
               </div>
             )}
@@ -441,7 +441,7 @@ useEffect(() => {
                 backgroundColor: `${COLORS.mistyBlue}4D`,
                 color: COLORS.darkTeal,
                 padding: '8px 16px',
-                borderRadius: '999px',
+                borderRadius: '12px',
                 border: 'none',
                 fontSize: '16px',
                 fontWeight: '600',
