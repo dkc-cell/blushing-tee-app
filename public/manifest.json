@@ -1,0 +1,20 @@
+{
+  "name": "Blushing Birdie",
+  "short_name": "Birdie",
+  "start_url": "/?app=true",
+  "display": "standalone",
+  "background_color": "#F7F4F2",
+  "theme_color": "#103E43",
+  "icons": [
+    {
+      "src": "/Blushing-Birdie-Icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/Blushing-Birdie-Icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

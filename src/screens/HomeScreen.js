@@ -8,6 +8,16 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
   const fairwaysHit = stats?.fairwayPercentage ?? stats?.fairwaysHit ?? 0;
   const threePuttPct = stats?.threePuttPercentage ?? 0;
 
+  const screenWidth = window.innerWidth;
+
+  const brandScale = Math.max(0.78, Math.min(1, screenWidth / 430));
+
+  const titleSize = 34 * brandScale;
+  const taglineSize = 18.2 * brandScale;
+  const logoSize = 96 * brandScale;
+  const logoGap = 16 * brandScale;
+  const textSpacing = 5 * brandScale;
+
   return (
     <div
       style={{
@@ -17,6 +27,7 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
       }}
     >
  {/* Header */}
+{/* Header */}
 <div
   style={{
     background: '#FFFFFF',
@@ -29,53 +40,64 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
   <div
     style={{
       display: 'flex',
+      justifyContent: 'center',
       alignItems: 'center',
-      gap: '18px',
     }}
   >
-    {/* Logo – larger like your sample */}
-    <img
-      src={blushingBirdieLogo}
-      alt="Blushing Birdie Logo"
+    <div
       style={{
-        width: '90px',
-        height: '90px',
-        objectFit: 'contain',
+        display: 'flex',
+        alignItems: 'center',
+        gap: `${logoGap}px`,
       }}
-    />
-
-    {/* Title + Tagline */}
-    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-      {/* Title – thinner strokes, taller feel, closer to Canva */}
-      <span
+    >
+      <img
+        src={blushingBirdieLogo}
+        alt="Blushing Birdie Logo"
         style={{
-          color: COLORS.darkTeal,
-          fontSize: '30px',
-          fontFamily: '"Playfair Display SC", serif',
-          fontWeight: 500,           // thinner than 700/800
-          letterSpacing: '0.1px',    // tighter like Canva
-          transform: 'scaleY(1.00)', // makes letters visually taller
-          transformOrigin: 'bottom',
-          lineHeight: 1.05,
-          marginBottom: '2px',
+          width: `${logoSize}px`,
+          height: `${logoSize}px`,
+          objectFit: 'contain',
+          flexShrink: 0,
+        }}
+      />
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          lineHeight: 1,
         }}
       >
-        Blushing Birdie
-      </span>
+        <span
+          style={{
+            color: COLORS.darkTeal,
+            fontSize: `${titleSize}px`,
+            fontFamily: '"Playfair Display SC", serif',
+            fontWeight: 500,
+            letterSpacing: '0.15px',
+            lineHeight: 1.02,
+            marginBottom: `${textSpacing}px`,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Blushing Birdie
+        </span>
 
-      {/* Tagline – darker blush, rounded font, lowercase */}
-      <span
-        style={{
-          color: '#c07084ff',    // deeper rose
-          fontSize: '16px',
-          fontFamily: '"Quicksand", sans-serif', // your rounded substitute
-          letterSpacing: '0.4px',
-          textTransform: 'none',
-          lineHeight: 1.2,
-        }}
-      >
-        confidence, one swing at a time
-      </span>
+        <span
+          style={{
+            color: '#c07084ff',
+            fontSize: `${taglineSize}px`,
+            fontFamily: '"Quicksand", sans-serif',
+            letterSpacing: '0.2px',
+            lineHeight: 1.1,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          confidence, one swing at a time
+        </span>
+      </div>
     </div>
   </div>
 </div>
