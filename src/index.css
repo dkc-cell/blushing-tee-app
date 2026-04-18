@@ -17,3 +17,25 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/* Mobile tagline line break */
+.mobileTaglineBreak {
+  display: none;
+}
+
+.mobileTaglineSpacing {
+  display: inline;
+}
+
+@media (max-width: 768px) {
+  .mobileTaglineBreak {
+    display: inline;
+  }
+
+  .mobileTaglineSpacing {
+    display: inline-block;
+    margin-top: 6px; /* 👈 adjust this (4px–8px range) */
+  }
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

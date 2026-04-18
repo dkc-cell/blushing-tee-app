@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
 import { COLORS } from '../constants';
-import { calcStats, formatDateForDisplay, formatScoreToPar, exportToCSV, downloadCSV } from '../utils';
+import {
+  calcStats,
+  formatDateForDisplay,
+  formatScoreToPar,
+  exportToCSV,
+  downloadCSV,
+  downloadBackupJSON,
+  readBackupFile,
+} from '../utils';
 
-const StatsScreen = ({ 
-  rounds, 
+const StatsScreen = ({
+  rounds,
+  courses,
+  setRounds,
+  setCourses,
   onBack,
   onUpdateRound,
-  onDeleteRound 
+  onDeleteRound
 }) => {
   const [selectedRound, setSelectedRound] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -15,6 +26,8 @@ const StatsScreen = ({
   const [isEditingRound, setIsEditingRound] = useState(false);
   const [editRoundDate, setEditRoundDate] = useState('');
   const [editRoundCourse, setEditRoundCourse] = useState('');
+  const [editCourseRating, setEditCourseRating] = useState('');
+  const [editSlopeRating, setEditSlopeRating] = useState('');
 
   // All-time stats
 const allHoles = rounds.flatMap(r => r.holes || []);
@@ -32,38 +45,95 @@ const recentStats = calcStats(recentHoles);
 const recentRoundCount = recentRounds.length;
 
 
-  const handleExport = () => {
-    const csvContent = exportToCSV(rounds, exportStartDate || null, exportEndDate || null);
-    if (!csvContent) {
-      alert('No rounds found in the selected date range.');
-      return;
-    }
-    downloadCSV(csvContent, `blushing-birdie-stats-${new Date().toISOString().slice(0, 10)}.csv`);
-    setShowExportModal(false);
-    setExportStartDate('');
-    setExportEndDate('');
-    alert('CSV file downloaded successfully!');
+// ✅ CSV Export (existing)
+const handleExport = () => {
+  const csvContent = exportToCSV(rounds, exportStartDate || null, exportEndDate || null);
+  if (!csvContent) {
+    alert('No rounds found in the selected date range.');
+    return;
+  }
+  downloadCSV(
+    csvContent,
+    `blushing-birdie-stats-${new Date().toISOString().slice(0, 10)}.csv`
+  );
+  setShowExportModal(false);
+  setExportStartDate('');
+  setExportEndDate('');
+  alert('CSV file downloaded successfully!');
+};
+
+// ✅ Backup Export (NEW)
+const handleExportBackup = () => {
+  const backupData = {
+    app: 'Blushing Birdie',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    rounds,
+    courses,
   };
+
+  downloadBackupJSON(
+    backupData,
+    `blushing-birdie-backup-${new Date().toISOString().slice(0, 10)}.json`
+  );
+
+  alert('Backup file downloaded successfully!');
+};
+
+// ✅ Backup Import (NEW)
+const handleImportBackup = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const confirmed = window.confirm(
+    'Importing a backup will replace all current rounds and courses on this device. Do you want to continue?'
+  );
+
+  if (!confirmed) {
+    event.target.value = '';
+    return;
+  }
+
+  try {
+    const backupData = await readBackupFile(file);
+
+    setRounds(backupData.rounds);
+    setCourses(backupData.courses);
+
+    alert('Backup imported successfully!');
+  } catch (error) {
+    alert('That file could not be imported. Please choose a valid Blushing Birdie backup.');
+  }
+
+  event.target.value = '';
+};
 
   const startEditingRound = () => {
-    setEditRoundDate(selectedRound.date);
-    setEditRoundCourse(selectedRound.courseName || '');
-    setIsEditingRound(true);
+  setEditRoundDate(selectedRound.date);
+  setEditRoundCourse(selectedRound.courseName || '');
+  setEditCourseRating(selectedRound.courseRating ?? '');
+  setEditSlopeRating(selectedRound.slopeRating ?? '');
+  setIsEditingRound(true);
+};
+
+ const saveRoundMetadata = () => {
+  if (!editRoundCourse.trim()) {
+    alert('Please enter a course name');
+    return;
+  }
+
+  const updatedRound = {
+    date: editRoundDate,
+    courseName: editRoundCourse.trim(),
+    courseRating: editCourseRating === '' ? null : Number(editCourseRating),
+    slopeRating: editSlopeRating === '' ? null : Number(editSlopeRating)
   };
 
-  const saveRoundMetadata = () => {
-    if (!editRoundCourse.trim()) {
-      alert('Please enter a course name');
-      return;
-    }
-    onUpdateRound(selectedRound.id, {
-      date: editRoundDate,
-      courseName: editRoundCourse.trim()
-    });
-    setSelectedRound({ ...selectedRound, date: editRoundDate, courseName: editRoundCourse.trim() });
-    setIsEditingRound(false);
-    alert('Round updated successfully!');
-  };
+  onUpdateRound(selectedRound.id, updatedRound);
+  setSelectedRound({ ...selectedRound, ...updatedRound });
+  setIsEditingRound(false);
+  alert('Round updated successfully!');
+};
 
   const handleDeleteRound = () => {
     const dateStr = formatDateForDisplay(selectedRound.date, { month: 'long', day: 'numeric', year: 'numeric' });
@@ -75,88 +145,374 @@ const recentRoundCount = recentRounds.length;
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '80px' }}>
-      {/* Header */}
-      <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '8px' }}>← Back</button>
-        <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Your Stats</h2>
-        <p style={{ color: COLORS.charcoal, fontSize: '18px', margin: '4px 0 0 0' }}>Track your progress over time</p>
-      </div>
-      
-      <div style={{ padding: '0 24px' }}>
-        {/* Summary Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ background: `linear-gradient(135deg, ${COLORS.blush}33 0%, #FFFFFF 100%)`, borderRadius: '16px', padding: '20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '36px', fontWeight: 'bold', color: COLORS.darkTeal }}>{rounds.length}</div>
-            <div style={{ color: COLORS.charcoal, fontSize: '16px', fontWeight: '600' }}>Total Rounds</div>
+  <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '80px' }}>
+    {/* Header */}
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        padding: '20px 24px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        marginBottom: '24px',
+      }}
+    >
+      <button
+        onClick={onBack}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: COLORS.darkTeal,
+          fontSize: '18px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          marginBottom: '8px',
+        }}
+      >
+        ← Back
+      </button>
+      <h2
+        style={{
+          color: COLORS.darkTeal,
+          fontSize: '28px',
+          fontWeight: 'bold',
+          margin: 0,
+        }}
+      >
+        Your Stats
+      </h2>
+      <p
+        style={{
+          color: COLORS.charcoal,
+          fontSize: '18px',
+          margin: '4px 0 0 0',
+        }}
+      >
+        Track your progress over time
+      </p>
+    </div>
+
+    <div style={{ padding: '0 24px' }}>
+      {/* Summary Cards */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '16px',
+          marginBottom: '24px',
+        }}
+      >
+        <div
+          style={{
+            background: `linear-gradient(135deg, ${COLORS.blush}33 0%, #FFFFFF 100%)`,
+            borderRadius: '16px',
+            padding: '20px',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '36px',
+              fontWeight: 'bold',
+              color: COLORS.darkTeal,
+            }}
+          >
+            {rounds.length}
           </div>
-          <div style={{ background: `linear-gradient(135deg, ${COLORS.mistyBlue}33 0%, #FFFFFF 100%)`, borderRadius: '16px', padding: '20px', textAlign: 'center' }}>
-           <div style={{ fontSize: '36px', fontWeight: 'bold', color: COLORS.darkTeal }}>{recentRoundCount}</div>
-            <div style={{ color: COLORS.charcoal, fontSize: '16px', fontWeight: '600' }}>Rounds (Last 10)</div>
+          <div
+            style={{
+              color: COLORS.charcoal,
+              fontSize: '16px',
+              fontWeight: '600',
+            }}
+          >
+            Total Rounds
           </div>
         </div>
-        
-        {rounds.length === 0 ? (
-          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', textAlign: 'center' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏌️‍♀️</div>
-            <p style={{ color: COLORS.charcoal }}>No rounds logged yet. Start your first round to see your stats!</p>
+
+        <div
+          style={{
+            background: `linear-gradient(135deg, ${COLORS.mistyBlue}33 0%, #FFFFFF 100%)`,
+            borderRadius: '16px',
+            padding: '20px',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '36px',
+              fontWeight: 'bold',
+              color: COLORS.darkTeal,
+            }}
+          >
+            {recentRoundCount}
           </div>
-        ) : (
-          <>
-           {/* Last 10 Rounds Stats */}
-{recentStats && (
-  <StatsCard
-    title={`📊 Last ${recentRoundCount} Round${recentRoundCount === 1 ? '' : 's'}`}
-    stats={recentStats}
-  />
-)}            
-            {/* All-Time Stats */}
-            {allTimeStats && <StatsCard title="🌟 All-Time Statistics" stats={allTimeStats} totalHoles={allHoles.length} />}
-            
-            {/* Export Button */}
-            <button
-              onClick={() => setShowExportModal(true)}
-              style={{ width: '100%', backgroundColor: `${COLORS.darkTeal}D9`, color: COLORS.cream, padding: '16px', borderRadius: '12px', border: 'none', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '24px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}
-            >
-              📥 Export Data to CSV
-            </button>
-            
-            {/* Round History */}
-            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', marginBottom: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-              <h3 style={{ color: COLORS.darkTeal, fontWeight: 'bold', fontSize: '20px', marginTop: 0, marginBottom: '16px' }}>📅 Round History</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {[...rounds].reverse().map((round) => {
-                  const roundScore = round.holes.reduce((sum, h) => sum + h.total, 0);
-                  const roundPar = round.holes.reduce((sum, h) => sum + h.par, 0);
-                  
-                  return (
-                    <button
-                      key={round.id}
-                      onClick={() => setSelectedRound(round)}
-                      style={{ width: '100%', backgroundColor: COLORS.cream, border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '12px', padding: '16px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold', marginBottom: '4px' }}>
-                            {formatDateForDisplay(round.date)}
-                          </div>
-                          <div style={{ color: COLORS.charcoal, fontSize: '16px', fontWeight: '600' }}>
-                            {round.courseName || 'Unnamed Course'} • {round.holes.length} holes
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.blush }}>{roundScore}</div>
-                          <div style={{ fontSize: '14px', color: COLORS.mistyBlue }}>{formatScoreToPar(roundScore, roundPar)}</div>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </>
-        )}
+          <div
+            style={{
+              color: COLORS.charcoal,
+              fontSize: '16px',
+              fontWeight: '600',
+            }}
+          >
+            Rounds (Last 10)
+          </div>
+        </div>
       </div>
+
+      {/* Empty State OR Stats */}
+      {rounds.length === 0 ? (
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '32px',
+            textAlign: 'center',
+            marginBottom: '24px',
+          }}
+        >
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏌️‍♀️</div>
+          <p style={{ color: COLORS.charcoal }}>
+            No rounds logged yet. You can still import a backup file to restore your data.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Last 10 Rounds Stats */}
+          {recentStats && (
+            <StatsCard
+              title={`📊 Last ${recentRoundCount} Round${recentRoundCount === 1 ? '' : 's'}`}
+              stats={recentStats}
+            />
+          )}
+
+          {/* All-Time Stats */}
+          {allTimeStats && (
+            <StatsCard
+              title="🌟 All-Time Statistics"
+              stats={allTimeStats}
+              totalHoles={allHoles.length}
+            />
+          )}
+
+          {/* ⭐ Unofficial Handicap */}
+          <div
+            style={{
+              background: `linear-gradient(180deg, ${COLORS.blush}33 0%, #FFFFFF 100%)`,
+              borderRadius: '16px',
+              padding: '16px 20px',
+              marginBottom: '18px',
+              marginTop: '10px',
+              textAlign: 'center',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div
+              style={{
+                color: COLORS.charcoal,
+                fontSize: '14px',
+                fontWeight: '600',
+                marginBottom: '6px',
+              }}
+            >
+              🖤 Your Unofficial Handicap 🖤
+            </div>
+
+            <div
+              style={{
+                color: COLORS.charcoal,
+                fontSize: '24px',
+                fontWeight: 'bold',
+                lineHeight: 1.1,
+              }}
+            >
+              {allTimeStats?.unofficialHandicap ?? '—'}
+            </div>
+
+            <div
+              style={{
+                color: COLORS.darkTeal,
+                fontSize: '14px',
+                marginTop: '6px',
+                opacity: 0.85,
+              }}
+            >
+              (Based on your rounds with course rating and slope entered)
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Export / Backup Actions - ALWAYS VISIBLE */}
+     <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '12px',
+          flexWrap: 'wrap',
+          marginBottom: '24px',
+        }}
+>
+        <button
+          onClick={() => setShowExportModal(true)}
+          disabled={rounds.length === 0}
+          style={{
+            backgroundColor: '#67999eff', // softened teal
+            color: COLORS.cream,
+            padding: '12px 18px',
+            borderRadius: '16px',
+            border: 'none',
+            fontSize: '15px',
+            fontWeight: '600',
+            cursor: rounds.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: rounds.length === 0 ? 0.5 : 1,
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Export CSV
+        </button>
+
+        <button
+          onClick={handleExportBackup}
+          disabled={rounds.length === 0}
+          style={{
+            backgroundColor: rounds.length === 0 ? '#E0E4E5' : '#67999eff',
+            color: rounds.length === 0 ? '#8A9496' : COLORS.cream,
+            padding: '12px 18px',
+            borderRadius: '16px',
+            border: 'none',
+            fontSize: '15px',
+            fontWeight: '600',
+            cursor: rounds.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: rounds.length === 0 ? 0.6 : 1,
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Export Backup
+        </button>
+
+        <label
+          style={{
+            backgroundColor: '#f1d3d9ff', // softer blush
+            color: COLORS.darkTeal,
+            padding: '12px 18px',
+            borderRadius: '16px',
+            border: 'none',
+            fontSize: '15px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Import Backup
+          <input
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportBackup}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+
+      {/* Round History - ONLY WHEN ROUNDS EXIST */}
+      {rounds.length > 0 && (
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '24px',
+            marginBottom: '24px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          }}
+        >
+          <h3
+            style={{
+              color: COLORS.darkTeal,
+              fontWeight: 'bold',
+              fontSize: '20px',
+              marginTop: 0,
+              marginBottom: '16px',
+            }}
+          >
+            📅 Round History
+          </h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {[...rounds].reverse().map((round) => {
+              const roundScore = round.holes.reduce((sum, h) => sum + h.total, 0);
+              const roundPar = round.holes.reduce((sum, h) => sum + h.par, 0);
+
+              return (
+                <button
+                  key={round.id}
+                  onClick={() => setSelectedRound(round)}
+                  style={{
+                    width: '100%',
+                    backgroundColor: COLORS.cream,
+                    border: `2px solid ${COLORS.mistyBlue}`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          color: COLORS.darkTeal,
+                          fontSize: '18px',
+                          fontWeight: 'bold',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        {formatDateForDisplay(round.date)}
+                      </div>
+                      <div
+                        style={{
+                          color: COLORS.charcoal,
+                          fontSize: '16px',
+                          fontWeight: '600',
+                        }}
+                      >
+                        {round.courseName || 'Unnamed Course'} • {round.holes.length} holes
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'right' }}>
+                      <div
+                        style={{
+                          fontSize: '28px',
+                          fontWeight: 'bold',
+                          color: COLORS.blush,
+                        }}
+                      >
+                        {roundScore}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '14px',
+                          color: COLORS.mistyBlue,
+                        }}
+                      >
+                        {formatScoreToPar(roundScore, roundPar)}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
       
       {/* Round Detail Modal */}
       {selectedRound && (
@@ -165,12 +521,29 @@ const recentRoundCount = recentRounds.length;
           isEditing={isEditingRound}
           editDate={editRoundDate}
           editCourse={editRoundCourse}
+          editCourseRating={editCourseRating}
+          editSlopeRating={editSlopeRating}
           setEditDate={setEditRoundDate}
           setEditCourse={setEditRoundCourse}
-          onClose={() => { setSelectedRound(null); setIsEditingRound(false); }}
+          setEditCourseRating={setEditCourseRating}
+          setEditSlopeRating={setEditSlopeRating}
+          onClose={() => {
+              setSelectedRound(null);
+              setIsEditingRound(false);
+              setEditRoundDate('');
+              setEditRoundCourse('');
+              setEditCourseRating('');
+              setEditSlopeRating('');
+            }}
           onStartEdit={startEditingRound}
           onSaveEdit={saveRoundMetadata}
-          onCancelEdit={() => setIsEditingRound(false)}
+          onCancelEdit={() => {
+              setIsEditingRound(false);
+              setEditRoundDate('');
+              setEditRoundCourse('');
+              setEditCourseRating('');
+              setEditSlopeRating('');
+            }}
           onDelete={handleDeleteRound}
         />
       )}
@@ -221,7 +594,23 @@ const StatItem = ({ label, value, variant }) => (
   </div>
 );
 
-const RoundDetailModal = ({ round, isEditing, editDate, editCourse, setEditDate, setEditCourse, onClose, onStartEdit, onSaveEdit, onCancelEdit, onDelete }) => {
+const RoundDetailModal = ({
+  round,
+  isEditing,
+  editDate,
+  editCourse,
+  editCourseRating,
+  editSlopeRating,
+  setEditDate,
+  setEditCourse,
+  setEditCourseRating,
+  setEditSlopeRating,
+  onClose,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  onDelete
+}) => {
   const totalScore = round.holes.reduce((sum, h) => sum + h.total, 0);
   const totalPar = round.holes.reduce((sum, h) => sum + h.par, 0);
   const totalPutts = round.holes.reduce((sum, h) => sum + h.putts, 0);
@@ -229,7 +618,18 @@ const RoundDetailModal = ({ round, isEditing, editDate, editCourse, setEditDate,
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '20px', overflowY: 'auto' }} onClick={onClose}>
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ position: 'sticky', top: 0, backgroundColor: '#FFFFFF', padding: '24px', borderBottom: `2px solid ${COLORS.mistyBlue}33`, borderRadius: '24px 24px 0 0' }}>
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 5,
+            backgroundColor: '#FFFFFF',
+            padding: '24px',
+            borderBottom: `2px solid ${COLORS.mistyBlue}33`,
+            borderRadius: '24px 24px 0 0',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+          }}
+>
           <button onClick={onClose} style={{ position: 'absolute', top: '20px', right: '20px', backgroundColor: 'transparent', border: 'none', fontSize: '24px', cursor: 'pointer', color: COLORS.charcoal }}>✕</button>
           
           {!isEditing ? (
@@ -254,6 +654,50 @@ const RoundDetailModal = ({ round, isEditing, editDate, editCourse, setEditDate,
                 <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>Course Name</label>
                 <input type="text" value={editCourse} onChange={(e) => setEditCourse(e.target.value)} placeholder="Enter course name" style={{ width: '100%', padding: '10px', fontSize: '16px', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '8px', fontFamily: 'inherit' }} />
               </div>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>
+                Course Rating
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={editCourseRating}
+                  onChange={(e) => setEditCourseRating(e.target.value)}
+                  placeholder="e.g. 72.4"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    fontSize: '16px',
+                    border: `2px solid ${COLORS.mistyBlue}`,
+                    borderRadius: '8px',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>
+                    Slope Rating
+                  </label>
+                  <input
+                    type="number"
+                    value={editSlopeRating}
+                    onChange={(e) => setEditSlopeRating(e.target.value)}
+                    placeholder="e.g. 128"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      fontSize: '16px',
+                      border: `2px solid ${COLORS.mistyBlue}`,
+                      borderRadius: '8px',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                </div>
+
+                <p style={{ color: COLORS.charcoal, fontSize: '13px', marginTop: '-4px', marginBottom: '16px', lineHeight: 1.4 }}>
+                  Add these anytime to support your Unofficial Handicap.
+                </p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={onCancelEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: COLORS.cream, color: COLORS.charcoal, border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>Cancel</button>
                 <button onClick={onSaveEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: COLORS.darkTeal, color: COLORS.cream, border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>✓ Save Changes</button>

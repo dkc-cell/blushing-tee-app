@@ -85,7 +85,8 @@ export const calcOverallStats = (rounds) => {
   if (!rounds || rounds.length === 0) {
     return {
       fairwaysHit: 0,
-      threePuttPercentage: 0
+      threePuttPercentage: 0,
+      unofficialHandicap: null
     };
   }
 
@@ -95,22 +96,40 @@ export const calcOverallStats = (rounds) => {
 
   const threePuttPercentage = Math.round(calcThreePuttPercentage(allHoles));
 
+  // ⭐ Handicap calculation
+  const eligibleRounds = rounds.filter(r =>
+    r.courseRating &&
+    r.slopeRating &&
+    r.holes &&
+    r.holes.length > 0
+  );
+
+  const differentials = eligibleRounds.map(r => {
+    const score = r.holes.reduce((sum, h) => sum + (Number(h.total) || 0), 0);
+    return (score - r.courseRating) * 113 / r.slopeRating;
+  });
+
+  const unofficialHandicap = differentials.length
+    ? (differentials.reduce((a, b) => a + b, 0) / differentials.length).toFixed(1)
+    : null;
+
   return {
     fairwaysHit: fairwayHoles.length > 0
       ? Math.round((fairwaysHitCount / fairwayHoles.length) * 100)
       : 0,
-    threePuttPercentage
+    threePuttPercentage,
+    unofficialHandicap
   };
 };
 
 /**
- * Export rounds data to CSV format
+ * Export round summary data to CSV format
  */
 export const exportToCSV = (rounds, startDate = null, endDate = null) => {
   let filteredRounds = rounds;
-  
+
   if (startDate || endDate) {
-    filteredRounds = rounds.filter(r => {
+    filteredRounds = rounds.filter((r) => {
       const roundDate = new Date(r.date);
       const start = startDate ? new Date(startDate) : new Date('1900-01-01');
       const end = endDate ? new Date(endDate) : new Date('2100-12-31');
@@ -118,35 +137,137 @@ export const exportToCSV = (rounds, startDate = null, endDate = null) => {
       return roundDate >= start && roundDate <= end;
     });
   }
-  
-  if (filteredRounds.length === 0) {
+
+  if (!filteredRounds.length) {
     return null;
   }
-  
-  const csvContent = [
-    ['Date', 'Course', 'Hole', 'Par', 'Yardage', 'Score', 'Drive', 'Approaches', 'Chips', 'Putts', 'Penalties', 'Fairway Hit', 'Notes'].join(','),
-    ...filteredRounds.flatMap(round =>
-      round.holes.map(hole => [
-        round.date,
-        `"${round.courseName || 'Unnamed Course'}"`,
-        hole.hole,
-        hole.par,
-        hole.yardage,
-        hole.total,
-        hole.drive,
-        hole.approaches,
-        hole.chips,
-        hole.putts,
-        ((hole.penalties?.water ? 1 : 0) +
-         (hole.penalties?.lost ? 1 : 0) +
-         (hole.penalties?.ob ? 1 : 0)),
-        hole.par > 3 ? (hole.fairwayHit ? 'Yes' : 'No') : '',
-          `"${hole.notes || ''}"`
-      ].join(','))  
-    )
-  ].join('\n');
-  
-  return csvContent;
+
+  const escapeCSV = (value) => {
+    if (value === null || value === undefined) return '""';
+    const stringValue = String(value).replace(/"/g, '""');
+    return `"${stringValue}"`;
+  };
+
+  const getPenaltyCount = (hole) => {
+    const water = hole.penalties?.water ? 1 : 0;
+    const lost = hole.penalties?.lost ? 1 : 0;
+    const ob = hole.penalties?.ob ? 1 : 0;
+    return water + lost + ob;
+  };
+
+  const getParBucketAverage = (holes, parValue) => {
+    const matching = holes.filter((hole) => Number(hole.par) === parValue);
+    if (!matching.length) return '';
+    const total = matching.reduce((sum, hole) => sum + (Number(hole.total) || 0), 0);
+    return (total / matching.length).toFixed(2);
+  };
+
+  const rows = filteredRounds.map((round) => {
+    const holes = Array.isArray(round.holes) ? round.holes : [];
+
+    const holesPlayed = holes.length;
+
+    const totalScore = holes.reduce((sum, hole) => sum + (Number(hole.total) || 0), 0);
+    const totalPar = holes.reduce((sum, hole) => sum + (Number(hole.par) || 0), 0);
+    const scoreToPar = totalScore - totalPar;
+
+    const totalPutts = holes.reduce((sum, hole) => sum + (Number(hole.putts) || 0), 0);
+    const avgPuttsPerHole = holesPlayed ? (totalPutts / holesPlayed).toFixed(2) : '';
+
+    const fairwayOpportunities = holes.filter((hole) => Number(hole.par) > 3).length;
+    const fairwaysHit = holes.filter(
+      (hole) => Number(hole.par) > 3 && hole.fairwayHit
+    ).length;
+    const fairwayPct = fairwayOpportunities
+      ? ((fairwaysHit / fairwayOpportunities) * 100).toFixed(1)
+      : '';
+
+    const birdies = holes.filter(
+      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) === -1
+    ).length;
+
+    const pars = holes.filter(
+      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) === 0
+    ).length;
+
+    const bogeys = holes.filter(
+      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) === 1
+    ).length;
+
+    const doubleBogeyPlus = holes.filter(
+      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) >= 2
+    ).length;
+
+    const totalPenalties = holes.reduce((sum, hole) => sum + getPenaltyCount(hole), 0);
+
+    const notes = holes
+      .map((hole) => hole.notes?.trim())
+      .filter(Boolean)
+      .join(' | ');
+
+    return [
+      escapeCSV(round.date || ''),
+      escapeCSV(round.courseName || 'Unnamed Course'),
+      holesPlayed,
+
+      totalScore, 
+      totalPar,
+      scoreToPar > 0 ? `+${scoreToPar}` : scoreToPar,
+
+      totalPutts,
+      avgPuttsPerHole,
+
+      fairwaysHit,
+      fairwayOpportunities,
+      fairwayPct ? `${fairwayPct}%` : '',
+
+      birdies,
+      pars,
+      bogeys,
+      doubleBogeyPlus, // 👈 remove triple, combine into this
+
+      totalPenalties,
+
+      getParBucketAverage(holes, 3),
+      getParBucketAverage(holes, 4),
+      getParBucketAverage(holes, 5),
+
+      escapeCSV(round.unofficialHandicap ?? ''),
+      escapeCSV(notes),
+    ].join(',');
+      });
+
+  const header = [
+    'Date',
+  'Course',
+  'Holes Played',
+  'Score',
+  'Par',
+  'Score to Par',
+
+  'Putts',
+  'Avg Putts / Hole',
+
+  'Fairways Hit',
+  'Fairways Total',
+  'Fairways %',
+
+  'Birdies',
+  'Pars',
+  'Bogeys',
+  'Doubles+',
+
+  'Penalties',
+
+  'Avg Par 3',
+  'Avg Par 4',
+  'Avg Par 5',
+
+  'Unofficial Handicap',
+  'Notes',
+  ].join(',');
+
+  return [header, ...rows].join('\n');
 };
 
 /**
@@ -164,6 +285,49 @@ export const downloadCSV = (csvContent, filename) => {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };
+
+// ✅ Backup export (JSON)
+export const downloadBackupJSON = (backupData, fileName) => {
+  const blob = new Blob([JSON.stringify(backupData, null, 2)], {
+    type: 'application/json',
+  });
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
+
+// ✅ Backup import (JSON)
+export const readBackupFile = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result);
+
+        if (
+          !parsed ||
+          parsed.app !== 'Blushing Birdie' ||
+          !Array.isArray(parsed.rounds) ||
+          !Array.isArray(parsed.courses)
+        ) {
+          reject(new Error('Invalid backup file.'));
+          return;
+        }
+
+        resolve(parsed);
+      } catch (error) {
+        reject(new Error('Invalid backup file.'));
+      }
+    };
+
+    reader.onerror = () => reject(new Error('Unable to read file.'));
+    reader.readAsText(file);
+  });
 
 /**
  * Format score relative to par

@@ -63,12 +63,13 @@ export const useRounds = () => {
   }, [rounds]);
 
   return {
-    rounds,
-    addRound,
-    updateRound,
-    deleteRound,
-    getRoundById
-  };
+  rounds,
+  setRounds,
+  addRound,
+  updateRound,
+  deleteRound,
+  getRoundById
+};
 };
 
 /**

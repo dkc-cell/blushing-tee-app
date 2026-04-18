@@ -13,9 +13,9 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
   const brandScale = Math.max(0.78, Math.min(1, screenWidth / 430));
 
   const titleSize = 34 * brandScale;
-  const taglineSize = 18.2 * brandScale;
-  const logoSize = 96 * brandScale;
-  const logoGap = 16 * brandScale;
+  const taglineSize = 19 * brandScale;
+  const logoSize = 102 * brandScale;
+  const logoGap = 12 * brandScale;
   const textSpacing = 5 * brandScale;
 
   return (
@@ -90,7 +90,7 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
             color: '#c07084ff',
             fontSize: `${taglineSize}px`,
             fontFamily: '"Quicksand", sans-serif',
-            letterSpacing: '0.2px',
+            letterSpacing: '0.35 px',
             lineHeight: 1.1,
             whiteSpace: 'nowrap',
           }}
