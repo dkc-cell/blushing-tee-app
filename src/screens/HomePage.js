@@ -195,6 +195,7 @@ export default function HomePage() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const featuresScrollRef = useRef(null);
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
   const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -258,6 +259,27 @@ export default function HomePage() {
     });
   });
 }, [isMobile]);
+
+// 👇 ADD THIS HERE
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const form = e.target;
+  const data = new FormData(form);
+
+  try {
+    await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(data).toString(),
+    });
+
+    setSubmitted(true);
+    form.reset();
+  } catch (error) {
+    console.error('Form submission error:', error);
+  }
+};
 
   const featureSlides = [
   {
@@ -987,7 +1009,7 @@ const toggleItem = (id) => {
   </div>
 </section>
 
-      {/* EMAIL */}
+     {/* EMAIL */}
 <section
   style={{
     ...sectionBaseStyle,
@@ -996,46 +1018,71 @@ const toggleItem = (id) => {
 >
   <div style={{ ...cardStyle, padding: '60px 40px', textAlign: 'center' }}>
     <h3 style={{ color: COLORS.darkTeal, marginBottom: '12px' }}>
-  Stay in the Loop
-</h3>
+      Stay in the Loop
+    </h3>
+
     <p style={{ color: '#5F7C7F', marginBottom: '24px' }}>
       Journal updates, thoughtful notes, and a few lovely things along the way.
     </p>
 
-    <div
-  style={{
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '12px',
-    flexWrap: 'wrap',
-    marginTop: '10px',
-  }}
->
-  <input
-    placeholder="Enter your email"
-    style={{
-      padding: '14px 20px',
-      borderRadius: '16px',
-      border: '1px solid #ccc',
-      minWidth: '230px',   // 👈 makes it longer
-      maxWidth: '290px',
-      width: '100%',
-    }}
-  />
+    {submitted ? (
+      <p
+        style={{
+          marginTop: '10px',
+          color: COLORS.darkTeal,
+          fontSize: '0.95rem',
+          fontWeight: 500,
+        }}
+      >
+        Thank you for signing up 💕
+      </p>
+    ) : (
+      <form
+        name="email-signup"
+        method="POST"
+        data-netlify="true"
+        onSubmit={handleSubmit}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '12px',
+          flexWrap: 'wrap',
+          marginTop: '10px',
+        }}
+      >
+        <input type="hidden" name="form-name" value="email-signup" />
 
-  <button
-    style={{
-      padding: '14px 26px',
-      borderRadius: '16px',
-      background: COLORS.darkTeal,
-      color: COLORS.cream,
-      border: '1px solid rgba(0,0,0,0.15)',
-      fontWeight: 600,
-    }}
-  >
-    Sign Up
-  </button>
-</div>
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="Enter your email"
+          style={{
+            padding: '14px 20px',
+            borderRadius: '16px',
+            border: '1px solid #ccc',
+            minWidth: '230px',
+            maxWidth: '290px',
+            width: '100%',
+          }}
+        />
+
+        <button
+          type="submit"
+          style={{
+            padding: '14px 26px',
+            borderRadius: '16px',
+            background: COLORS.darkTeal,
+            color: COLORS.cream,
+            border: '1px solid rgba(0,0,0,0.15)',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          Sign Up
+        </button>
+      </form>
+    )}
   </div>
 </section>
 
