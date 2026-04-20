@@ -1,35 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-   <meta charset="utf-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#103E43" />
-    <meta name="description" content="Track your golf rounds with The Blushing Birdie" />
+    <meta
+      name="description"
+      content="Track your golf rounds with The Blushing Birdie"
+    />
     <title>The Blushing Birdie Golf Tracker</title>
-   
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&display=swap" rel="stylesheet">
-   
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/Blushing-Birdie-Icon.png" />
-  
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2WEVXX0QDZ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag() {
+        dataLayer.push(arguments);
+      }
       gtag('js', new Date());
-
       gtag('config', 'G-2WEVXX0QDZ');
     </script>
-   </head>
-   
+  </head>
+
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+
+    <form name="email-signup" data-netlify="true" netlify hidden>
+      <input type="hidden" name="form-name" value="email-signup" />
+      <input type="email" name="email" />
+    </form>
   </body>
-  <form name="email-signup" data-netlify="true" netlify hidden>
-  <input type="hidden" name="form-name" value="email-signup" />
-  <input type="email" name="email" />
-</form>
 </html>

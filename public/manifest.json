@@ -1,7 +1,9 @@
 {
   "name": "Blushing Birdie",
   "short_name": "Birdie",
-  "start_url": "/?app=true",
+  "id": "/app",
+  "start_url": "/app",
+  "scope": "/app",
   "display": "standalone",
   "background_color": "#F7F4F2",
   "theme_color": "#103E43",
