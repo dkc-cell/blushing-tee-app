@@ -64,6 +64,7 @@ export default function AccountBackupScreen({
 
   const localRoundCount = rounds.length;
   const localCourseCount = courses.length;
+  const hasLocalData = localRoundCount > 0 || localCourseCount > 0;
 
   useEffect(() => {
     if (!user) return;
@@ -417,21 +418,31 @@ export default function AccountBackupScreen({
                 {user.email}
               </p>
               <p style={{ color: '#5f6f73', lineHeight: 1.6, margin: '0 0 18px' }}>
-                Cloud backup is optional. Your local data stays on this device unless you back it up.
+                {hasLocalData
+                  ? 'Cloud backup is optional. Your local data stays on this device unless you back it up.'
+                  : 'Your account is ready. Record a round or save a course, then come back here to back it up.'}
               </p>
               <button
                 type="button"
                 onClick={handleBackupLocalData}
-                disabled={backupLoading || restoreLoading || submitting}
+                disabled={!hasLocalData || backupLoading || restoreLoading || submitting}
                 style={{
                   ...buttonBaseStyle,
                   backgroundColor: COLORS.darkTeal,
                   color: COLORS.cream,
-                  opacity: backupLoading || restoreLoading || submitting ? 0.65 : 1,
+                  cursor:
+                    !hasLocalData || backupLoading || restoreLoading || submitting
+                      ? 'default'
+                      : 'pointer',
+                  opacity: !hasLocalData || backupLoading || restoreLoading || submitting ? 0.65 : 1,
                   marginBottom: '10px',
                 }}
               >
-                {backupLoading ? 'Backing Up...' : 'Back Up Local Data'}
+                {backupLoading
+                  ? 'Backing Up...'
+                  : hasLocalData
+                  ? 'Back Up Local Data'
+                  : 'No Local Data to Back Up Yet'}
               </button>
               <button
                 type="button"
