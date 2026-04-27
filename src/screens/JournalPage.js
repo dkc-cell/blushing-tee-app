@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { journalArticles } from '../data/journalArticles';
 import { COLORS } from '../constants';
@@ -7,6 +7,16 @@ export default function JournalPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Topics');
   const [sortOrder, setSortOrder] = useState('newest');
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  );
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const categories = [
     'All Topics',
@@ -104,7 +114,7 @@ export default function JournalPage() {
         {/* SEARCH + FILTER */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1.5fr 1fr 1fr',
+          gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr 1fr',
           gap: '14px',
           marginBottom: '34px',
         }}>

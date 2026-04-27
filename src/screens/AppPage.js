@@ -9,9 +9,11 @@ import {
   ManageCoursesScreen,
   CreateCourseScreen,
   ShopScreen,
-  AboutScreen
+  AboutScreen,
+  AccountBackupScreen
 } from './index';
 import { useRounds, useCourses } from '../hooks';
+import { useAuth } from '../hooks/useAuth';
 import { calcOverallStats, getLocalDateString } from '../utils';
 
 export default function AppPage() {
@@ -24,6 +26,7 @@ export default function AppPage() {
   // Data hooks with localStorage persistence
   const { rounds, setRounds, addRound, updateRound, deleteRound } = useRounds();
   const { courses, setCourses, addCourse, updateCourse, deleteCourse, getCourseByName } = useCourses();
+  const auth = useAuth();
   
   // Current round state
   const [currentHole, setCurrentHole] = useState(1);
@@ -42,6 +45,13 @@ export default function AppPage() {
     const timer = setTimeout(() => setShowSplash(false), 4000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!auth.isPasswordRecovery) return;
+
+    setShowSplash(false);
+    setCurrentScreen('accountBackup');
+  }, [auth.isPasswordRecovery]);
 
   // Calculate overall stats for home screen
   const stats = calcOverallStats(rounds);
@@ -293,6 +303,24 @@ const handleSaveReflection = (roundId, reflection) => {
     case 'shop':
       return (
         <ShopScreen
+          onBack={() => setCurrentScreen('home')}
+        />
+      );
+
+    case 'accountBackup':
+      return (
+        <AccountBackupScreen
+          user={auth.user}
+          authLoading={auth.loading}
+          isSupabaseConfigured={auth.isConfigured}
+          isPasswordRecovery={auth.isPasswordRecovery}
+          onPasswordRecoveryComplete={auth.clearPasswordRecovery}
+          rounds={rounds}
+          courses={courses}
+          onRestoreData={({ rounds: restoredRounds, courses: restoredCourses }) => {
+            setRounds(restoredRounds);
+            setCourses(restoredCourses);
+          }}
           onBack={() => setCurrentScreen('home')}
         />
       );

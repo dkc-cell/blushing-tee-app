@@ -7,3 +7,4 @@ export { default as ManageCoursesScreen } from './ManageCoursesScreen';
 export { default as CreateCourseScreen } from './CreateCourseScreen';
 export { default as ShopScreen } from './ShopScreen';
 export { default as AboutScreen } from './AboutScreen';
+export { default as AccountBackupScreen } from './AccountBackupScreen';

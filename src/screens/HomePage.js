@@ -28,6 +28,12 @@ const mobileNavLinkStyle = {
   fontSize: '1rem',
   fontWeight: 600,
 };
+const footerLinkStyle = {
+  color: COLORS.darkTeal,
+  textDecoration: 'none',
+  fontSize: '1.06rem',
+  fontWeight: 600,
+};
 const sectionTitleStyle = {
   fontSize: '2rem',
   fontWeight: 700,
@@ -192,13 +198,15 @@ const sectionStyle = {
 
 export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+  );
   const featuresScrollRef = useRef(null);
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-  const handleResize = () => setIsMobile(window.innerWidth < 768);
+  const handleResize = () => setIsMobile(window.innerWidth <= 768);
   window.addEventListener('resize', handleResize);
 
   return () => window.removeEventListener('resize', handleResize);
@@ -268,11 +276,15 @@ const handleSubmit = async (e) => {
   const data = new FormData(form);
 
   try {
-    await fetch('/', {
+    const response = await fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(data).toString(),
     });
+
+    if (!response.ok) {
+      throw new Error(`Signup failed with status ${response.status}`);
+    }
 
     setSubmitted(true);
     form.reset();
@@ -599,7 +611,7 @@ const toggleItem = (id) => {
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '80px'}}>
           <Link
-            to="/App"
+            to="/app"
             style={{
               background: COLORS.darkTeal,
               color: COLORS.cream,
@@ -1011,6 +1023,7 @@ const toggleItem = (id) => {
 
      {/* EMAIL */}
 <section
+  id="contact"
   style={{
     ...sectionBaseStyle,
     paddingBottom: '80px',
@@ -1086,15 +1099,96 @@ const toggleItem = (id) => {
   </div>
 </section>
 
+{/* FINAL CTA */}
+<section
+  style={{
+    padding: '80px 20px',
+    textAlign: 'center',
+  }}
+>
+  <h2
+    style={{
+      fontSize: isMobile ? '28px' : '34px',
+      color: COLORS.darkTeal,
+      marginBottom: '16px',
+      lineHeight: 1.2,
+    }}
+  >
+    Ready to see your game differently?
+  </h2>
+
+  <p
+    style={{
+      maxWidth: '520px',
+      margin: '0 auto 28px',
+      color: COLORS.charcoal,
+      lineHeight: 1.6,
+    }}
+  >
+    No pressure. No accounts. Just your game.
+  </p>
+
+  <a
+    href="/app"
+    onClick={() => {
+      if (window.gtag) {
+        window.gtag('event', 'bottom_try_app_click');
+      }
+    }}
+    style={{
+      display: 'inline-block',
+      backgroundColor: COLORS.darkTeal,
+      color: COLORS.cream,
+      padding: '16px 28px',
+      borderRadius: '999px',
+      textDecoration: 'none',
+      fontWeight: 600,
+      fontSize: '16px',
+    }}
+  >
+    Try the App
+  </a>
+</section>
+
      {/* FOOTER */}
 <footer
   style={{
     textAlign: 'center',
-    paddingTop: '10px',
-    paddingBottom: '30px',
+    paddingTop: '14px',
+    paddingBottom: '36px',
     color: '#5F7C7F',
   }}
 >
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '10px',
+      flexWrap: 'wrap',
+      marginBottom: '22px',
+    }}
+  >
+    <Link to="/app" style={footerLinkStyle}>
+      Try the App
+    </Link>
+    <span>•</span>
+    <Link to="/journal" style={footerLinkStyle}>
+      Journal
+    </Link>
+    <span>•</span>
+    <Link to="/our-story" style={footerLinkStyle}>
+      Our Story
+    </Link>
+    <span>•</span>
+    <Link to="/privacy" style={footerLinkStyle}>
+      Privacy
+    </Link>
+    <span>•</span>
+    <a href="#contact" style={footerLinkStyle}>
+      Contact
+    </a>
+  </div>
   © 2026 Blushing Birdie
 </footer>
     </div>

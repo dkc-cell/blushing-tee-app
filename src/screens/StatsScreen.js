@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { COLORS } from '../constants';
 import {
   calcStats,
+  calcOverallStats,
   formatDateForDisplay,
   formatScoreToPar,
   exportToCSV,
@@ -32,6 +33,7 @@ const StatsScreen = ({
   // All-time stats
 const allHoles = rounds.flatMap(r => r.holes || []);
 const allTimeStats = calcStats(allHoles);
+const overallStats = calcOverallStats(rounds);
 
 // Recent stats (Last 10 logged rounds, including partial rounds)
 const sortedRounds = [...rounds]
@@ -122,11 +124,32 @@ const handleImportBackup = async (event) => {
     return;
   }
 
+  const courseRating =
+    editCourseRating === '' ? null : Number.parseFloat(editCourseRating);
+  const slopeRating =
+    editSlopeRating === '' ? null : Number.parseInt(editSlopeRating, 10);
+
+  if (
+    courseRating !== null &&
+    (Number.isNaN(courseRating) || courseRating < 60 || courseRating > 85)
+  ) {
+    alert('Please enter a valid Course Rating (usually between 60.0 and 85.0).');
+    return;
+  }
+
+  if (
+    slopeRating !== null &&
+    (Number.isNaN(slopeRating) || slopeRating < 55 || slopeRating > 155)
+  ) {
+    alert('Please enter a valid Slope Rating (55-155).');
+    return;
+  }
+
   const updatedRound = {
     date: editRoundDate,
     courseName: editRoundCourse.trim(),
-    courseRating: editCourseRating === '' ? null : Number(editCourseRating),
-    slopeRating: editSlopeRating === '' ? null : Number(editSlopeRating)
+    courseRating,
+    slopeRating
   };
 
   onUpdateRound(selectedRound.id, updatedRound);
@@ -324,7 +347,7 @@ const handleImportBackup = async (event) => {
                 lineHeight: 1.1,
               }}
             >
-              {allTimeStats?.unofficialHandicap ?? '—'}
+              {overallStats?.unofficialHandicap ?? '—'}
             </div>
 
             <div

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Heart, Flag, ChevronRight, BarChart3, BookOpen, Gem } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Heart, Flag, ChevronRight, BarChart3, BookOpen, Gem, Cloud } from 'lucide-react';
 import { COLORS } from '../constants';
 import blushingBirdieLogo from '../assets/images/Blushing_Birdie_Logo.png';
 
@@ -8,7 +8,16 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
   const fairwaysHit = stats?.fairwayPercentage ?? stats?.fairwaysHit ?? 0;
   const threePuttPct = stats?.threePuttPercentage ?? 0;
 
-  const screenWidth = window.innerWidth;
+  const [screenWidth, setScreenWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 430
+  );
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const brandScale = Math.max(0.78, Math.min(1, screenWidth / 430));
 
@@ -240,6 +249,18 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
           />
 
           <MenuButton
+            onClick={() => onNavigate('accountBackup')}
+            icon={
+              <Cloud
+                style={{ width: '28px', height: '28px', color: COLORS.darkTeal }}
+              />
+            }
+            title="Account & Backup"
+            subtitle="Optional cloud backup"
+            variant="account"
+          />
+
+          <MenuButton
             onClick={() => onNavigate('about')}
             icon={
               <BookOpen
@@ -276,6 +297,10 @@ const MenuButton = ({ onClick, icon, title, subtitle, primary, variant }) => {
   if (variant === 'shop') {
     // Shop – cream → two blush
     return `linear-gradient(90deg, ${COLORS.cream} 0%, ${COLORS.twoblush} 100%)`;
+  }
+
+  if (variant === 'account') {
+    return `linear-gradient(90deg, ${COLORS.cream} 0%, ${COLORS.mistyBlue} 100%)`;
   }
 
   if (variant === 'about') {

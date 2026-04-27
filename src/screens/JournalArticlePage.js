@@ -98,8 +98,8 @@ export default function JournalArticlePage() {
        <article
   style={{
     background: '#ffffff',
-    borderRadius: window.innerWidth <= 768 ? '24px' : '32px',
-    padding: window.innerWidth <= 768 ? '30px 22px' : '52px 44px',
+    borderRadius: 'clamp(24px, 4vw, 32px)',
+    padding: 'clamp(30px, 6vw, 52px) clamp(22px, 5vw, 44px)',
     border: '1px solid #dbe4e5',
     boxShadow: '0 14px 36px rgba(16, 62, 67, 0.06)',
   }}
@@ -170,11 +170,52 @@ export default function JournalArticlePage() {
     }}
   >
     {article.content.map((paragraph, index) => {
+      const isStoryQuote =
+        article.slug === 'my-story' &&
+        paragraph ===
+          'After a period away from golf, following an unexpected setback, returning to the game reminded me that confidence often comes back quietly — one small step at a time. Sometimes progress is not dramatic. Sometimes it is simply showing up again.';
+
+      const isArticleTagline = index === article.content.length - 1;
+
       const isSectionHeading =
         paragraph.length < 42 &&
         !paragraph.includes('.') &&
         !paragraph.includes('?') &&
         !paragraph.includes('!');
+
+      if (isStoryQuote) {
+        return (
+          <p
+            key={index}
+            style={{
+              margin: '10px 0 28px',
+              paddingLeft: '24px',
+              borderLeft: `3px solid ${COLORS.blush}`,
+              fontStyle: 'italic',
+              color: '#587072',
+            }}
+          >
+            {paragraph}
+          </p>
+        );
+      }
+
+      if (isArticleTagline) {
+        return (
+          <p
+            key={index}
+            style={{
+              margin: '10px 0 0',
+              color: COLORS.darkTeal,
+              fontWeight: 700,
+              fontSize: '1.14rem',
+              letterSpacing: '0.01em',
+            }}
+          >
+            {paragraph}
+          </p>
+        );
+      }
 
       if (isSectionHeading) {
         return (

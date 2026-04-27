@@ -37,6 +37,66 @@ const calcThreePuttPercentage = (holes = []) => {
   return (threePuttHoles / holesWithPutts.length) * 100;
 };
 
+const hasRatingAndSlope = (round) => {
+  const courseRating = Number(round?.courseRating);
+  const slopeRating = Number(round?.slopeRating);
+
+  return (
+    Number.isFinite(courseRating) &&
+    Number.isFinite(slopeRating) &&
+    courseRating > 0 &&
+    slopeRating > 0
+  );
+};
+
+const calcRoundScore = (round) =>
+  (round?.holes || []).reduce((sum, h) => sum + (Number(h.total) || 0), 0);
+
+const calcHandicapDifferential = (score, courseRating, slopeRating) =>
+  ((score - courseRating) * 113) / slopeRating;
+
+export const calcUnofficialHandicap = (rounds = []) => {
+  const ratedRounds = rounds.filter((round) => hasRatingAndSlope(round));
+
+  const fullRounds = ratedRounds.filter((round) => round.holes?.length === 18);
+  const nineHoleRounds = ratedRounds.filter((round) => round.holes?.length === 9);
+
+  if (fullRounds.length < 3 && nineHoleRounds.length < 6) {
+    return null;
+  }
+
+  const fullRoundDifferentials =
+    fullRounds.length >= 3
+      ? fullRounds.map((round) =>
+          calcHandicapDifferential(
+            calcRoundScore(round),
+            Number(round.courseRating),
+            Number(round.slopeRating)
+          )
+        )
+      : [];
+
+  const nineHoleDifferentials =
+    nineHoleRounds.length >= 6
+      ? nineHoleRounds.map((round) =>
+          calcHandicapDifferential(
+            calcRoundScore(round) * 2,
+            Number(round.courseRating),
+            Number(round.slopeRating)
+          )
+        )
+      : [];
+
+  const differentials = [...fullRoundDifferentials, ...nineHoleDifferentials];
+
+  if (!differentials.length) return null;
+
+  return (
+    differentials.reduce((sum, differential) => sum + differential, 0) /
+    differentials.length
+  ).toFixed(1);
+};
+
 /**
  * Calculate statistics from an array of holes
  */
@@ -96,29 +156,12 @@ export const calcOverallStats = (rounds) => {
 
   const threePuttPercentage = Math.round(calcThreePuttPercentage(allHoles));
 
-  // ⭐ Handicap calculation
-  const eligibleRounds = rounds.filter(r =>
-    r.courseRating &&
-    r.slopeRating &&
-    r.holes &&
-    r.holes.length > 0
-  );
-
-  const differentials = eligibleRounds.map(r => {
-    const score = r.holes.reduce((sum, h) => sum + (Number(h.total) || 0), 0);
-    return (score - r.courseRating) * 113 / r.slopeRating;
-  });
-
-  const unofficialHandicap = differentials.length
-    ? (differentials.reduce((a, b) => a + b, 0) / differentials.length).toFixed(1)
-    : null;
-
   return {
     fairwaysHit: fairwayHoles.length > 0
       ? Math.round((fairwaysHitCount / fairwayHoles.length) * 100)
       : 0,
     threePuttPercentage,
-    unofficialHandicap
+    unofficialHandicap: calcUnofficialHandicap(rounds)
   };
 };
 
