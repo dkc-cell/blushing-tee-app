@@ -2,8 +2,36 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { journalArticles } from '../data/journalArticles';
 import { COLORS } from '../constants';
+import { absoluteUrl, organizationSchema, usePageSeo } from '../utils/seo';
 
 export default function JournalPage() {
+  usePageSeo({
+    title: 'The Birdie Journal - Women Golf Encouragement',
+    description:
+      'The Blushing Birdie Journal shares thoughtful golf encouragement, simple mindset notes, and everyday reflections for women golfers.',
+    path: '/journal',
+    structuredData: [
+      organizationSchema,
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Blog',
+        '@id': `${absoluteUrl('/journal')}#blog`,
+        name: 'The Birdie Journal by Blushing Birdie',
+        url: absoluteUrl('/journal'),
+        description:
+          'Golf mindset, confidence, and encouragement articles from Blushing Birdie for women golfers.',
+        publisher: { '@id': `${absoluteUrl('/')}#organization` },
+        blogPost: journalArticles.map((article) => ({
+          '@type': 'BlogPosting',
+          headline: article.title,
+          description: article.excerpt,
+          datePublished: article.date,
+          url: absoluteUrl(`/journal/${article.slug}`),
+        })),
+      },
+    ],
+  });
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Topics');
   const [sortOrder, setSortOrder] = useState('newest');

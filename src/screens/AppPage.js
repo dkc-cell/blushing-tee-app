@@ -27,8 +27,17 @@ import {
   syncRoundToCloud,
   syncRoundsToCloud,
 } from '../services/accountSyncService';
+import { usePageSeo } from '../utils/seo';
 
 export default function AppPage() {
+  usePageSeo({
+    title: 'Blushing Birdie App',
+    description:
+      'Open the Blushing Birdie private golf round tracker and scorecard app.',
+    path: '/app',
+    robots: 'noindex,nofollow',
+  });
+
   // Splash screen
   const [showSplash, setShowSplash] = useState(true);
   

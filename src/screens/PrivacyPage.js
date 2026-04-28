@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { COLORS } from '../constants';
 import logo from '../assets/images/Blushing_Birdie_Logo.png';
+import { usePageSeo } from '../utils/seo';
 
 const pageWidth = {
   width: '100%',
@@ -19,6 +20,13 @@ const cardStyle = {
 };
 
 export default function PrivacyPage() {
+  usePageSeo({
+    title: 'Privacy and Data - Blushing Birdie',
+    description:
+      'How Blushing Birdie handles golf round data, local storage, optional account sync, and email signup information.',
+    path: '/privacy',
+  });
+
   return (
     <div
       style={{

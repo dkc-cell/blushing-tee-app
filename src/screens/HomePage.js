@@ -7,6 +7,13 @@ import screenHome from '../assets/images/screenHome.png';
 import screenHole1 from '../assets/images/screenHole1.png';
 import screenStats from '../assets/images/screenStats.png';
 import screenExport from '../assets/images/screenExport.png';
+import {
+  DEFAULT_DESCRIPTION,
+  organizationSchema,
+  softwareApplicationSchema,
+  usePageSeo,
+  websiteSchema,
+} from '../utils/seo';
 
 const sectionWidth = {
   width: '100%',
@@ -197,6 +204,47 @@ const sectionStyle = {
 };
 
 export default function HomePage() {
+  usePageSeo({
+    title: 'Blushing Birdie Golf Tracker for Women',
+    description: DEFAULT_DESCRIPTION,
+    path: '/',
+    structuredData: [
+      organizationSchema,
+      websiteSchema,
+      softwareApplicationSchema,
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'Is Blushing Birdie free?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Blushing Birdie is free to use, with no subscriptions or hidden fees for the core golf round tracker.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Who is Blushing Birdie designed for?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Blushing Birdie is designed for women golfers and everyday recreational golfers who want simple, private, encouraging golf progress tracking.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Where is Blushing Birdie data stored?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Rounds and stats are stored locally on your device by default. Optional account sync is only used if you choose to sign in.',
+            },
+          },
+        ],
+      },
+    ],
+  });
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.innerWidth <= 768 : false
@@ -575,12 +623,12 @@ const toggleItem = (id) => {
   }}
 >
  <>
-  confidence,
+  Confidence,
   <span className="mobileTaglineBreak">
     <br />
   </span>
   <span className="mobileTaglineSpacing">
-    one swing at a time
+    one swing at a time.
   </span>
 </>
 </div>
@@ -592,7 +640,7 @@ const toggleItem = (id) => {
             marginBottom: '18px',
           }}
         >
-          A simple, private golf app designed to feel easy to use.
+          A simple, private golf tracker for women.
         </h1>
 
         <p
@@ -604,9 +652,9 @@ const toggleItem = (id) => {
             color: '#35565A',
           }}
         >
-          Track your rounds, reflect on your progress, and enjoy the game
-          without pressure. Everything stays on your device — simple,
-          personal, and completely yours.
+          Blushing Birdie helps you track your rounds, reflect on your
+          progress, and enjoy the game without pressure. Everything stays on
+          your device — simple, personal, and completely yours.
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '80px'}}>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { COLORS } from '../constants';
 import logo from '../assets/images/Blushing_Birdie_Logo.png';
 import { journalArticles } from '../data/journalArticles';
+import { absoluteUrl, organizationSchema, usePageSeo } from '../utils/seo';
 
 const pageWidth = {
   width: '100%',
@@ -22,6 +23,27 @@ const cardStyle = {
 export default function OurStoryPage() {
   const storyArticle = journalArticles.find((article) => article.slug === 'my-story');
   const storyContent = storyArticle?.content ?? [];
+
+  usePageSeo({
+    title: 'Our Story - Blushing Birdie Golf Tracker',
+    description:
+      'Learn why Blushing Birdie was created as a calmer, simpler, more encouraging golf round tracker for women golfers.',
+    path: '/our-story',
+    structuredData: [
+      organizationSchema,
+      {
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        '@id': `${absoluteUrl('/our-story')}#about`,
+        name: 'Our Story - Blushing Birdie',
+        url: absoluteUrl('/our-story'),
+        description:
+          'The story behind Blushing Birdie, a simple and encouraging golf app for women golfers.',
+        isPartOf: { '@id': `${absoluteUrl('/')}#website` },
+        about: { '@id': `${absoluteUrl('/')}#organization` },
+      },
+    ],
+  });
 
   return (
     <div

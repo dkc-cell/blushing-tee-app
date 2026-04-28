@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { journalArticles } from '../data/journalArticles';
 import { COLORS } from '../constants';
+import { absoluteUrl, organizationSchema, usePageSeo } from '../utils/seo';
 
 export default function JournalArticlePage() {
   const { slug } = useParams();
@@ -12,6 +13,45 @@ export default function JournalArticlePage() {
   }, []);
 
   const article = journalArticles.find((item) => item.slug === slug);
+
+  usePageSeo({
+    title: article
+      ? `${article.title} - Blushing Birdie Journal`
+      : 'Article Not Found - Blushing Birdie Journal',
+    description:
+      article?.excerpt ??
+      'This Blushing Birdie Journal article could not be found.',
+    path: article ? `/journal/${article.slug}` : '/journal',
+    type: 'article',
+    robots: article ? 'index,follow' : 'noindex,follow',
+    structuredData: article
+      ? [
+          organizationSchema,
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            '@id': `${absoluteUrl(`/journal/${article.slug}`)}#article`,
+            headline: article.title,
+            description: article.excerpt,
+            datePublished: article.date,
+            dateModified: article.date,
+            author: {
+              '@type': 'Organization',
+              name: 'Blushing Birdie',
+            },
+            publisher: { '@id': `${absoluteUrl('/')}#organization` },
+            mainEntityOfPage: absoluteUrl(`/journal/${article.slug}`),
+            articleSection: article.category,
+            about: [
+              'women golfers',
+              'golf confidence',
+              'golf mindset',
+              'Blushing Birdie golf tracker',
+            ],
+          },
+        ]
+      : [organizationSchema],
+  });
 
   const relatedArticles = journalArticles
     .filter((item) => item.slug !== slug)
