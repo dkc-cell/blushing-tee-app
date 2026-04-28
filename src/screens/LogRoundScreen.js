@@ -128,6 +128,8 @@ useEffect(() => {
   const getCurrentPar = () => customPars[currentHole] || null;
   const getCurrentYardage = () => customYardages[currentHole] || null;
   const needsHoleSetup = () => getCurrentPar() === null || getCurrentYardage() === null;
+  const holesLogged = recordedHoles.size;
+  const isFinalHole = currentHole === 18;
 
   const totalShots = (drive ? 1 : 0) + approaches + chips + putts;
   const totalScore = totalShots; // penalties are reminders only
@@ -219,6 +221,23 @@ useEffect(() => {
     }
   };
 
+  const handleEndRoundEarly = () => {
+    if (holesLogged === 0) {
+      alert('Please log at least one hole before ending the round.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `End this round now? You have logged ${holesLogged} hole${
+        holesLogged === 1 ? '' : 's'
+      }. Unplayed holes will not be included in your stats.`
+    );
+
+    if (confirmed) {
+      onCompleteRound(null);
+    }
+  };
+
   // SETUP MODE - Show when par/yardage not set
   if (needsHoleSetup() && !isHoleRecorded) {
     return (
@@ -238,7 +257,7 @@ useEffect(() => {
               <p style={{ color: COLORS.mistyBlue, fontSize: '16px', margin: '4px 0 0 0' }}>Set up this hole</p>
             </div>
             <button
-              onClick={() => onCompleteRound(null)}
+              onClick={handleEndRoundEarly}
               style={{
                 backgroundColor: `${COLORS.mistyBlue}4D`,
                 color: COLORS.darkTeal,
@@ -436,7 +455,7 @@ useEffect(() => {
               </div>
             )}
             <button
-              onClick={() => onCompleteRound(null)}
+              onClick={handleEndRoundEarly}
               style={{
                 backgroundColor: `${COLORS.mistyBlue}4D`,
                 color: COLORS.darkTeal,
@@ -628,7 +647,13 @@ useEffect(() => {
           }}
         >
           <CheckCircle2 style={{ width: '28px', height: '28px' }} />
-          {(isHoleRecorded && !editingHole) ? 'Hole Recorded' : editingHole ? 'Update Hole' : 'Record Hole & Continue'}
+          {(isHoleRecorded && !editingHole)
+            ? 'Hole Recorded'
+            : editingHole
+            ? 'Update Hole'
+            : isFinalHole
+            ? 'Complete Round'
+            : 'Record Hole & Continue'}
         </button>
       </div>
 

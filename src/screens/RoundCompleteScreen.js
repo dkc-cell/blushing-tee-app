@@ -21,6 +21,7 @@ const RoundCompleteScreen = ({
   const totalScore = currentRound.reduce((sum, hole) => sum + hole.total, 0);
   const totalPar = currentRound.reduce((sum, hole) => sum + hole.par, 0);
   const holesPlayed = currentRound.length;
+  const isFullRound = holesPlayed === 18;
   const scoreToPar = totalScore - totalPar;
   const fairwaysHit = currentRound.filter(h => h.fairwayHit && h.par > 3).length;
   const possibleFairways = currentRound.filter(h => h.par > 3).length;
@@ -58,9 +59,17 @@ const RoundCompleteScreen = ({
     <div style={{ minHeight: '100vh', background: `linear-gradient(135deg, ${COLORS.blush}33 0%, ${COLORS.cream} 50%, ${COLORS.mistyBlue}33 100%)`, padding: '32px 24px 80px 24px' }}>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <div style={{ fontSize: '64px', marginBottom: '16px' }}>🎉</div>
-        <h1 style={{ color: COLORS.darkTeal, fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>Round Complete!</h1>
-        <p style={{ color: COLORS.mistyBlue, fontSize: '20px', margin: 0 }}>You played {holesPlayed} hole{holesPlayed > 1 ? 's' : ''} beautifully</p>
+        <div style={{ fontSize: '64px', marginBottom: '16px' }}>
+          {isFullRound ? '🎉' : '⛳'}
+        </div>
+        <h1 style={{ color: COLORS.darkTeal, fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>
+          {isFullRound ? 'Round Complete!' : 'Round Saved'}
+        </h1>
+        <p style={{ color: COLORS.mistyBlue, fontSize: '20px', margin: 0 }}>
+          {isFullRound
+            ? 'You completed all 18 holes.'
+            : `You saved a ${holesPlayed}-hole round.`}
+        </p>
       </div>
 
       {/* Score Card */}
