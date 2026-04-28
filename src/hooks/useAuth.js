@@ -21,6 +21,8 @@ export const useAuth = () => {
       urlParams.get('type') === 'recovery' ||
       hashParams.get('type') === 'recovery';
     const authCode = urlParams.get('code');
+    const hashAccessToken = hashParams.get('access_token');
+    const hashRefreshToken = hashParams.get('refresh_token');
 
     if (isRecoveryUrl) {
       setIsPasswordRecovery(true);
@@ -30,6 +32,11 @@ export const useAuth = () => {
       try {
         if (authCode) {
           await supabase.auth.exchangeCodeForSession(authCode);
+        } else if (hashAccessToken && hashRefreshToken) {
+          await supabase.auth.setSession({
+            access_token: hashAccessToken,
+            refresh_token: hashRefreshToken,
+          });
         }
 
         const { data } = await supabase.auth.getSession();

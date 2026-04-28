@@ -41,6 +41,26 @@ const getFriendlyBackupError = (backupError) => {
   return message || 'Unable to back up your local data. Please try again.';
 };
 
+const getRecoverySession = async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const authCode = urlParams.get('code');
+  const hashAccessToken = hashParams.get('access_token');
+  const hashRefreshToken = hashParams.get('refresh_token');
+
+  if (authCode) {
+    await supabase.auth.exchangeCodeForSession(authCode);
+  } else if (hashAccessToken && hashRefreshToken) {
+    await supabase.auth.setSession({
+      access_token: hashAccessToken,
+      refresh_token: hashRefreshToken,
+    });
+  }
+
+  const { data } = await supabase.auth.getSession();
+  return data.session;
+};
+
 export default function AccountBackupScreen({
   user,
   authLoading,
@@ -168,9 +188,9 @@ export default function AccountBackupScreen({
     setSubmitting(true);
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
+      const session = await getRecoverySession();
 
-      if (!sessionData.session) {
+      if (!session) {
         throw new Error('This password reset link is expired or incomplete. Request a new reset email and use the latest link.');
       }
 
