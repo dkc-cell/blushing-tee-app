@@ -57,6 +57,9 @@ alter table public.courses add column if not exists deleted_at timestamptz;
 alter table public.rounds add column if not exists local_id text;
 update public.rounds set local_id = id::text where local_id is null;
 alter table public.rounds alter column local_id set not null;
+alter table public.rounds add column if not exists client_created_at timestamptz;
+alter table public.rounds add column if not exists client_updated_at timestamptz;
+alter table public.rounds add column if not exists deleted_at timestamptz;
 
 create unique index if not exists courses_user_id_local_id_key
   on public.courses(user_id, local_id);

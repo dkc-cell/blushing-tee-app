@@ -20,6 +20,22 @@ const normalizeCourse = (course) => {
 const normalizeCourses = (courses) =>
   Array.isArray(courses) ? courses.map(normalizeCourse) : [];
 
+const normalizeRound = (round) => {
+  const timestamp = nowIso();
+  const createdAt = round.createdAt || timestamp;
+
+  return {
+    ...round,
+    id: round.id || generateId(),
+    createdAt,
+    updatedAt: round.updatedAt || createdAt,
+    syncedAt: round.syncedAt || null,
+  };
+};
+
+const normalizeRounds = (rounds) =>
+  Array.isArray(rounds) ? rounds.map(normalizeRound) : [];
+
 /**
  * Custom hook for managing rounds data with localStorage persistence
  */
@@ -32,12 +48,7 @@ export const useRounds = () => {
       const savedRounds = localStorage.getItem(STORAGE_KEYS.ROUNDS);
       if (savedRounds) {
         const parsedRounds = JSON.parse(savedRounds);
-        // Ensure all rounds have unique IDs (migration for old data)
-        const roundsWithIds = parsedRounds.map(round => ({
-          ...round,
-          id: round.id || generateId()
-        }));
-        setRounds(roundsWithIds);
+        setRounds(normalizeRounds(parsedRounds));
       }
     } catch (error) {
       console.error('Error loading rounds from localStorage:', error);
@@ -53,23 +64,45 @@ export const useRounds = () => {
     }
   }, [rounds]);
 
+  const setRoundsForStorage = useCallback((nextRounds) => {
+    if (typeof nextRounds === 'function') {
+      setRounds(prev => normalizeRounds(nextRounds(prev)));
+      return;
+    }
+
+    setRounds(normalizeRounds(nextRounds));
+  }, []);
+
   const addRound = useCallback((roundData) => {
-    const newRound = {
+    const timestamp = nowIso();
+    const newRound = normalizeRound({
       ...roundData,
-      id: generateId()
-    };
+      id: roundData.id || generateId(),
+      createdAt: roundData.createdAt || timestamp,
+      updatedAt: timestamp,
+      syncedAt: roundData.syncedAt || null,
+    });
     setRounds(prev => [...prev, newRound]);
     return newRound;
   }, []);
 
   const updateRound = useCallback((roundId, updates) => {
+  let updatedRound = null;
   setRounds(prev =>
     prev.map(round =>
       round.id === roundId
-        ? { ...round, ...updates }
+        ? (updatedRound = normalizeRound({
+            ...round,
+            ...updates,
+            id: round.id,
+            createdAt: round.createdAt,
+            updatedAt: nowIso(),
+            syncedAt: updates.syncedAt ?? null,
+          }))
         : round
     )
   );
+  return updatedRound;
 }, []);
 
   const deleteRound = useCallback((roundId) => {
@@ -82,7 +115,7 @@ export const useRounds = () => {
 
   return {
   rounds,
-  setRounds,
+  setRounds: setRoundsForStorage,
   addRound,
   updateRound,
   deleteRound,

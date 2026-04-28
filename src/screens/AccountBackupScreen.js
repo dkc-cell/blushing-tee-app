@@ -440,8 +440,8 @@ export default function AccountBackupScreen({
               </p>
               <p style={{ color: '#5f6f73', lineHeight: 1.6, margin: '0 0 18px' }}>
                 {hasLocalData
-                  ? 'Account sync is on. Courses sync automatically; use Sync Local Data to sync rounds for now.'
-                  : 'Your account is ready. Courses you save while signed in will sync automatically.'}
+                  ? 'Account sync is on. Rounds and courses you save while signed in will sync automatically.'
+                  : 'Your account is ready. Rounds and courses you save while signed in will sync automatically.'}
               </p>
               <button
                 type="button"

@@ -365,6 +365,22 @@ const handleImportBackup = async (event) => {
       )}
 
       {/* Export / Backup Actions - ALWAYS VISIBLE */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          border: `1px solid ${COLORS.mistyBlue}66`,
+          borderRadius: '14px',
+          padding: '14px 16px',
+          marginBottom: '14px',
+          color: COLORS.charcoal,
+          fontSize: '14px',
+          lineHeight: 1.5,
+        }}
+      >
+        File export and import are separate from Account Sync. Export CSV creates a spreadsheet of
+        your rounds. Export Backup downloads a full backup file you can keep for yourself. Import
+        Backup restores from a saved backup file and may replace data on this device.
+      </div>
      <div
         style={{
           display: 'flex',

@@ -378,7 +378,7 @@ const handleSubmit = async (e) => {
     id: 'export-import',
     question: 'How do I export, import, or switch devices?',
     answer:
-      'You can export your rounds at any time as a CSV file—a simple spreadsheet format you can open in Excel, Google Sheets, or Numbers.\n\nExporting allows you to keep a personal backup of your data and makes it easy to move your rounds to a new device.\n\nYou can also create an optional account for sync. Courses you save while signed in can load when you sign in on another device, and rounds can still be synced manually for now.\n\nIf you switch phones or your browser storage is cleared, you can import a previously saved file or load your account data to get your rounds and stats back.',
+      'You can export your rounds at any time as a CSV file—a simple spreadsheet format you can open in Excel, Google Sheets, or Numbers.\n\nExporting allows you to keep a personal backup of your data and makes it easy to move your rounds to a new device.\n\nYou can also create an optional account for sync. Rounds and courses you save while signed in can load when you sign in on another device.\n\nIf you switch phones or your browser storage is cleared, you can import a previously saved file or load your account data to get your rounds and stats back.',
   },
   {
     id: 'install',

@@ -17,10 +17,15 @@ import { useAuth } from '../hooks/useAuth';
 import { calcOverallStats, getLocalDateString } from '../utils';
 import {
   deleteCourseFromCloud,
+  deleteRoundFromCloud,
   loadCloudCourses,
+  loadCloudRounds,
   mergeCourses,
+  mergeRounds,
   syncCourseToCloud,
   syncCoursesToCloud,
+  syncRoundToCloud,
+  syncRoundsToCloud,
 } from '../services/accountSyncService';
 
 export default function AppPage() {
@@ -35,6 +40,7 @@ export default function AppPage() {
   const { courses, setCourses, addCourse, updateCourse, deleteCourse, getCourseByName } = useCourses();
   const auth = useAuth();
   const courseSyncUserIdRef = useRef(null);
+  const roundSyncUserIdRef = useRef(null);
   
   // Current round state
   const [currentHole, setCurrentHole] = useState(1);
@@ -103,6 +109,48 @@ export default function AppPage() {
     };
   }, [auth.loading, auth.user, courses, setCourses]);
 
+  useEffect(() => {
+    if (auth.loading) return;
+
+    if (!auth.user?.id) {
+      roundSyncUserIdRef.current = null;
+      return;
+    }
+
+    if (roundSyncUserIdRef.current === auth.user.id) return;
+
+    let cancelled = false;
+    roundSyncUserIdRef.current = auth.user.id;
+
+    const syncRoundsForSignedInUser = async () => {
+      try {
+        const cloudRounds = await loadCloudRounds({ user: auth.user });
+        const mergedRounds = mergeRounds({ localRounds: rounds, cloudRounds });
+        const syncedRounds = await syncRoundsToCloud({
+          user: auth.user,
+          rounds: mergedRounds,
+        });
+
+        if (cancelled) return;
+
+        setRounds(
+          mergeRounds({
+            localRounds: mergedRounds,
+            cloudRounds: syncedRounds,
+          })
+        );
+      } catch (error) {
+        console.error('Error syncing account rounds:', error);
+      }
+    };
+
+    syncRoundsForSignedInUser();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [auth.loading, auth.user, rounds, setRounds]);
+
   // Calculate overall stats for home screen
   const stats = calcOverallStats(rounds);
 
@@ -169,6 +217,7 @@ const saved = addRound({
   focusNextRound: ''
 });
 
+syncSavedRound(saved);
 setLastCompletedRoundId(saved.id);
 setCurrentScreen('roundComplete');
   };
@@ -189,7 +238,39 @@ setCurrentScreen('roundComplete');
   };
 
   updateRound(roundId, updatedRound);
+  syncSavedRound({ ...updatedRound, updatedAt: new Date().toISOString(), syncedAt: null });
 };
+
+  const replaceRoundWithSyncedCopy = (syncedRound) => {
+    if (!syncedRound?.id) return;
+
+    setRounds(prevRounds =>
+      prevRounds.map(round =>
+        round.id === syncedRound.id ? { ...round, ...syncedRound } : round
+      )
+    );
+  };
+
+  const syncSavedRound = async (round) => {
+    if (!auth.user?.id || !round?.id) return;
+
+    try {
+      const syncedRound = await syncRoundToCloud({ user: auth.user, round });
+      replaceRoundWithSyncedCopy(syncedRound);
+    } catch (error) {
+      console.error('Error syncing round:', error);
+    }
+  };
+
+  const deleteSyncedRound = async (roundId) => {
+    if (!auth.user?.id || !roundId) return;
+
+    try {
+      await deleteRoundFromCloud({ user: auth.user, roundId });
+    } catch (error) {
+      console.error('Error deleting synced round:', error);
+    }
+  };
 
   const replaceCourseWithSyncedCopy = (syncedCourse) => {
     if (!syncedCourse?.id) return;
@@ -361,8 +442,23 @@ setCurrentScreen('roundComplete');
           setRounds={setRounds}
           setCourses={setCourses}
           onBack={() => setCurrentScreen('home')}
-          onUpdateRound={updateRound}
-          onDeleteRound={deleteRound}
+          onUpdateRound={(roundId, updates) => {
+            const existing = rounds.find(round => round.id === roundId);
+            const updatedRound = {
+              ...existing,
+              ...updates,
+              id: roundId,
+              createdAt: existing?.createdAt,
+              updatedAt: new Date().toISOString(),
+              syncedAt: null,
+            };
+            updateRound(roundId, updatedRound);
+            syncSavedRound(updatedRound);
+          }}
+          onDeleteRound={(roundId) => {
+            deleteRound(roundId);
+            deleteSyncedRound(roundId);
+          }}
         />
       );
 
