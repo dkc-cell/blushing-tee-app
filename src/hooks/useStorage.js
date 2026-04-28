@@ -2,6 +2,24 @@ import { useState, useEffect, useCallback } from 'react';
 import { STORAGE_KEYS } from '../constants';
 import { generateId } from '../utils';
 
+const nowIso = () => new Date().toISOString();
+
+const normalizeCourse = (course) => {
+  const timestamp = nowIso();
+  const createdAt = course.createdAt || timestamp;
+
+  return {
+    ...course,
+    id: course.id || generateId(),
+    createdAt,
+    updatedAt: course.updatedAt || createdAt,
+    syncedAt: course.syncedAt || null,
+  };
+};
+
+const normalizeCourses = (courses) =>
+  Array.isArray(courses) ? courses.map(normalizeCourse) : [];
+
 /**
  * Custom hook for managing rounds data with localStorage persistence
  */
@@ -84,7 +102,7 @@ export const useCourses = () => {
       const savedCourses = localStorage.getItem(STORAGE_KEYS.COURSES);
       if (savedCourses) {
         const parsedCourses = JSON.parse(savedCourses);
-        setCourses(parsedCourses);
+        setCourses(normalizeCourses(parsedCourses));
       }
     } catch (error) {
       console.error('Error loading courses from localStorage:', error);
@@ -100,19 +118,43 @@ export const useCourses = () => {
     }
   }, [courses]);
 
+  const setCoursesForStorage = useCallback((nextCourses) => {
+    if (typeof nextCourses === 'function') {
+      setCourses(prev => normalizeCourses(nextCourses(prev)));
+      return;
+    }
+
+    setCourses(normalizeCourses(nextCourses));
+  }, []);
+
   const addCourse = useCallback((courseData) => {
-    const newCourse = {
+    const timestamp = nowIso();
+    const newCourse = normalizeCourse({
       ...courseData,
-      id: generateId()
-    };
+      id: courseData.id || generateId(),
+      createdAt: courseData.createdAt || timestamp,
+      updatedAt: timestamp,
+      syncedAt: courseData.syncedAt || null,
+    });
     setCourses(prev => [...prev, newCourse]);
     return newCourse;
   }, []);
 
   const updateCourse = useCallback((courseId, updates) => {
+    let updatedCourse = null;
     setCourses(prev => prev.map(course => 
-      course.id === courseId ? { ...course, ...updates } : course
+      course.id === courseId
+        ? (updatedCourse = normalizeCourse({
+            ...course,
+            ...updates,
+            id: course.id,
+            createdAt: course.createdAt,
+            updatedAt: nowIso(),
+            syncedAt: updates.syncedAt ?? null,
+          }))
+        : course
     ));
+    return updatedCourse;
   }, []);
 
   const deleteCourse = useCallback((courseId) => {
@@ -131,7 +173,7 @@ export const useCourses = () => {
 
   return {
     courses,
-    setCourses,
+    setCourses: setCoursesForStorage,
     addCourse,
     updateCourse,
     deleteCourse,

@@ -312,7 +312,7 @@ const handleSubmit = async (e) => {
   {
     image: screenExport,
     title: 'Keep your rounds',
-    text: 'Your data stays with you — simple to view, download, and keep anytime.',
+    text: 'Your rounds stay yours — simple to view, export, and back up when you choose.',
   },
 ];
 
@@ -342,7 +342,7 @@ const handleSubmit = async (e) => {
     id: 'free',
     question: 'Is the app free? Do I need an account?',
     answer:
-      'Blushing Birdie is completely free to use.\n\nThere are no subscriptions, no hidden fees, and no account required.\n\nYou can open the app and start using it right away—no sign-up, no login, and no password to remember.',
+      'Blushing Birdie is completely free to use.\n\nThere are no subscriptions or hidden fees, and you do not need an account to log rounds, view stats, or use the core app.\n\nYou can open the app and start right away. If you want account sync later, signing in is optional.',
   },
   {
     id: 'phone',
@@ -372,13 +372,13 @@ const handleSubmit = async (e) => {
     id: 'privacy',
     question: 'Where is my data stored? Is it private?',
     answer:
-      'Your rounds and stats are stored locally on your device.\n\nThere are no accounts, no cloud storage, and no tracking—your data is not sold or shared.\n\nYour information stays private and fully in your control.',
+      'Your rounds and stats are stored locally on your device by default.\n\nYou do not need an account for local mode. Account sync is optional and only used if you choose to sign in.\n\nBlushing Birdie does not sell your golf data. Your information stays in your control.',
   },
   {
     id: 'export-import',
     question: 'How do I export, import, or switch devices?',
     answer:
-      'You can export your rounds at any time as a CSV file—a simple spreadsheet format you can open in Excel, Google Sheets, or Numbers.\n\nExporting allows you to keep a personal backup of your data and makes it easy to move your rounds to a new device.\n\nIf you switch phones or your browser storage is cleared, you can import a previously saved file to restore your rounds and stats.\n\nIf your data is important to you, exporting occasionally is a simple way to keep a backup.',
+      'You can export your rounds at any time as a CSV file—a simple spreadsheet format you can open in Excel, Google Sheets, or Numbers.\n\nExporting allows you to keep a personal backup of your data and makes it easy to move your rounds to a new device.\n\nYou can also create an optional account for sync. Courses you save while signed in can load when you sign in on another device, and rounds can still be synced manually for now.\n\nIf you switch phones or your browser storage is cleared, you can import a previously saved file or load your account data to get your rounds and stats back.',
   },
   {
     id: 'install',
@@ -1125,7 +1125,7 @@ const toggleItem = (id) => {
       lineHeight: 1.6,
     }}
   >
-    No pressure. No accounts. Just your game.
+    No pressure. No account required. Just your game.
   </p>
 
   <a

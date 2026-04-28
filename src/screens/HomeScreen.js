@@ -255,8 +255,8 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
                 style={{ width: '28px', height: '28px', color: COLORS.darkTeal }}
               />
             }
-            title="Account & Backup"
-            subtitle="Optional cloud backup"
+            title="Account Sync"
+            subtitle="Optional account sync"
             variant="account"
           />
 

@@ -221,10 +221,9 @@ const AboutScreen = ({ onNavigate }) => {
               Your rounds and courses are stored locally on your device using your browser&apos;s
               storage.
             </li>
-            <li>No login or account is required to use this app.</li>
+            <li>No login or account is required to use the core app.</li>
             <li>
-              From this app, your golf data is not sent to a remote server or shared with third
-              parties.
+              Account sync is optional and only used if you choose to sign in.
             </li>
           </ul>
           <p
@@ -235,8 +234,8 @@ const AboutScreen = ({ onNavigate }) => {
               lineHeight: 1.5
             }}
           >
-            If you later add cloud sync or online features, you&apos;ll want to update this
-            section and create a formal privacy policy.
+            Blushing Birdie does not sell your golf data. Local mode keeps your information on this
+            device unless you choose to sync it.
           </p>
         </section>
 

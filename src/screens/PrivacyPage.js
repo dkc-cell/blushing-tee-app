@@ -142,8 +142,8 @@ export default function PrivacyPage() {
             device you use.
           </p>
           <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            No account is required to use the app in its current form, and your golf data is not
-            uploaded to a Blushing Birdie server as part of normal app use.
+            You do not need an account to use the core app. Your golf data is not uploaded to a
+            Blushing Birdie server during normal local use.
           </p>
         </section>
 
@@ -163,7 +163,8 @@ export default function PrivacyPage() {
             browser storage is cleared, locally stored rounds and courses may be removed.
           </p>
           <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            The app includes export and backup features to help you keep copies of your information.
+            The app includes export tools and optional account sync to help you keep copies of your
+            information. Account sync only applies if you choose to sign in.
           </p>
         </section>
 
@@ -183,8 +184,8 @@ export default function PrivacyPage() {
             mailing list communication and updates. That is separate from your in-app golf data.
           </p>
           <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            If email or account-based product features are added later, this page should be updated
-            to reflect those changes before they go live.
+            If you create an account for optional sync, that account is separate from the email
+            list and is used to connect your synced data to you.
           </p>
         </section>
 

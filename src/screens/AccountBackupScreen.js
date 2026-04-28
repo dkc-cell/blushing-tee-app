@@ -35,10 +35,10 @@ const getFriendlyBackupError = (backupError) => {
     message.includes('schema cache') ||
     message.includes("Could not find the table")
   ) {
-    return 'Cloud backup tables are not set up yet. Run supabase-schema.sql in the Supabase SQL Editor, then try again.';
+    return 'Account sync tables are not set up yet. Run supabase-schema.sql in the Supabase SQL Editor, then try again.';
   }
 
-  return message || 'Unable to back up your local data. Please try again.';
+  return message || 'Unable to sync your local data. Please try again.';
 };
 
 const getRecoverySession = async () => {
@@ -230,7 +230,7 @@ export default function AccountBackupScreen({
     resetStatus();
 
     if (localRoundCount === 0 && localCourseCount === 0) {
-      setMessage('There is no local round or course data to back up yet.');
+      setMessage('There is no local round or course data to sync yet.');
       return;
     }
 
@@ -239,7 +239,7 @@ export default function AccountBackupScreen({
     try {
       const result = await backupLocalDataToCloud({ user, rounds, courses });
       setMessage(
-        `Backed up ${result.roundsBackedUp} round${
+        `Synced ${result.roundsBackedUp} round${
           result.roundsBackedUp === 1 ? '' : 's'
         } and ${result.coursesBackedUp} course${
           result.coursesBackedUp === 1 ? '' : 's'
@@ -256,7 +256,7 @@ export default function AccountBackupScreen({
     resetStatus();
 
     const shouldRestore = window.confirm(
-      'Restore cloud backup to this device? This will replace the local rounds and courses currently stored on this device.'
+      'Load account data onto this device? This will replace the local rounds and courses currently stored on this device.'
     );
 
     if (!shouldRestore) return;
@@ -270,7 +270,7 @@ export default function AccountBackupScreen({
         restoredData.rounds.length === 0 &&
         restoredData.courses.length === 0
       ) {
-        setMessage('No cloud backup data was found for this account.');
+        setMessage('No synced data was found for this account.');
         return;
       }
 
@@ -327,10 +327,10 @@ export default function AccountBackupScreen({
             margin: 0,
           }}
         >
-          Account & Backup
+          Account Sync
         </h2>
         <p style={{ color: COLORS.charcoal, fontSize: '17px', margin: '6px 0 0' }}>
-          Keep using local mode, or sign in when you want cloud backup.
+          Keep using local mode, or sign in to sync your data across devices.
         </p>
       </div>
 
@@ -375,7 +375,8 @@ export default function AccountBackupScreen({
             </div>
           </div>
           <p style={{ color: COLORS.charcoal, lineHeight: 1.55, margin: '14px 0 0' }}>
-            Local mode stays private and works without an account. Cloud backup will be optional.
+            Local mode works without an account. Account sync is optional and starts when you
+            choose to sign in.
           </p>
         </section>
 
@@ -390,7 +391,7 @@ export default function AccountBackupScreen({
           {!isSupabaseConfigured ? (
             <div>
               <h3 style={{ color: COLORS.darkTeal, margin: '0 0 10px', fontSize: '20px' }}>
-                Cloud backup is not configured
+                Account sync is not configured
               </h3>
               <p style={{ color: COLORS.charcoal, lineHeight: 1.6, margin: 0 }}>
                 Add your Supabase URL and publishable key to enable account creation.
@@ -439,8 +440,8 @@ export default function AccountBackupScreen({
               </p>
               <p style={{ color: '#5f6f73', lineHeight: 1.6, margin: '0 0 18px' }}>
                 {hasLocalData
-                  ? 'Cloud backup is optional. Your local data stays on this device unless you back it up.'
-                  : 'Your account is ready. Record a round or save a course, then come back here to back it up.'}
+                  ? 'Account sync is on. Courses sync automatically; use Sync Local Data to sync rounds for now.'
+                  : 'Your account is ready. Courses you save while signed in will sync automatically.'}
               </p>
               <button
                 type="button"
@@ -459,10 +460,10 @@ export default function AccountBackupScreen({
                 }}
               >
                 {backupLoading
-                  ? 'Backing Up...'
+                  ? 'Syncing...'
                   : hasLocalData
-                  ? 'Back Up Local Data'
-                  : 'No Local Data to Back Up Yet'}
+                  ? 'Sync Local Data'
+                  : 'No Local Data to Sync Yet'}
               </button>
               <button
                 type="button"
@@ -476,7 +477,7 @@ export default function AccountBackupScreen({
                   marginBottom: '10px',
                 }}
               >
-                {restoreLoading ? 'Restoring...' : 'Restore Cloud Backup'}
+                {restoreLoading ? 'Loading...' : 'Load Account Data'}
               </button>
               <button
                 type="button"

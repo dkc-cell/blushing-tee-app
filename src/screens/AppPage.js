@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SplashScreen } from '../components';
 import {
   HomeScreen,
@@ -15,6 +15,13 @@ import {
 import { useRounds, useCourses } from '../hooks';
 import { useAuth } from '../hooks/useAuth';
 import { calcOverallStats, getLocalDateString } from '../utils';
+import {
+  deleteCourseFromCloud,
+  loadCloudCourses,
+  mergeCourses,
+  syncCourseToCloud,
+  syncCoursesToCloud,
+} from '../services/accountSyncService';
 
 export default function AppPage() {
   // Splash screen
@@ -27,6 +34,7 @@ export default function AppPage() {
   const { rounds, setRounds, addRound, updateRound, deleteRound } = useRounds();
   const { courses, setCourses, addCourse, updateCourse, deleteCourse, getCourseByName } = useCourses();
   const auth = useAuth();
+  const courseSyncUserIdRef = useRef(null);
   
   // Current round state
   const [currentHole, setCurrentHole] = useState(1);
@@ -52,6 +60,48 @@ export default function AppPage() {
     setShowSplash(false);
     setCurrentScreen('accountBackup');
   }, [auth.isPasswordRecovery]);
+
+  useEffect(() => {
+    if (auth.loading) return;
+
+    if (!auth.user?.id) {
+      courseSyncUserIdRef.current = null;
+      return;
+    }
+
+    if (courseSyncUserIdRef.current === auth.user.id) return;
+
+    let cancelled = false;
+    courseSyncUserIdRef.current = auth.user.id;
+
+    const syncCoursesForSignedInUser = async () => {
+      try {
+        const cloudCourses = await loadCloudCourses({ user: auth.user });
+        const mergedCourses = mergeCourses({ localCourses: courses, cloudCourses });
+        const syncedCourses = await syncCoursesToCloud({
+          user: auth.user,
+          courses: mergedCourses,
+        });
+
+        if (cancelled) return;
+
+        setCourses(
+          mergeCourses({
+            localCourses: mergedCourses,
+            cloudCourses: syncedCourses,
+          })
+        );
+      } catch (error) {
+        console.error('Error syncing account courses:', error);
+      }
+    };
+
+    syncCoursesForSignedInUser();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [auth.loading, auth.user, courses, setCourses]);
 
   // Calculate overall stats for home screen
   const stats = calcOverallStats(rounds);
@@ -124,7 +174,7 @@ setCurrentScreen('roundComplete');
   };
   // Save round reflection (highlight + focusNextRound)
 // Ensure we update the FULL round object so it persists correctly
-const handleSaveReflection = (roundId, reflection) => {
+  const handleSaveReflection = (roundId, reflection) => {
   const existing = rounds.find(r => r.id === roundId);
   if (!existing) return;
 
@@ -141,6 +191,37 @@ const handleSaveReflection = (roundId, reflection) => {
   updateRound(roundId, updatedRound);
 };
 
+  const replaceCourseWithSyncedCopy = (syncedCourse) => {
+    if (!syncedCourse?.id) return;
+
+    setCourses(prevCourses =>
+      prevCourses.map(course =>
+        course.id === syncedCourse.id ? { ...course, ...syncedCourse } : course
+      )
+    );
+  };
+
+  const syncSavedCourse = async (course) => {
+    if (!auth.user?.id || !course?.id) return;
+
+    try {
+      const syncedCourse = await syncCourseToCloud({ user: auth.user, course });
+      replaceCourseWithSyncedCopy(syncedCourse);
+    } catch (error) {
+      console.error('Error syncing course:', error);
+    }
+  };
+
+  const deleteSyncedCourse = async (courseId) => {
+    if (!auth.user?.id || !courseId) return;
+
+    try {
+      await deleteCourseFromCloud({ user: auth.user, courseId });
+    } catch (error) {
+      console.error('Error deleting synced course:', error);
+    }
+  };
+
   // Save course
   const handleSaveCourse = (name, parsData, yardagesData) => {
     // Check for existing course with same name
@@ -151,13 +232,15 @@ const handleSaveReflection = (roundId, reflection) => {
       );
       if (!shouldOverwrite) return;
       deleteCourse(existing.id);
+      deleteSyncedCourse(existing.id);
     }
     
-    addCourse({
+    const savedCourse = addCourse({
       name,
       pars: parsData,
       yardages: yardagesData
     });
+    syncSavedCourse(savedCourse);
     
     alert(`"${name}" has been saved!`);
   };
@@ -166,7 +249,17 @@ const handleSaveReflection = (roundId, reflection) => {
   const handleSaveCourseFromEditor = (courseData) => {
     if (courseData.id) {
       // Update existing
-      updateCourse(courseData.id, courseData);
+      const existing = courses.find(course => course.id === courseData.id);
+      const updatedCourse = {
+        ...existing,
+        ...courseData,
+        id: courseData.id,
+        createdAt: existing?.createdAt,
+        updatedAt: new Date().toISOString(),
+        syncedAt: null,
+      };
+      updateCourse(courseData.id, updatedCourse);
+      syncSavedCourse(updatedCourse);
       alert(`"${courseData.name}" has been updated!`);
     } else {
       // Check for duplicate name
@@ -177,8 +270,10 @@ const handleSaveReflection = (roundId, reflection) => {
         );
         if (!shouldOverwrite) return;
         deleteCourse(existing.id);
+        deleteSyncedCourse(existing.id);
       }
-      addCourse(courseData);
+      const savedCourse = addCourse(courseData);
+      syncSavedCourse(savedCourse);
       alert(`"${courseData.name}" has been saved!`);
     }
     setEditingCourse(null);
@@ -280,7 +375,10 @@ const handleSaveReflection = (roundId, reflection) => {
             setEditingCourse(course);
             setCurrentScreen('createCourse');
           }}
-          onDeleteCourse={deleteCourse}
+          onDeleteCourse={(courseId) => {
+            deleteCourse(courseId);
+            deleteSyncedCourse(courseId);
+          }}
           onCreateCourse={() => {
             setEditingCourse(null);
             setCurrentScreen('createCourse');
