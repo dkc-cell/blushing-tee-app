@@ -414,7 +414,7 @@ const handleSubmit = async (e) => {
     id: 'handicap',
     question: 'What is an “Unofficial Handicap”?',
     answer:
-      'Your Unofficial Handicap is a simple way to track your personal progress over time—without the pressure of official scoring systems.\n\nIt’s designed to give you a general sense of how you’re improving, round by round.\n\nYour handicap will appear after you’ve played:\n\n• At least 3 full rounds (18 holes)\n\n• 6 nine-hole rounds\n\nRounds are included when course rating and slope have been entered, helping your handicap reflect the difficulty of the course.\n\nThis helps ensure your number reflects a more accurate picture of your game.\n\nPartial rounds are not included in the calculation. You can still log and enjoy them, but your handicap is based only on completed rounds.\n\nThis is not an official USGA/GHIN handicap—just a personal, encouraging way to see your progress, one swing at a time. 🖤',
+      'Your Unofficial Handicap is a simple way to track your personal progress over time—without the pressure of official scoring systems.\n\nIt’s designed to give you a general sense of how you’re improving, round by round.\n\nYour handicap will appear after you’ve played:\n\n• At least 3 full rounds (18 holes)\n\n• 6 nine-hole rounds\n\nUnofficial Handicap is only calculated from rounds with both course rating and slope rating. This helps your handicap reflect the difficulty of the course.\n\nPartial rounds are not included in the calculation. You can still log and enjoy them, but your handicap is based only on completed rounds.\n\nThis is not an official USGA/GHIN handicap—just a personal, encouraging way to see your progress, one swing at a time. 🖤',
   },
   {
     id: 'privacy',

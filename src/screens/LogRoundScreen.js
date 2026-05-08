@@ -134,6 +134,17 @@ useEffect(() => {
   const totalShots = (drive ? 1 : 0) + approaches + chips + putts;
   const totalScore = totalShots; // penalties are reminders only
 
+  const getNextHoleToLogAfterUpdate = () => {
+    const recordedAfterSave = new Set(recordedHoles);
+    recordedAfterSave.add(currentHole);
+
+    for (let hole = currentHole + 1; hole <= 18; hole += 1) {
+      if (!recordedAfterSave.has(hole)) return hole;
+    }
+
+    return null;
+  };
+
   const resetInputs = () => {
     setDrive('');
     setApproaches(0);
@@ -159,6 +170,9 @@ useEffect(() => {
 
     return;
   }
+
+  const wasEditingHole = editingHole;
+  const nextHoleToLogAfterUpdate = wasEditingHole ? getNextHoleToLogAfterUpdate() : null;
 
   const newHoleData = {
     hole: currentHole,
@@ -200,7 +214,9 @@ useEffect(() => {
     setTimeout(() => {
      if (kind) confetti.reset(); // stops any lingering particles before next hole
 
-      if (currentHole < 18) {
+      if (wasEditingHole && nextHoleToLogAfterUpdate) {
+        setCurrentHole(nextHoleToLogAfterUpdate);
+      } else if (currentHole < 18) {
         setCurrentHole(currentHole + 1);
       } else {
         onCompleteRound(newHoleData);
@@ -372,6 +388,7 @@ useEffect(() => {
         <HoleNavigation 
           currentHole={currentHole} 
           setCurrentHole={setCurrentHole} 
+          recordedHoles={recordedHoles}
         />
 
         {/* Yardage Modal */}
@@ -648,12 +665,12 @@ useEffect(() => {
         >
           <CheckCircle2 style={{ width: '28px', height: '28px' }} />
           {(isHoleRecorded && !editingHole)
-            ? 'Hole Recorded'
+            ? `Hole ${currentHole} Recorded`
             : editingHole
-            ? 'Update Hole'
+            ? `Update Hole ${currentHole}`
             : isFinalHole
             ? 'Complete Round'
-            : 'Record Hole & Continue'}
+            : `Record Hole ${currentHole} & Continue`}
         </button>
       </div>
 
@@ -661,6 +678,7 @@ useEffect(() => {
       <HoleNavigation 
         currentHole={currentHole} 
         setCurrentHole={setCurrentHole} 
+        recordedHoles={recordedHoles}
       />
        {/* Penalty Tip Modal */}
       {showPenaltyTip && (
@@ -904,62 +922,62 @@ const PenaltyTipModal = ({ type, onClose, onSuppressThisRound, onSuppressForever
   );
 };
 
-const HoleNavigation = ({ currentHole, setCurrentHole }) => (
-  <div style={{ 
-    position: 'fixed', 
-    bottom: 0, 
-    left: 0, 
-    right: 0, 
-    backgroundColor: '#FFFFFF', 
-    padding: '16px 24px',
-    boxShadow: '0 -4px 12px rgba(0,0,0,0.1)',
-    display: 'flex',
-    gap: '12px',
-    justifyContent: 'center',
-    zIndex: 1000
-  }}>
-    <button
-      onClick={() => { if (currentHole > 1) setCurrentHole(currentHole - 1); }}
-      disabled={currentHole === 1}
-      style={{
-        flex: 1,
-        maxWidth: '200px',
-        backgroundColor: currentHole === 1 ? '#E0E0E0' : COLORS.mistyBlue,
-        color: COLORS.charcoal,
-        padding: '16px 24px',
-        borderRadius: '12px',
-        border: 'none',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        cursor: currentHole === 1 ? 'not-allowed' : 'pointer',
-        opacity: currentHole === 1 ? 0.5 : 1,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-      }}
-    >
-      ← Previous
-    </button>
-    <button
-      onClick={() => { if (currentHole < 18) setCurrentHole(currentHole + 1); }}
-      disabled={currentHole === 18}
-      style={{
-        flex: 1,
-        maxWidth: '200px',
-        backgroundColor: currentHole === 18 ? '#E0E0E0' : COLORS.blush,
-        color: COLORS.charcoal,
-        padding: '16px 24px',
-        borderRadius: '12px',
-        border: 'none',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        cursor: currentHole === 18 ? 'not-allowed' : 'pointer',
-        opacity: currentHole === 18 ? 0.5 : 1,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-      }}
-    >
-      Next →
-    </button>
-  </div>
-);
+const HoleNavigation = ({ currentHole, setCurrentHole, recordedHoles }) => {
+  const recordedHoleNumbers = [...recordedHoles].sort((a, b) => a - b);
+  const previousRecordedHole = [...recordedHoleNumbers].reverse().find((hole) => hole < currentHole);
+  const currentHoleIsRecorded = recordedHoles.has(currentHole);
+  const nextHole = Array.from({ length: 18 - currentHole }, (_, index) => currentHole + index + 1)
+    .find((hole) => recordedHoles.has(hole) || currentHoleIsRecorded);
+  const nextHoleIsRecorded = nextHole ? recordedHoles.has(nextHole) : false;
+  const nextHoleLabel = nextHoleIsRecorded ? `Hole ${nextHole} →` : `Hole ${nextHole} to Record →`;
+
+  const navButtonStyle = (isEnabled) => ({
+    flex: 1,
+    maxWidth: '220px',
+    backgroundColor: isEnabled ? '#FFFFFF' : '#E0E0E0',
+    color: isEnabled ? COLORS.darkTeal : '#777777',
+    padding: '14px 16px',
+    borderRadius: '12px',
+    border: `2px solid ${isEnabled ? COLORS.mistyBlue : '#D0D0D0'}`,
+    fontSize: '16px',
+    fontWeight: 'bold',
+    cursor: isEnabled ? 'pointer' : 'not-allowed',
+    opacity: isEnabled ? 1 : 0.55,
+    boxShadow: isEnabled ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+    minHeight: '54px',
+  });
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: '#FFFFFF',
+      padding: '14px 20px',
+      boxShadow: '0 -4px 12px rgba(0,0,0,0.1)',
+      display: 'flex',
+      gap: '10px',
+      justifyContent: 'center',
+      zIndex: 1000
+    }}>
+      <button
+        onClick={() => { if (previousRecordedHole) setCurrentHole(previousRecordedHole); }}
+        disabled={!previousRecordedHole}
+        style={navButtonStyle(Boolean(previousRecordedHole))}
+      >
+        ← Hole {previousRecordedHole}
+      </button>
+      <button
+        onClick={() => { if (nextHole) setCurrentHole(nextHole); }}
+        disabled={!nextHole}
+        style={navButtonStyle(Boolean(nextHole))}
+      >
+        {nextHole ? nextHoleLabel : 'Hole →'}
+      </button>
+    </div>
+  );
+};
 
 const DriveSelector = ({ drive, setDrive, isPar3 }) => {
   const options = [

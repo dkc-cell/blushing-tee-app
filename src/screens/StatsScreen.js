@@ -358,7 +358,7 @@ const handleImportBackup = async (event) => {
                 opacity: 0.85,
               }}
             >
-              (Based on your rounds with course rating and slope entered)
+              Unofficial Handicap is only calculated from rounds with both course rating and slope rating.
             </div>
           </div>
         </>
@@ -735,7 +735,7 @@ const RoundDetailModal = ({
                 </div>
 
                 <p style={{ color: COLORS.charcoal, fontSize: '13px', marginTop: '-4px', marginBottom: '16px', lineHeight: 1.4 }}>
-                  Add these anytime to support your Unofficial Handicap.
+                  Unofficial Handicap is only calculated from rounds with both course rating and slope rating.
                 </p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={onCancelEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: COLORS.cream, color: COLORS.charcoal, border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>Cancel</button>
