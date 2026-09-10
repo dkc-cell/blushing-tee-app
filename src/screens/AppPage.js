@@ -16,6 +16,11 @@ import { useRounds, useCourses } from '../hooks';
 import { useAuth } from '../hooks/useAuth';
 import { calcOverallStats, getLocalDateString } from '../utils';
 import {
+  clearActiveRound,
+  loadActiveRound,
+  saveActiveRound,
+} from '../utils/activeRoundStorage';
+import {
   deleteCourseFromCloud,
   deleteRoundFromCloud,
   loadCloudCourses,
@@ -38,6 +43,9 @@ export default function AppPage() {
     robots: 'noindex,nofollow',
   });
 
+  const initialActiveRoundRef = useRef(loadActiveRound());
+  const initialActiveRound = initialActiveRoundRef.current;
+
   // Splash screen
   const [showSplash, setShowSplash] = useState(true);
   
@@ -52,12 +60,15 @@ export default function AppPage() {
   const roundSyncUserIdRef = useRef(null);
   
   // Current round state
-  const [currentHole, setCurrentHole] = useState(1);
-  const [currentRound, setCurrentRound] = useState([]);
-  const [recordedHoles, setRecordedHoles] = useState(new Set());
-  const [customPars, setCustomPars] = useState({});
-  const [customYardages, setCustomYardages] = useState({});
-  const [courseName, setCourseName] = useState('');
+  const [currentHole, setCurrentHole] = useState(initialActiveRound?.currentHole || 1);
+  const [currentRound, setCurrentRound] = useState(initialActiveRound?.currentRound || []);
+  const [recordedHoles, setRecordedHoles] = useState(
+    new Set(initialActiveRound?.recordedHoles || [])
+  );
+  const [customPars, setCustomPars] = useState(initialActiveRound?.customPars || {});
+  const [customYardages, setCustomYardages] = useState(initialActiveRound?.customYardages || {});
+  const [courseName, setCourseName] = useState(initialActiveRound?.courseName || '');
+  const [roundIsActive, setRoundIsActive] = useState(Boolean(initialActiveRound));
   const [lastCompletedRoundId, setLastCompletedRoundId] = useState(null);
 
   // Course editing state
@@ -75,6 +86,28 @@ export default function AppPage() {
     setShowSplash(false);
     setCurrentScreen('accountBackup');
   }, [auth.isPasswordRecovery]);
+
+  useEffect(() => {
+    if (!roundIsActive) return;
+
+    saveActiveRound({
+      currentHole,
+      currentRound,
+      recordedHoles: [...recordedHoles],
+      customPars,
+      customYardages,
+      courseName,
+      holeDraft: initialActiveRoundRef.current?.holeDraft || null,
+    });
+  }, [
+    roundIsActive,
+    currentHole,
+    currentRound,
+    recordedHoles,
+    customPars,
+    customYardages,
+    courseName,
+  ]);
 
   useEffect(() => {
     if (auth.loading) return;
@@ -163,6 +196,20 @@ export default function AppPage() {
   // Calculate overall stats for home screen
   const stats = calcOverallStats(rounds);
 
+  const getActiveRoundSnapshot = () => {
+    if (!roundIsActive) return null;
+
+    return {
+      currentHole,
+      currentRound,
+      recordedHoles: [...recordedHoles],
+      customPars,
+      customYardages,
+      courseName,
+      holeDraft: initialActiveRoundRef.current?.holeDraft || null,
+    };
+  };
+
   // Reset round state
   const resetRoundState = () => {
     setCurrentRound([]);
@@ -171,7 +218,18 @@ export default function AppPage() {
     setCustomPars({});
     setCustomYardages({});
     setCourseName('');
+    setRoundIsActive(false);
     setLastCompletedRoundId(null);
+    initialActiveRoundRef.current = null;
+    clearActiveRound();
+  };
+
+  const confirmReplaceActiveRound = () => {
+    if (!roundIsActive) return true;
+
+    return window.confirm(
+      'You already have a round in progress. Starting another round will discard the unfinished round. Continue?'
+    );
   };
 
   // Record a hole
@@ -181,6 +239,7 @@ export default function AppPage() {
       return [...filtered, holeData].sort((a, b) => a.hole - b.hole);
     });
     setRecordedHoles(prev => new Set(prev).add(holeData.hole));
+    setRoundIsActive(true);
   };
 
   // Unrecord a hole (for editing)
@@ -210,6 +269,9 @@ export default function AppPage() {
     
     // Update currentRound for the complete screen
     setCurrentRound(holesData);
+    setRoundIsActive(false);
+    initialActiveRoundRef.current = null;
+    clearActiveRound();
 
   // Add round to storage
 const matchedCourse = getCourseByName(courseName);
@@ -383,6 +445,9 @@ setCurrentScreen('roundComplete');
           stats={stats}
           savedCourses={courses}
           onNavigate={setCurrentScreen}
+          activeRound={getActiveRoundSnapshot()}
+          onResumeRound={() => setCurrentScreen('logRound')}
+          onEndActiveRound={() => handleCompleteRound(null)}
         />
       );
 
@@ -392,13 +457,18 @@ setCurrentScreen('roundComplete');
           courses={courses}
           onUpdateCourses={setCourses}
           onSelectCourse={(course) => {
+            if (!confirmReplaceActiveRound()) return;
+            resetRoundState();
             setCustomPars(course.pars || {});
             setCustomYardages(course.yardages || {});
             setCourseName(course.name);
+            setRoundIsActive(true);
             setCurrentScreen('logRound');
           }}
           onNewCourse={() => {
+            if (!confirmReplaceActiveRound()) return;
             resetRoundState();
+            setRoundIsActive(true);
             setCurrentScreen('logRound');
           }}
           onBack={() => setCurrentScreen('home')}
@@ -546,6 +616,9 @@ case 'about':
           stats={stats}
           savedCourses={courses}
           onNavigate={setCurrentScreen}
+          activeRound={getActiveRoundSnapshot()}
+          onResumeRound={() => setCurrentScreen('logRound')}
+          onEndActiveRound={() => handleCompleteRound(null)}
         />
       );
   }
