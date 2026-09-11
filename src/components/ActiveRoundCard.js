@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { COLORS } from '../constants';
-import { isHoleDraftMeaningful } from '../utils/activeRoundStorage';
+import { isHoleDraftMeaningful, loadActiveRound } from '../utils/activeRoundStorage';
 
 const ActiveRoundCard = ({ activeRound, onResume, onEndRoundEarly }) => {
   const [showEndModal, setShowEndModal] = useState(false);
@@ -11,7 +11,11 @@ const ActiveRoundCard = ({ activeRound, onResume, onEndRoundEarly }) => {
   const holesRecorded = Array.isArray(activeRound.currentRound)
     ? activeRound.currentRound.length
     : 0;
-  const hasDraft = isHoleDraftMeaningful(activeRound.holeDraft);
+  const latestSavedRound = loadActiveRound();
+  const latestDraft = latestSavedRound?.currentHole === currentHole
+    ? latestSavedRound.holeDraft
+    : activeRound.holeDraft;
+  const hasDraft = isHoleDraftMeaningful(latestDraft);
   const lastRecordedHole = Math.max(0, currentHole - 1);
 
   const finishLabel = `Finish Recording Hole ${currentHole}`;
