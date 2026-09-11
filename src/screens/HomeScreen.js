@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Heart, Flag, ChevronRight, BarChart3, BookOpen, Gem, Cloud } from 'lucide-react';
 import { COLORS } from '../constants';
+import ActiveRoundCard from '../components/ActiveRoundCard';
 import blushingBirdieLogo from '../assets/images/Blushing_Birdie_Logo.png';
 
-const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
+const HomeScreen = ({
+  stats,
+  savedCourses,
+  onNavigate,
+  activeRound = null,
+  onResumeRound,
+  onEndActiveRound,
+}) => {
   // Safeguards so UI doesn't break if stats are missing
   const fairwaysHit = stats?.fairwayPercentage ?? stats?.fairwaysHit ?? 0;
   const threePuttPct = stats?.threePuttPercentage ?? 0;
@@ -113,6 +121,14 @@ const HomeScreen = ({ stats, savedCourses, onNavigate }) => {
 
       {/* Main content */}
       <div style={{ padding: '16px 24px 24px' }}>
+        {activeRound && (
+          <ActiveRoundCard
+            activeRound={activeRound}
+            onResume={onResumeRound}
+            onEndRoundEarly={onEndActiveRound}
+          />
+        )}
+
         {/* Stats “pills” row */}
         <div
           style={{
