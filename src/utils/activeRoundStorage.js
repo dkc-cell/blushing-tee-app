@@ -35,7 +35,40 @@ export const loadActiveRound = () => {
 
 export const saveActiveRound = (activeRound) => {
   try {
-    localStorage.setItem(ACTIVE_ROUND_STORAGE_KEY, JSON.stringify(activeRound));
+    const currentHole = Number(activeRound?.currentHole) || 1;
+    let existingDraft = null;
+
+    const saved = localStorage.getItem(ACTIVE_ROUND_STORAGE_KEY);
+    if (saved) {
+      const existing = JSON.parse(saved);
+      existingDraft = existing?.holeDraft && typeof existing.holeDraft === 'object'
+        ? existing.holeDraft
+        : null;
+    }
+
+    const incomingDraft = activeRound?.holeDraft && typeof activeRound.holeDraft === 'object'
+      ? activeRound.holeDraft
+      : null;
+
+    const existingDraftIsCurrent = Number(existingDraft?.hole) === currentHole;
+    const existingDraftIsNewer =
+      existingDraftIsCurrent &&
+      Number(existingDraft?.updatedAt || 0) > Number(incomingDraft?.updatedAt || 0);
+
+    let holeDraft = existingDraftIsNewer ? existingDraft : incomingDraft;
+
+    if (Number(holeDraft?.hole) !== currentHole) {
+      holeDraft = null;
+    }
+
+    localStorage.setItem(
+      ACTIVE_ROUND_STORAGE_KEY,
+      JSON.stringify({
+        ...activeRound,
+        currentHole,
+        holeDraft,
+      })
+    );
   } catch (error) {
     console.error('Error saving active round:', error);
   }
@@ -50,7 +83,7 @@ export const clearActiveRound = () => {
 };
 
 export const isHoleDraftMeaningful = (draft) => Boolean(
-  draft && (
+  draft && !draft.cleared && (
     draft.drive ||
     Number(draft.approaches) > 0 ||
     Number(draft.chips) > 0 ||
