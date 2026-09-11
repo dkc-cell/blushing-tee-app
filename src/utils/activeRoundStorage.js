@@ -51,14 +51,14 @@ export const saveActiveRound = (activeRound) => {
       : null;
 
     const existingDraftIsCurrent = Number(existingDraft?.hole) === currentHole;
-    const existingDraftIsNewer =
-      existingDraftIsCurrent &&
-      Number(existingDraft?.updatedAt || 0) > Number(incomingDraft?.updatedAt || 0);
+    const incomingDraftIsCurrent = Number(incomingDraft?.hole) === currentHole;
 
-    let holeDraft = existingDraftIsNewer ? existingDraft : incomingDraft;
-
-    if (Number(holeDraft?.hole) !== currentHole) {
-      holeDraft = null;
+    // AppPage saves round-level state independently from LogRoundScreen. If the
+    // screen has already saved meaningful inputs for the current hole, do not
+    // let a round-level save replace them with an older/null snapshot.
+    let holeDraft = incomingDraftIsCurrent ? incomingDraft : null;
+    if (existingDraftIsCurrent && isHoleDraftMeaningful(existingDraft)) {
+      holeDraft = existingDraft;
     }
 
     localStorage.setItem(
@@ -83,7 +83,7 @@ export const clearActiveRound = () => {
 };
 
 export const isHoleDraftMeaningful = (draft) => Boolean(
-  draft && !draft.cleared && (
+  draft && (
     draft.drive ||
     Number(draft.approaches) > 0 ||
     Number(draft.chips) > 0 ||
