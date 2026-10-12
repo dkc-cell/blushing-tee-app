@@ -97,7 +97,7 @@ export default function AppPage() {
       customPars,
       customYardages,
       courseName,
-      holeDraft: initialActiveRoundRef.current?.holeDraft || null,
+      holeDraft: loadActiveRound()?.holeDraft || null,
     });
   }, [
     roundIsActive,
@@ -206,7 +206,7 @@ export default function AppPage() {
       customPars,
       customYardages,
       courseName,
-      holeDraft: initialActiveRoundRef.current?.holeDraft || null,
+      holeDraft: loadActiveRound()?.holeDraft || null,
     };
   };
 

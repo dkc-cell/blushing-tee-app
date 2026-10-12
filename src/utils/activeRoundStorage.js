@@ -46,20 +46,9 @@ export const saveActiveRound = (activeRound) => {
         : null;
     }
 
-    const incomingDraft = activeRound?.holeDraft && typeof activeRound.holeDraft === 'object'
-      ? activeRound.holeDraft
-      : null;
-
-    const existingDraftIsCurrent = Number(existingDraft?.hole) === currentHole;
-    const incomingDraftIsCurrent = Number(incomingDraft?.hole) === currentHole;
-
-    // AppPage saves round-level state independently from LogRoundScreen. If the
-    // screen has already saved meaningful inputs for the current hole, do not
-    // let a round-level save replace them with an older/null snapshot.
-    let holeDraft = incomingDraftIsCurrent ? incomingDraft : null;
-    if (existingDraftIsCurrent && isHoleDraftMeaningful(existingDraft)) {
-      holeDraft = existingDraft;
-    }
+    // Round-level saves preserve the screen's latest draft for this hole.
+    // Only saveHoleDraft writes or explicitly clears input state.
+    const holeDraft = Number(existingDraft?.hole) === currentHole ? existingDraft : null;
 
     localStorage.setItem(
       ACTIVE_ROUND_STORAGE_KEY,
@@ -94,3 +83,17 @@ export const isHoleDraftMeaningful = (draft) => Boolean(
     (typeof draft.notes === 'string' && draft.notes.trim())
   )
 );
+
+export const saveHoleDraft = (hole, draft) => {
+  const activeRound = loadActiveRound();
+  if (!activeRound) return;
+  try {
+    localStorage.setItem(ACTIVE_ROUND_STORAGE_KEY, JSON.stringify({
+      ...activeRound,
+      currentHole: hole,
+      holeDraft: isHoleDraftMeaningful(draft) ? draft : null,
+    }));
+  } catch (error) {
+    console.error('Error saving hole draft:', error);
+  }
+};
