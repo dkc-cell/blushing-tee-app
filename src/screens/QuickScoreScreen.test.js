@@ -5,10 +5,10 @@ import { loadActiveRound, saveActiveRound } from '../utils/activeRoundStorage';
 import { calcStats, calcOverallStats } from '../utils';
 jest.mock('canvas-confetti', () => ({ __esModule: true, default: Object.assign(jest.fn(), { reset: jest.fn() }) }));
 let container, root, recorded, completed;
-function Harness() {
+function Harness({ pars = { 1: 4, 2: 4, 3: 3 } }) {
   const [hole, setHole] = useState(1);
   const [round, setRound] = useState([]);
-  return <QuickScoreScreen currentHole={hole} setCurrentHole={setHole} currentRound={round} customPars={{ 1: 4, 2: 4, 3: 3 }} setCustomPars={jest.fn()} customYardages={{}} setCustomYardages={jest.fn()} courseName="Test Course" onRecordHole={data => { recorded(data); setRound(r => [...r.filter(h => h.hole !== data.hole), data]); }} onCompleteRound={completed} onBack={jest.fn()} />;
+  return <QuickScoreScreen currentHole={hole} setCurrentHole={setHole} currentRound={round} customPars={pars} setCustomPars={jest.fn()} customYardages={{}} setCustomYardages={jest.fn()} courseName="Test Course" onRecordHole={data => { recorded(data); setRound(r => [...r.filter(h => h.hole !== data.hole), data]); }} onCompleteRound={completed} onBack={jest.fn()} />;
 }
 const render = () => act(() => root.render(<Harness />));
 const click = name => {
@@ -63,4 +63,12 @@ test('missing fairway and putt stats do not dilute detailed statistics', () => {
   expect(calcStats([detailed, quick])).toMatchObject({ totalScore: 11, fairwayPct: 100, totalFairways: 1, threePuttPercentage: 100 });
   expect(calcOverallStats([{ holes: [detailed, quick] }])).toMatchObject({ fairwaysHit: 100, threePuttPercentage: 100 });
   expect(calcStats([quick])).toMatchObject({ fairwayPct: null, threePuttPercentage: null, totalPutts: null });
+});
+
+test('fairway question stays available with unknown par and is hidden for par 3', () => {
+  act(() => root.render(<Harness pars={{}} />));
+  act(() => container.querySelector('summary').click());
+  expect(container.textContent).toContain('Fairway hit?');
+  act(() => root.render(<Harness pars={{ 1: 3 }} />));
+  expect(container.textContent).not.toContain('Fairway hit?');
 });
