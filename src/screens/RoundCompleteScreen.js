@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getRoundPar } from '../utils';
 import { COLORS } from '../constants';
 
 const RoundCompleteScreen = ({
@@ -19,10 +20,10 @@ const RoundCompleteScreen = ({
   const [focusNextRound, setFocusNextRound] = useState('');
   
   const totalScore = currentRound.reduce((sum, hole) => sum + hole.total, 0);
-  const totalPar = currentRound.reduce((sum, hole) => sum + hole.par, 0);
+  const totalPar = getRoundPar(currentRound);
   const holesPlayed = currentRound.length;
   const isFullRound = holesPlayed === 18;
-  const scoreToPar = totalScore - totalPar;
+  const scoreToPar = totalPar == null ? null : totalScore - totalPar;
   const fairwaysHit = currentRound.filter(h => h.fairwayHit && h.par > 3).length;
   const possibleFairways = currentRound.filter(h => h.par > 3 && typeof h.fairwayHit === 'boolean').length;
   const holesWithPutts = currentRound.filter(h => Number.isFinite(h?.putts));
@@ -77,8 +78,8 @@ const RoundCompleteScreen = ({
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <div style={{ fontSize: '56px', fontWeight: 'bold', color: COLORS.blush, marginBottom: '8px' }}>{totalScore}</div>
           <div style={{ color: COLORS.darkTeal, fontSize: '20px' }}>
-            {scoreToPar > 0 ? `+${scoreToPar}` : scoreToPar === 0 ? 'Even' : scoreToPar}
-            <span style={{ color: COLORS.mistyBlue, marginLeft: '8px' }}>(Par {totalPar})</span>
+            {scoreToPar == null ? '—' : scoreToPar > 0 ? `+${scoreToPar}` : scoreToPar === 0 ? 'Even' : scoreToPar}
+            {totalPar != null && <span style={{ color: COLORS.mistyBlue, marginLeft: '8px' }}>(Par {totalPar})</span>}
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', paddingTop: '16px', borderTop: `2px solid ${COLORS.mistyBlue}33` }}>

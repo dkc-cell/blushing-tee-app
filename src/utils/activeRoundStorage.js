@@ -81,6 +81,7 @@ export const isHoleDraftMeaningful = (draft) => Boolean(
   draft && (
     Number(draft.score) > 0 ||
     typeof draft.fairwayHit === 'boolean' ||
+    typeof draft.greenInRegulation === 'boolean' ||
     (draft.scoringMode === 'quick' && Number.isFinite(draft.putts)) ||
     draft.drive ||
     Number(draft.approaches) > 0 ||

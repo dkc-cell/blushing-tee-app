@@ -2,7 +2,7 @@ import React, { act, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import QuickScoreScreen from './QuickScoreScreen';
 import { loadActiveRound, saveActiveRound } from '../utils/activeRoundStorage';
-import { calcStats, calcOverallStats } from '../utils';
+import { calcStats, calcOverallStats, formatScoreToPar, exportToCSV } from '../utils';
 jest.mock('canvas-confetti', () => ({ __esModule: true, default: Object.assign(jest.fn(), { reset: jest.fn() }) }));
 let container, root, recorded, completed;
 function Harness({ pars = { 1: 4, 2: 4, 3: 3 } }) {
@@ -65,10 +65,44 @@ test('missing fairway and putt stats do not dilute detailed statistics', () => {
   expect(calcStats([quick])).toMatchObject({ fairwayPct: null, threePuttPercentage: null, totalPutts: null });
 });
 
-test('fairway question stays available with unknown par and is hidden for par 3', () => {
+test('unknown par prompts for par and par 3 asks about the green', () => {
   act(() => root.render(<Harness pars={{}} />));
   act(() => container.querySelector('summary').click());
-  expect(container.textContent).toContain('Fairway hit?');
+  expect(container.textContent).toContain('Add par to track fairways or greens');
   act(() => root.render(<Harness pars={{ 1: 3 }} />));
   expect(container.textContent).not.toContain('Fairway hit?');
+  expect(container.textContent).toContain('Green hit?');
+});
+
+test('saves score with no par or yardage and no birdie/eagle celebration', () => {
+  act(() => root.render(<Harness pars={{}} />));
+  for (let i = 0; i < 4; i++) click('Increase score');
+  click('Save & Next Hole →');
+  expect(recorded).toHaveBeenCalledWith(expect.objectContaining({ total: 4, par: null, yardage: null }));
+  expect(container.querySelector('.birdie-overlay')).toBeNull();
+});
+test('par 3 green response is saved separately from fairways', () => {
+  act(() => root.render(<Harness pars={{ 1: 3 }} />));
+  for (let i = 0; i < 4; i++) click('Increase score');
+  act(() => container.querySelector('summary').click()); click('✓ Yes'); click('Save & Next Hole →');
+  expect(recorded).toHaveBeenCalledWith(expect.objectContaining({ total: 4, greenInRegulation: true, fairwayHit: null }));
+});
+test('unknown pars are excluded from comparisons and export handicap is removed', () => {
+  const holes = [{ total: 5, par: 4 }, { total: 6, par: null }];
+  expect(calcStats(holes)).toMatchObject({ totalScore: 11, totalPar: null, scoreToPar: null, avgToParPerHole: '1.00', knownParCount: 1 });
+  expect(calcStats([{ total: 6, par: null }])).toMatchObject({ scoreToPar: null, avgToParPerHole: null });
+  expect(formatScoreToPar(6, null)).toBe('—');
+  expect(exportToCSV([{ holes }])).not.toContain('Unofficial Handicap');
+});
+
+test('birdie uses artwork without duplicate caption and advances after four seconds', () => {
+  jest.useFakeTimers();
+  render(); for (let i = 0; i < 3; i++) click('Increase score'); click('Save & Next Hole →');
+  const overlay = container.querySelector('.birdie-overlay');
+  expect(overlay.querySelector('img').alt).toBe('Birdie');
+  expect(overlay.textContent).toBe('');
+  act(() => jest.advanceTimersByTime(4000));
+  expect(container.querySelector('.birdie-overlay')).toBeNull();
+  expect(container.querySelector('.qs-total').textContent).toBe('--');
+  jest.useRealTimers();
 });

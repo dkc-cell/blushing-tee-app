@@ -12,7 +12,7 @@ const CreateCourseScreen = ({
   
   const [courseName, setCourseName] = useState(initialCourse?.name || '');
   const [pars, setPars] = useState(initialCourse?.pars || {});
-   // Optional: for Unofficial Handicap tracking
+   // Optional scorecard metadata
   const [courseRating, setCourseRating] = useState(initialCourse?.courseRating ?? '');
   const [slopeRating, setSlopeRating] = useState(initialCourse?.slopeRating ?? '');
   const [yardages, setYardages] = useState(initialCourse?.yardages || {});
@@ -195,7 +195,7 @@ if (
     />
   </div>
 
-  {/* Unofficial Handicap — NOW inside the white header */}
+  {/* Optional course metadata */}
   <div style={{ marginTop: '14px' }}>
     <div
       style={{
@@ -208,7 +208,7 @@ if (
       }}
     >
       <div style={{ color: COLORS.darkTeal, fontWeight: 800, fontSize: '16px' }}>
-        Unofficial Handicap (optional)
+        Course rating and slope (optional)
       </div>
 
       <div style={{ color: COLORS.charcoal, fontSize: '12px', fontWeight: 600 }}>
@@ -267,7 +267,7 @@ if (
     </div>
 
     <div style={{ marginTop: '10px', fontSize: '12px', color: COLORS.charcoal, textAlign: 'center', lineHeight: 1.4 }}>
-      Add these if you'd like the app to track an <strong>Unofficial Handicap</strong> for personal use.
+      Optional scorecard information. These fields are not needed to track your rounds.
     </div>
   </div>
 </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { COLORS } from '../constants';
 import {
   calcStats,
-  calcOverallStats,
+  getRoundPar,
   formatDateForDisplay,
   formatScoreToPar,
   exportToCSV,
@@ -33,7 +33,7 @@ const StatsScreen = ({
   // All-time stats
 const allHoles = rounds.flatMap(r => r.holes || []);
 const allTimeStats = calcStats(allHoles);
-const overallStats = calcOverallStats(rounds);
+
 
 // Recent stats (Last 10 logged rounds, including partial rounds)
 const sortedRounds = [...rounds]
@@ -315,52 +315,6 @@ const handleImportBackup = async (event) => {
             />
           )}
 
-          {/* ⭐ Unofficial Handicap */}
-          <div
-            style={{
-              background: `linear-gradient(180deg, ${COLORS.blush}33 0%, #FFFFFF 100%)`,
-              borderRadius: '16px',
-              padding: '16px 20px',
-              marginBottom: '18px',
-              marginTop: '10px',
-              textAlign: 'center',
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
-            <div
-              style={{
-                color: COLORS.charcoal,
-                fontSize: '14px',
-                fontWeight: '600',
-                marginBottom: '6px',
-              }}
-            >
-              🖤 Your Unofficial Handicap 🖤
-            </div>
-
-            <div
-              style={{
-                color: COLORS.charcoal,
-                fontSize: '24px',
-                fontWeight: 'bold',
-                lineHeight: 1.1,
-              }}
-            >
-              {overallStats?.unofficialHandicap ?? '—'}
-            </div>
-
-            <div
-              style={{
-                color: COLORS.darkTeal,
-                fontSize: '14px',
-                marginTop: '6px',
-                opacity: 0.85,
-              }}
-            >
-              Unofficial Handicap is only calculated from rounds with both course rating and slope rating.
-            </div>
-          </div>
         </>
       )}
 
@@ -479,7 +433,7 @@ const handleImportBackup = async (event) => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {[...rounds].reverse().map((round) => {
               const roundScore = round.holes.reduce((sum, h) => sum + h.total, 0);
-              const roundPar = round.holes.reduce((sum, h) => sum + h.par, 0);
+              const roundPar = getRoundPar(round.holes);
 
               return (
                 <button
@@ -605,16 +559,18 @@ const handleImportBackup = async (event) => {
 // Sub-components
 const StatsCard = ({ title, stats, totalHoles }) => (
   <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', marginBottom: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+    {stats.knownParCount < stats.holeCount && <p style={{ fontSize: 13, color: COLORS.darkTeal }}>Par-based averages use only holes with par entered. Missing comparisons are shown as —.</p>}
     <h3 style={{ color: COLORS.darkTeal, fontWeight: 'bold', fontSize: '20px', marginTop: 0, marginBottom: '16px' }}>{title}</h3>
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
       <StatItem
   label="Avg to Par / Hole"
-  value={stats.avgToParPerHole > 0 ? `+${stats.avgToParPerHole}` : stats.avgToParPerHole}
+  value={stats.avgToParPerHole == null ? '—' : stats.avgToParPerHole > 0 ? `+${stats.avgToParPerHole}` : stats.avgToParPerHole}
   variant="blush"
 />
       <StatItem label="3+ Putts" value={stats.threePuttPercentage == null ? '—' : `${stats.threePuttPercentage}%`} variant="misty" />
+      {stats.par3GreenPct != null && <StatItem label="Par 3 Greens Hit" value={`${stats.par3GreenPct}%`} variant="blush" />}
       <StatItem label="Fairways Hit" value={stats.fairwayPct == null ? '—' : `${stats.fairwayPct}%`} variant="blush" />
-      <StatItem label={totalHoles ? "Total Holes" : "Score to Par"} value={totalHoles || (stats.scoreToPar > 0 ? `+${stats.scoreToPar}` : stats.scoreToPar)} variant="misty" />
+      <StatItem label={totalHoles ? "Total Holes" : "Score to Par"} value={totalHoles || (stats.scoreToPar == null ? '—' : stats.scoreToPar > 0 ? `+${stats.scoreToPar}` : stats.scoreToPar)} variant="misty" />
     </div>
     <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `2px solid ${COLORS.mistyBlue}33` }}>
       <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: '14px', color: COLORS.charcoal }}>
@@ -651,7 +607,7 @@ const RoundDetailModal = ({
   onDelete
 }) => {
   const totalScore = round.holes.reduce((sum, h) => sum + h.total, 0);
-  const totalPar = round.holes.reduce((sum, h) => sum + h.par, 0);
+  const totalPar = getRoundPar(round.holes);
   const totalPutts = round.holes.some(h => Number.isFinite(h.putts)) ? round.holes.reduce((sum, h) => sum + (h.putts ?? 0), 0) : '—';
 
   return (
@@ -734,9 +690,6 @@ const RoundDetailModal = ({
                   />
                 </div>
 
-                <p style={{ color: COLORS.charcoal, fontSize: '13px', marginTop: '-4px', marginBottom: '16px', lineHeight: 1.4 }}>
-                  Unofficial Handicap is only calculated from rounds with both course rating and slope rating.
-                </p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={onCancelEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: COLORS.cream, color: COLORS.charcoal, border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>Cancel</button>
                 <button onClick={onSaveEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: COLORS.darkTeal, color: COLORS.cream, border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>✓ Save Changes</button>
@@ -797,7 +750,7 @@ const RoundDetailModal = ({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
                   <div>
                     <span style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold' }}>Hole {hole.hole}</span>
-                    <span style={{ color: COLORS.mistyBlue, fontSize: '14px', marginLeft: '8px' }}>Par {hole.par} • {hole.yardage} yds</span>
+                    <span style={{ color: COLORS.mistyBlue, fontSize: '14px', marginLeft: '8px' }}>Par {hole.par ?? '—'} • {hole.yardage ?? '—'} yds</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.blush }}>{hole.total}</div>
@@ -805,7 +758,7 @@ const RoundDetailModal = ({
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px', color: COLORS.charcoal }}>
-                  <div><strong>Drive:</strong> {hole.drive === 'middle' ? '✨ Fairway' : hole.drive ? hole.drive.charAt(0).toUpperCase() + hole.drive.slice(1) : (typeof hole.fairwayHit === 'boolean' ? (hole.fairwayHit ? 'Fairway' : 'Missed fairway') : '—')}</div>
+                  <div><strong>Tee result:</strong> {hole.drive === 'middle' ? '✨ Fairway' : hole.drive ? hole.drive.charAt(0).toUpperCase() + hole.drive.slice(1) : (hole.par === 3 && typeof hole.greenInRegulation === 'boolean' ? (hole.greenInRegulation ? 'Green' : 'Missed green') : typeof hole.fairwayHit === 'boolean' ? (hole.fairwayHit ? 'Fairway' : 'Missed fairway') : '—')}</div>
                   <div><strong>Putts:</strong> {hole.putts ?? '—'}</div>
                   <div><strong>Approaches:</strong> {hole.approaches ?? '—'}</div>
                   <div><strong>Chips:</strong> {hole.chips ?? '—'}</div>

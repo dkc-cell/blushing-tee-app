@@ -61,6 +61,10 @@ const AboutScreen = ({ onNavigate }) => {
           gap: '16px'
         }}
       >
+        <section style={{ background: '#FFFFFF', padding: 20, borderRadius: 16 }}>
+          <h2 style={{ color: COLORS.darkTeal, fontSize: 20 }}>Tracking your progress</h2>
+          <p>Blushing Birdie does not calculate an official handicap. Golfers who maintain one can post eligible scores through GHIN or their handicap service.</p>
+        </section>
         {/* How to use */}
         <section
           style={{

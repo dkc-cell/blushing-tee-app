@@ -9,10 +9,7 @@ import {
 } from '../utils/activeRoundStorage';
 import confetti from 'canvas-confetti';
 
-// Celebration images (you said you’ll add these to /assets/images)
-import birdieImg from '../assets/images/birdie.png';
-import eagleImg from '../assets/images/eagle.png';
-import hioImg from '../assets/images/hio.png';
+import RoundCelebration, { CELEBRATION_MS } from '../components/RoundCelebration';
 
 const getSavedHoleDraft = (holeNumber) => {
   const active = loadActiveRound();
@@ -41,54 +38,6 @@ const LogRoundScreen = ({
   const [showDriveWarning, setShowDriveWarning] = useState(false);
   const [celebrationKind, setCelebrationKind] = useState(null); // 'birdie' | 'eagle' | 'hio' | null
   const driveSectionRef = useRef(null);
-    // Auto-hide celebration overlay after 4 seconds
-  useEffect(() => {
-    if (!celebrationKind) return;
-    const t = setTimeout(() => setCelebrationKind(null), CELEBRATION_MS);
-    return () => clearTimeout(t);
-  }, [celebrationKind]);
-  // Fire confetti burst when celebration starts
-useEffect(() => {
-  if (!celebrationKind) return;
-
-  const config =
-    celebrationKind === 'hio'
-      ? { particleCount: 260, spread: 120, startVelocity: 62, scalar: 1.2 }
-      : celebrationKind === 'eagle'
-      ? { particleCount: 200, spread: 105, startVelocity: 58, scalar: 1.1 }
-      : { particleCount: 170, spread: 95, startVelocity: 55, scalar: 1.05 };
-
-  // First burst
-  confetti({
-    particleCount: config.particleCount,
-    spread: config.spread,
-    startVelocity: config.startVelocity,
-    gravity: 0.85,
-    scalar: config.scalar,
-    ticks: 150,
-    origin: { x: 0.5, y: 0.38 },
-    colors: ['#F4A8B9', '#ACC8C8', '#103E43', '#FFF7F0'],
-    zIndex: 10050
-  });
-
-  // Second burst (adds punch)
-  const t2 = setTimeout(() => {
-    confetti({
-      particleCount: Math.round(config.particleCount * 0.65),
-      spread: config.spread + 10,
-      startVelocity: Math.max(40, config.startVelocity - 12),
-      gravity: 0.95,
-      scalar: Math.max(0.95, config.scalar - 0.1),
-      ticks: 130,
-      origin: { x: 0.5, y: 0.38 },
-      colors: ['#F4A8B9', '#ACC8C8', '#103E43', '#FFF7F0'],
-      zIndex: 10050
-    });
-  }, 180);
-
-  return () => clearTimeout(t2);
-}, [celebrationKind]);
-
     const handleDriveSelect = (value) => {
     setDrive(value);
     setShowDriveWarning(false);
@@ -135,7 +84,7 @@ useEffect(() => {
   const [tempYardage, setTempYardage] = useState('');
 
     // Celebration overlay (Birdie / Eagle / HIO)
-  const CELEBRATION_MS = 4000;
+
 
   const randomQuote = ENCOURAGING_QUOTES[currentHole % ENCOURAGING_QUOTES.length];
   const isHoleRecorded = recordedHoles.has(currentHole);
@@ -773,74 +722,7 @@ useEffect(() => {
         />
       )}
 
-      {/* Birdie celebration overlay */}
-      <style>{`
-    .birdie-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 245, 248, 0.88); /* soft blush */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  pointer-events: none;
-}
- .celebration-image {
-  position: relative;
-  z-index: 2;                 /* above confetti */
-  width: min(340px, 85vw);    /* phone-friendly */
-  height: auto;
-  opacity: 0.95;
-  animation: birdiePop 4s ease-in-out forwards;
-}
- /* Slightly bigger for Eagle */
-.celebration-image.eagle {
-  width: min(360px, 88vw);
-}
-
-/* Biggest moment for Hole-in-One */
-.celebration-image.hio {
-  width: min(400px, 92vw);
-}
- @keyframes birdiePop {
-  0%   { opacity: 0; transform: scale(0.9); }
-  15%  { opacity: 1; transform: scale(1); }
-  85%  { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.02); }
-}
- `}</style>
-
-{celebrationKind && (
-  <div
-  className="birdie-overlay"
-  aria-label={
-    celebrationKind === 'hio'
-      ? 'Hole in One celebration'
-      : celebrationKind === 'eagle'
-      ? 'Eagle celebration'
-      : 'Birdie celebration'
-  }
->
-  <img
-    className={`celebration-image ${celebrationKind}`}
-  src={
-    celebrationKind === 'hio'
-      ? hioImg
-      : celebrationKind === 'eagle'
-      ? eagleImg
-      : birdieImg
-  }
-  alt={
-    celebrationKind === 'hio'
-      ? 'Hole in One'
-      : celebrationKind === 'eagle'
-      ? 'Eagle'
-      : 'Birdie'
-  }
-/>
-
-    </div>
-)}
+      <RoundCelebration kind={celebrationKind} onDismiss={() => setCelebrationKind(null)} />
 
       {/* Par Modal */}
       {showParModal && (
