@@ -13,8 +13,8 @@ const HomeScreen = ({
   onEndActiveRound,
 }) => {
   // Safeguards so UI doesn't break if stats are missing
-  const fairwaysHit = stats?.fairwayPercentage ?? stats?.fairwaysHit ?? 0;
-  const threePuttPct = stats?.threePuttPercentage ?? 0;
+  const fairwaysHit = stats?.fairwayPercentage ?? stats?.fairwaysHit ?? '—';
+  const threePuttPct = stats?.threePuttPercentage ?? '—';
 
   const [screenWidth, setScreenWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 430
@@ -167,7 +167,7 @@ const HomeScreen = ({
                 lineHeight: 1.1,
               }}
             >
-              {fairwaysHit.toFixed ? fairwaysHit.toFixed(0) : Math.round(fairwaysHit)}%
+              {typeof fairwaysHit === 'number' ? `${Math.round(fairwaysHit)}%` : '—'}
             </div>
           </div>
 
@@ -200,7 +200,7 @@ const HomeScreen = ({
                 lineHeight: 1.1,
               }}
             >
-              {threePuttPct.toFixed ? threePuttPct.toFixed(0) : Math.round(threePuttPct)}%
+              {typeof threePuttPct === 'number' ? `${Math.round(threePuttPct)}%` : '—'}
             </div>
           </div>
         </div>

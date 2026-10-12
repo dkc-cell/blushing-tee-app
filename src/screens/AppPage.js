@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import QuickScoreScreen from './QuickScoreScreen';
+import { COLORS } from '../constants';
 import { SplashScreen } from '../components';
 import {
   HomeScreen,
@@ -59,6 +61,8 @@ export default function AppPage() {
   const courseSyncUserIdRef = useRef(null);
   const roundSyncUserIdRef = useRef(null);
   
+  const [scoringMode, setScoringMode] = useState(initialActiveRound?.scoringMode || 'detailed');
+
   // Current round state
   const [currentHole, setCurrentHole] = useState(initialActiveRound?.currentHole || 1);
   const [currentRound, setCurrentRound] = useState(initialActiveRound?.currentRound || []);
@@ -91,6 +95,7 @@ export default function AppPage() {
     if (!roundIsActive) return;
 
     saveActiveRound({
+      scoringMode,
       currentHole,
       currentRound,
       recordedHoles: [...recordedHoles],
@@ -101,6 +106,7 @@ export default function AppPage() {
     });
   }, [
     roundIsActive,
+    scoringMode,
     currentHole,
     currentRound,
     recordedHoles,
@@ -200,6 +206,7 @@ export default function AppPage() {
     if (!roundIsActive) return null;
 
     return {
+      scoringMode,
       currentHole,
       currentRound,
       recordedHoles: [...recordedHoles],
@@ -437,6 +444,8 @@ setCurrentScreen('roundComplete');
     return <SplashScreen />;
   }
 
+  const RoundScoringScreen = scoringMode === 'quick' ? QuickScoreScreen : LogRoundScreen;
+
   // Render current screen
   switch (currentScreen) {
     case 'home':
@@ -463,21 +472,30 @@ setCurrentScreen('roundComplete');
             setCustomYardages(course.yardages || {});
             setCourseName(course.name);
             setRoundIsActive(true);
-            setCurrentScreen('logRound');
+            setCurrentScreen('chooseScoring');
           }}
           onNewCourse={() => {
             if (!confirmReplaceActiveRound()) return;
             resetRoundState();
             setRoundIsActive(true);
-            setCurrentScreen('logRound');
+            setCurrentScreen('chooseScoring');
           }}
           onBack={() => setCurrentScreen('home')}
         />
       );
 
+    case 'chooseScoring':
+      return <main style={{ maxWidth: 520, margin: 'auto', padding: 24, color: COLORS.darkTeal }}>
+        <button onClick={() => setCurrentScreen('selectCourse')}>← Back</button>
+        <h1>How would you like to score?</h1>
+        <p>Choose what works for you today.</p>
+        {[['quick', 'Quick Score', 'Enter your total. Add fairway and putt stats if you like.'], ['detailed', 'Detailed Tracking', 'Record your tee shot, approaches, short game and putts. We calculate your score.']].map(([mode, title, description]) => <button key={mode} onClick={() => { setScoringMode(mode); localStorage.setItem('bb_scoringMode', mode); setCurrentScreen('logRound'); }} style={{ display: 'block', width: '100%', textAlign: 'left', background: mode === (localStorage.getItem('bb_scoringMode') || 'quick') ? '#f8dfe6' : '#eff8f8', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: 18, padding: 20, margin: '16px 0', color: COLORS.darkTeal, cursor: 'pointer' }}><strong style={{ fontSize: 22 }}>{title}</strong><p>{description}</p>{mode === localStorage.getItem('bb_scoringMode') && <span>Last used</span>}</button>)}
+      </main>;
+
     case 'logRound':
       return (
-        <LogRoundScreen
+        <RoundScoringScreen
+          courseName={courseName}
           currentHole={currentHole}
           setCurrentHole={setCurrentHole}
           customPars={customPars}
@@ -508,7 +526,7 @@ setCurrentScreen('roundComplete');
           }}
           onNewRound={() => {
             resetRoundState();
-            setCurrentScreen('logRound');
+            setCurrentScreen('selectCourse');
           }}
         />
       );

@@ -24,7 +24,7 @@ const RoundCompleteScreen = ({
   const isFullRound = holesPlayed === 18;
   const scoreToPar = totalScore - totalPar;
   const fairwaysHit = currentRound.filter(h => h.fairwayHit && h.par > 3).length;
-  const possibleFairways = currentRound.filter(h => h.par > 3).length;
+  const possibleFairways = currentRound.filter(h => h.par > 3 && typeof h.fairwayHit === 'boolean').length;
   const holesWithPutts = currentRound.filter(h => Number.isFinite(h?.putts));
   const threePuttCount = holesWithPutts.filter(h => h.putts >= 3).length;
   const threePuttPercentage = holesWithPutts.length > 0 ? Math.round((threePuttCount / holesWithPutts.length) * 100) : 0;
@@ -84,13 +84,13 @@ const RoundCompleteScreen = ({
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', paddingTop: '16px', borderTop: `2px solid ${COLORS.mistyBlue}33` }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.darkTeal, marginBottom: '4px' }}>
-              {possibleFairways > 0 ? Math.round((fairwaysHit / possibleFairways) * 100) : 0}%
+              {possibleFairways > 0 ? `${Math.round((fairwaysHit / possibleFairways) * 100)}%` : '—'}
             </div>
             <div style={{ fontSize: '14px', color: COLORS.mistyBlue }}>Fairways Hit</div>
             <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginTop: '4px' }}>{fairwaysHit}/{possibleFairways}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.darkTeal, marginBottom: '4px' }}>{threePuttPercentage}%</div>
+            <div style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.darkTeal, marginBottom: '4px' }}>{holesWithPutts.length ? `${threePuttPercentage}%` : '—'}</div>
             <div style={{ fontSize: '14px', color: COLORS.mistyBlue }}>3-Putt %</div>
             <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginTop: '4px' }}>{threePuttCount} of {holesWithPutts.length} holes</div>
           </div>

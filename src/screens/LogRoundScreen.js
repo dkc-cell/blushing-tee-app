@@ -15,7 +15,8 @@ import eagleImg from '../assets/images/eagle.png';
 import hioImg from '../assets/images/hio.png';
 
 const getSavedHoleDraft = (holeNumber) => {
-  const draft = loadActiveRound()?.holeDraft;
+  const active = loadActiveRound();
+  const draft = active?.holeDrafts?.[holeNumber] || active?.holeDraft;
   return draft?.hole === holeNumber ? draft : null;
 };
 

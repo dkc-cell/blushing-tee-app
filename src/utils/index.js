@@ -31,7 +31,7 @@ export const formatDateForDisplay = (dateString, options = {}) => {
 };
 const calcThreePuttPercentage = (holes = []) => {
   const holesWithPutts = holes.filter(h => Number.isFinite(h?.putts));
-  if (holesWithPutts.length === 0) return 0;
+  if (holesWithPutts.length === 0) return null;
 
   const threePuttHoles = holesWithPutts.filter(h => h.putts >= 3).length;
   return (threePuttHoles / holesWithPutts.length) * 100;
@@ -106,7 +106,7 @@ export const calcStats = (holes) => {
   const totalScore = holes.reduce((sum, h) => sum + h.total, 0);
   const totalPar = holes.reduce((sum, h) => sum + h.par, 0);
   const totalPutts = holes.reduce((sum, h) => sum + (Number.isFinite(h?.putts) ? h.putts : 0), 0);
-  const fairwayHoles = holes.filter(h => h.par > 3);
+  const fairwayHoles = holes.filter(h => h.par > 3 && typeof h.fairwayHit === 'boolean');
   const fairwaysHit = holes.filter(h => h.fairwayHit && h.par > 3).length;
   
   const par3Holes = holes.filter(h => h.par === 3);
@@ -117,7 +117,7 @@ export const calcStats = (holes) => {
     ? (arr.reduce((sum, h) => sum + h.total, 0) / arr.length).toFixed(1) 
     : 'N/A';
  
-  const threePuttPercentage = Math.round(calcThreePuttPercentage(holes));
+  const threePuttPercentage = calcThreePuttPercentage(holes) == null ? null : Math.round(calcThreePuttPercentage(holes));
   const avgToParPerHole = ((totalScore - totalPar) / holes.length).toFixed(2);
 
   return {
@@ -127,8 +127,8 @@ export const calcStats = (holes) => {
     avgToParPerHole,
 
 
-    totalPutts,
-    fairwayPct: fairwayHoles.length > 0 ? Math.round((fairwaysHit / fairwayHoles.length) * 100) : 0,
+    totalPutts: holes.some(h => Number.isFinite(h.putts)) ? totalPutts : null,
+    fairwayPct: fairwayHoles.length > 0 ? Math.round((fairwaysHit / fairwayHoles.length) * 100) : null,
     fairwaysHit,
     totalFairways: fairwayHoles.length,
     avgPar3: calcAvg(par3Holes),
@@ -151,15 +151,15 @@ export const calcOverallStats = (rounds) => {
   }
 
   const allHoles = rounds.flatMap(r => r.holes || []);
-  const fairwayHoles = allHoles.filter(h => h.par > 3);
+  const fairwayHoles = allHoles.filter(h => h.par > 3 && typeof h.fairwayHit === 'boolean');
   const fairwaysHitCount = allHoles.filter(h => h.fairwayHit && h.par > 3).length;
 
-  const threePuttPercentage = Math.round(calcThreePuttPercentage(allHoles));
+  const threePuttPercentage = calcThreePuttPercentage(allHoles) == null ? null : Math.round(calcThreePuttPercentage(allHoles));
 
   return {
     fairwaysHit: fairwayHoles.length > 0
       ? Math.round((fairwaysHitCount / fairwayHoles.length) * 100)
-      : 0,
+      : null,
     threePuttPercentage,
     unofficialHandicap: calcUnofficialHandicap(rounds)
   };
@@ -215,9 +215,10 @@ export const exportToCSV = (rounds, startDate = null, endDate = null) => {
     const scoreToPar = totalScore - totalPar;
 
     const totalPutts = holes.reduce((sum, hole) => sum + (Number(hole.putts) || 0), 0);
-    const avgPuttsPerHole = holesPlayed ? (totalPutts / holesPlayed).toFixed(2) : '';
+    const puttHoles = holes.filter(h => Number.isFinite(h.putts));
+    const avgPuttsPerHole = puttHoles.length ? (totalPutts / puttHoles.length).toFixed(2) : '';
 
-    const fairwayOpportunities = holes.filter((hole) => Number(hole.par) > 3).length;
+    const fairwayOpportunities = holes.filter((hole) => Number(hole.par) > 3 && typeof hole.fairwayHit === 'boolean').length;
     const fairwaysHit = holes.filter(
       (hole) => Number(hole.par) > 3 && hole.fairwayHit
     ).length;
@@ -257,7 +258,7 @@ export const exportToCSV = (rounds, startDate = null, endDate = null) => {
       totalPar,
       scoreToPar > 0 ? `+${scoreToPar}` : scoreToPar,
 
-      totalPutts,
+      puttHoles.length ? totalPutts : '',
       avgPuttsPerHole,
 
       fairwaysHit,

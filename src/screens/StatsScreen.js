@@ -612,8 +612,8 @@ const StatsCard = ({ title, stats, totalHoles }) => (
   value={stats.avgToParPerHole > 0 ? `+${stats.avgToParPerHole}` : stats.avgToParPerHole}
   variant="blush"
 />
-      <StatItem label="3+ Putts" value={`${stats.threePuttPercentage || 0}%`} variant="misty" />
-      <StatItem label="Fairways Hit" value={`${stats.fairwayPct}%`} variant="blush" />
+      <StatItem label="3+ Putts" value={stats.threePuttPercentage == null ? '—' : `${stats.threePuttPercentage}%`} variant="misty" />
+      <StatItem label="Fairways Hit" value={stats.fairwayPct == null ? '—' : `${stats.fairwayPct}%`} variant="blush" />
       <StatItem label={totalHoles ? "Total Holes" : "Score to Par"} value={totalHoles || (stats.scoreToPar > 0 ? `+${stats.scoreToPar}` : stats.scoreToPar)} variant="misty" />
     </div>
     <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `2px solid ${COLORS.mistyBlue}33` }}>
@@ -652,7 +652,7 @@ const RoundDetailModal = ({
 }) => {
   const totalScore = round.holes.reduce((sum, h) => sum + h.total, 0);
   const totalPar = round.holes.reduce((sum, h) => sum + h.par, 0);
-  const totalPutts = round.holes.reduce((sum, h) => sum + h.putts, 0);
+  const totalPutts = round.holes.some(h => Number.isFinite(h.putts)) ? round.holes.reduce((sum, h) => sum + (h.putts ?? 0), 0) : '—';
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '20px', overflowY: 'auto' }} onClick={onClose}>
@@ -805,10 +805,10 @@ const RoundDetailModal = ({
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px', color: COLORS.charcoal }}>
-                  <div><strong>Drive:</strong> {hole.drive === 'middle' ? '✨ Fairway' : hole.drive.charAt(0).toUpperCase() + hole.drive.slice(1)}</div>
-                  <div><strong>Putts:</strong> {hole.putts}</div>
-                  <div><strong>Approaches:</strong> {hole.approaches}</div>
-                  <div><strong>Chips:</strong> {hole.chips}</div>
+                  <div><strong>Drive:</strong> {hole.drive === 'middle' ? '✨ Fairway' : hole.drive ? hole.drive.charAt(0).toUpperCase() + hole.drive.slice(1) : (typeof hole.fairwayHit === 'boolean' ? (hole.fairwayHit ? 'Fairway' : 'Missed fairway') : '—')}</div>
+                  <div><strong>Putts:</strong> {hole.putts ?? '—'}</div>
+                  <div><strong>Approaches:</strong> {hole.approaches ?? '—'}</div>
+                  <div><strong>Chips:</strong> {hole.chips ?? '—'}</div>
                 </div>
                 {hole.notes && (
                   <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#FFFFFF', borderRadius: '8px', fontStyle: 'italic', fontSize: '14px', color: COLORS.charcoal }}>"{hole.notes}"</div>
