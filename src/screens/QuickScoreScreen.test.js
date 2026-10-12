@@ -1,5 +1,6 @@
 import React, { act, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Simulate } from 'react-dom/test-utils';
 import QuickScoreScreen from './QuickScoreScreen';
 import { loadActiveRound, saveActiveRound } from '../utils/activeRoundStorage';
 import { calcStats, calcOverallStats, formatScoreToPar, exportToCSV } from '../utils';
@@ -8,7 +9,8 @@ let container, root, recorded, completed;
 function Harness({ pars = { 1: 4, 2: 4, 3: 3 } }) {
   const [hole, setHole] = useState(1);
   const [round, setRound] = useState([]);
-  return <QuickScoreScreen currentHole={hole} setCurrentHole={setHole} currentRound={round} customPars={pars} setCustomPars={jest.fn()} customYardages={{}} setCustomYardages={jest.fn()} courseName="Test Course" onRecordHole={data => { recorded(data); setRound(r => [...r.filter(h => h.hole !== data.hole), data]); }} onCompleteRound={completed} onBack={jest.fn()} />;
+  const [courseName, setCourseName] = useState('Test Course');
+  return <QuickScoreScreen currentHole={hole} setCurrentHole={setHole} currentRound={round} customPars={pars} setCustomPars={jest.fn()} customYardages={{ 1: 297 }} courseName={courseName} setCourseName={setCourseName} onRecordHole={data => { recorded(data); setRound(r => [...r.filter(h => h.hole !== data.hole), data]); }} onCompleteRound={completed} onBack={jest.fn()} />;
 }
 const render = () => act(() => root.render(<Harness />));
 const click = name => {
@@ -78,8 +80,20 @@ test('saves score with no par or yardage and no birdie/eagle celebration', () =>
   act(() => root.render(<Harness pars={{}} />));
   for (let i = 0; i < 4; i++) click('Increase score');
   click('Save & Next Hole →');
-  expect(recorded).toHaveBeenCalledWith(expect.objectContaining({ total: 4, par: null, yardage: null }));
+  expect(recorded).toHaveBeenCalledWith(expect.objectContaining({ total: 4, par: null, yardage: 297 }));
   expect(container.querySelector('.birdie-overlay')).toBeNull();
+});
+
+test('course name can be edited during the round and yardage stays hidden but preserved', () => {
+  render();
+  expect(container.textContent).not.toContain('Yardage');
+  click('Edit course name');
+  act(() => Simulate.change(container.querySelector('input'), { target: { value: 'Olympic Hills' } }));
+  click('Save Name');
+  expect(container.querySelector('.qs-course-name').textContent).toContain('Olympic Hills');
+  for (let i = 0; i < 5; i++) click('Increase score');
+  click('Save & Next Hole →');
+  expect(recorded).toHaveBeenCalledWith(expect.objectContaining({ yardage: 297 }));
 });
 test('par 3 green response is saved separately from fairways', () => {
   act(() => root.render(<Harness pars={{ 1: 3 }} />));

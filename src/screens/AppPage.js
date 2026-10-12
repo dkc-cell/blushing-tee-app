@@ -496,6 +496,7 @@ setCurrentScreen('roundComplete');
       return (
         <RoundScoringScreen
           courseName={courseName}
+          setCourseName={setCourseName}
           currentHole={currentHole}
           setCurrentHole={setCurrentHole}
           customPars={customPars}
