@@ -69,7 +69,7 @@ const SelectCourseScreen = ({
           Start a Round
         </h2>
         <p style={{ color: COLORS.charcoal, fontSize: '18px', margin: '4px 0 0 0' }}>
-          Choose how to begin
+          Choose a saved course, or start without one.
         </p>
       </div>
 
@@ -106,9 +106,9 @@ const SelectCourseScreen = ({
               ⛳
             </div>
             <div>
-              <div>New Course</div>
+              <div>Start Without a Saved Course</div>
               <div style={{ fontSize: '14px', fontWeight: 'normal', opacity: 0.8, marginTop: '4px' }}>
-                Enter par & yardage as you play
+                Name today’s course during Quick Score.
               </div>
             </div>
           </div>
@@ -214,7 +214,7 @@ const SelectCourseScreen = ({
               No Saved Courses Yet
             </h3>
             <p style={{ color: COLORS.charcoal, fontSize: '14px', margin: 0 }}>
-              Start a new round and save your course to quickly access it next time!
+              You can start now. Use My Courses on the home screen to add a course for future rounds.
             </p>
           </div>
         )}

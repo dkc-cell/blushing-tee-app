@@ -200,7 +200,7 @@ const handleImportBackup = async (event) => {
           margin: 0,
         }}
       >
-        Your Stats
+        My Rounds & Stats
       </h2>
       <p
         style={{

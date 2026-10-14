@@ -3,7 +3,6 @@ import { COLORS } from '../constants';
 import { NumberPad } from '../components';
 import { loadActiveRound, saveHoleDraft, isHoleDraftMeaningful } from '../utils/activeRoundStorage';
 import RoundCelebration, { CELEBRATION_MS } from '../components/RoundCelebration';
-import logo from '../assets/images/Blushing_Birdie_Logo.png';
 import './QuickScoreScreen.css';
 
 const readInputs = (hole, round) => {
@@ -72,7 +71,6 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
   };
 
   return <main className="quick-score" style={{ '--teal': COLORS.darkTeal, '--blush': COLORS.blush, '--mist': COLORS.mistyBlue }}>
-    <header className="qs-brand"><img src={logo} alt="Blushing Birdie" /><div><strong>BLUSHING BIRDIE</strong><span>confidence, one swing at a time</span></div></header>
     <button className="qs-back" onClick={onBack}>← Back to Home</button>
     <section className="qs-course"><button className="qs-course-name" aria-label="Edit course name" onClick={() => { setNameDraft(courseName || ''); setModal('course'); }}>{courseName || 'Add course name'} <span aria-hidden="true">✎</span></button><div className="qs-course-grid"><div>Hole <strong>{currentHole}</strong></div><button aria-label="Edit par" onClick={() => setModal('par')}>Par <strong>{par || '--'}</strong><span className="qs-par-edit"> · Edit</span></button></div></section>
     <div className="qs-title"><h2>Score</h2><button aria-label="Score help" onClick={() => setModal('help')}>ⓘ</button></div>

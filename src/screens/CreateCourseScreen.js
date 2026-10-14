@@ -273,6 +273,7 @@ if (
 </div>
    
       <div style={{ padding: '24px' }}>
+        <p style={{ color: COLORS.darkTeal, lineHeight: 1.5 }}>Only the course name is needed to save. Add pars now or later; yardages are optional. This course will appear in My Courses and when you start a round.</p>
         {/* Tip */}
         <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.mistyBlue}33 100%)`, padding: '16px', borderRadius: '16px', marginBottom: '24px' }}>
           <p style={{ color: COLORS.darkTeal, fontSize: '16px', textAlign: 'center', fontWeight: '500', margin: 0 }}>

@@ -602,6 +602,7 @@ setCurrentScreen('roundComplete');
     case 'accountBackup':
       return (
         <AccountBackupScreen
+          onFileBackup={() => setCurrentScreen('stats')}
           user={auth.user}
           authLoading={auth.loading}
           isSupabaseConfigured={auth.isConfigured}
