@@ -53,7 +53,9 @@ const ManageCoursesScreen = ({
                       {course.name}
                     </div>
                     <div style={{ color: COLORS.charcoal, fontSize: '14px' }}>
-                      18 holes • Custom pars & yardages
+                      {Object.values(course.pars || {}).filter(par => [3, 4, 5].includes(par)).length
+                        ? `Par entered for ${Object.values(course.pars || {}).filter(par => [3, 4, 5].includes(par)).length} holes`
+                        : 'Course name saved · Add hole details anytime'}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
