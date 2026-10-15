@@ -151,6 +151,7 @@ export default function OurStoryPage() {
           </p>
         </div>
 
+        <p style={{ textAlign: 'center' }}><Link to="/app">Open the tracker →</Link></p>
         <section style={{ ...cardStyle, padding: '34px 30px' }}>
           {storyContent.map((paragraph, index) => {
             const isHeading =

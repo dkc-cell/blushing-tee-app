@@ -71,6 +71,7 @@ export default function AccountBackupScreen({
   courses,
   onRestoreData,
   onBack,
+  onFileBackup,
 }) {
   const [mode, setMode] = useState('signIn');
   const [email, setEmail] = useState('');
@@ -319,6 +320,7 @@ export default function AccountBackupScreen({
         >
           ← Back
         </button>
+
         <h2
           style={{
             color: COLORS.darkTeal,
@@ -327,7 +329,7 @@ export default function AccountBackupScreen({
             margin: 0,
           }}
         >
-          Account Sync
+          Backup & Account
         </h2>
         <p style={{ color: COLORS.charcoal, fontSize: '17px', margin: '6px 0 0' }}>
           Keep using local mode, or sign in to sync your data across devices.
@@ -335,6 +337,7 @@ export default function AccountBackupScreen({
       </div>
 
       <div style={{ padding: '0 24px', display: 'grid', gap: '18px' }}>
+        {onFileBackup && <div style={{ background: '#FFFFFF', border: `1px solid ${COLORS.mistyBlue}`, borderRadius: 14, padding: 16, margin: '12px 0' }}><strong>File backups · No account needed</strong><p>Export CSV, save a full backup, or import a backup from a file.</p><button onClick={onFileBackup} style={{ padding: 12, minHeight: 44, borderRadius: 10, border: 0, background: COLORS.mistyBlue, color: COLORS.darkTeal }}>Open File Export & Import</button></div>}
         <section
           style={{
             backgroundColor: '#FFFFFF',

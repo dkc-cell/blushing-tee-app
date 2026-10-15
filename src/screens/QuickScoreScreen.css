@@ -1,0 +1,91 @@
+.quick-score { max-width: 580px; margin: auto; padding: 20px 18px max(24px, env(safe-area-inset-bottom)); color: var(--teal); background: white; min-height: 100vh; box-sizing: border-box; }
+.quick-score * { box-sizing: border-box; }
+.quick-score button { color: var(--teal); font: inherit; cursor: pointer; min-height: 44px; }
+.quick-score button:disabled { opacity: .4; cursor: default; }
+.quick-score button:focus-visible, .quick-score summary:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.qs-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.qs-brand img { width: 55px; height: 55px; object-fit: contain; }
+.qs-brand strong { font: bold clamp(18px, 5vw, 28px) Georgia, serif; display: block; }
+.qs-brand span { display: block; color: #c76f88; font-size: clamp(11px, 3vw, 17px); }
+.qs-back, .qs-link { border: 0; background: none; text-decoration: underline; }
+.qs-course { border: 2px solid var(--mist); border-radius: 24px; background: #f2f8f8; padding: 18px; }
+.qs-course h1 { font-size: 22px; margin: 0 0 10px; overflow-wrap: anywhere; }
+.qs-course p { font-size: 14px; }
+.qs-course-grid { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+.qs-course-grid > * { border: 0; border-right: 2px solid var(--mist); background: none; font-size: 17px; }
+.qs-course-grid > :last-child { border: 0; }
+.qs-course-grid strong { display: block; font-size: 30px; margin-top: 8px; }
+.qs-title { display: flex; gap: 12px; justify-content: center; align-items: center; margin: 20px 0 14px; }
+.qs-title h2 { font-size: 32px; margin: 0; }
+.qs-title button { background: #e8f3f3; border: 0; border-radius: 50%; width: 44px; font-size: 24px; }
+.qs-counter { display: grid; grid-template-columns: 1fr 1.7fr 1fr; gap: 16px; align-items: center; }
+.qs-counter button { background: #f8dfe6; border: 2px solid #efd0d9; border-radius: 22px; height: 100px; font-size: 48px; }
+.qs-counter button:last-child { background: #e9a5b8; }
+.qs-counter .qs-total { height: 180px; font-size: 82px; background: #eaf6f6; border-color: var(--mist); }
+.qs-hint { text-align: center; font-size: 17px; margin: 18px 0 24px; }
+.qs-stats { border-top: 1px solid var(--mist); padding-top: 14px; }
+.qs-stats summary { cursor: pointer; font-weight: 600; min-height: 44px; padding: 10px 0; }
+.qs-stats > p { font-size: 14px; }
+.qs-stat { background: #f8dfe6; border-radius: 22px; padding: 16px; margin: 14px 0; text-align: center; }
+.qs-stat h3 { margin: 0 0 12px; }
+.qs-choices { display: flex; gap: 12px; }
+.qs-choices button { flex: 1; padding: 12px; background: white; border: 2px solid var(--mist); border-radius: 14px; }
+.qs-choices button[aria-pressed=true] { background: var(--mist); border-color: var(--teal); }
+.qs-putts { display: flex; align-items: center; justify-content: space-around; }
+.qs-putts button { width: 64px; height: 60px; font-size: 32px; background: white; border: 1px solid var(--mist); border-radius: 14px; }
+.qs-putts strong { font-size: 40px; }
+.qs-nav { display: grid; grid-template-columns: 1fr .85fr 1fr; align-items: center; gap: 8px; margin-top: 24px; text-align: center; font-size: 14px; }
+.qs-nav button { background: #eff8f8; border: 1px solid var(--mist); border-radius: 16px; min-height: 64px; padding: 10px 8px; font-weight: 600; }
+.qs-end { display: block; margin: 12px auto 0; font-size: 14px !important; }
+.qs-error { color: #8f2948; }
+.qs-overlay { position: fixed; inset: 0; background: #0007; display: flex; justify-content: center; align-items: center; padding: 16px; z-index: 5000; }
+.qs-modal { background: white; border-radius: 24px; padding: 20px; max-width: 420px; width: 100%; max-height: 90dvh; overflow: auto; }
+.qs-modal > button:not(.qs-link) { display: block; width: 100%; background: #eff8f8; border: 1px solid var(--mist); border-radius: 12px; padding: 12px; margin: 12px 0; }
+/* Compact phone scorecard: reserve space for the fixed navigation bar. */
+.quick-score { max-width: 440px; min-height: 100dvh; padding: 10px 16px calc(112px + env(safe-area-inset-bottom)); }
+.qs-brand { gap: 8px; margin-bottom: 0; }
+.qs-brand img { width: 36px; height: 36px; }
+.qs-brand strong { font-size: clamp(17px, 4.6vw, 22px); }
+.qs-brand span { font-size: 11px; }
+.qs-back { font-size: 14px !important; padding: 0; }
+.qs-course { padding: 6px 12px; border-radius: 16px; }
+.qs-course-name { width: 100%; border: 0; background: none; padding: 0; font-weight: 700 !important; text-align: left; font-size: 18px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qs-course-name span { font-size: 15px; opacity: .7; }
+.qs-course-grid { grid-template-columns: 1fr 1fr; align-items: center; }
+.qs-course-grid > * { font-size: 16px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.qs-course-grid strong { display: inline; font-size: 23px; margin: 0; }
+.qs-par-edit { font-size: 12px; }
+.qs-title { margin: 8px 0 4px; gap: 8px; }
+.qs-title h2 { font-size: 24px; }
+.qs-title button { font-size: 22px; background: none; }
+.qs-counter { gap: 12px; grid-template-columns: 1fr 1.5fr 1fr; }
+.qs-counter button { height: 64px; border-radius: 16px; font-size: 38px; }
+.qs-counter .qs-total { height: 104px; font-size: 66px; }
+.qs-hint { font-size: 13px; margin: 8px 0 6px; }
+.qs-stats { padding-top: 0; }
+.qs-stats summary { padding: 8px 0; font-size: 15px; }
+.qs-stat { display: flex; align-items: center; gap: 8px; margin: 4px 0; padding: 6px 10px; border-radius: 14px; min-height: 56px; }
+.qs-stat h3 { margin: 0; font-size: 16px; flex: 0 0 94px; text-align: left; }
+.qs-stat .qs-choices { flex: 1; gap: 8px; }
+.qs-stat .qs-choices button { padding: 5px 8px; border-radius: 10px; font-size: 15px; }
+.qs-putts { flex: 1; gap: 6px; }
+.qs-putts button { width: 44px; height: 44px; font-size: 26px; border-radius: 10px; }
+.qs-putts strong { font-size: 26px; min-width: 28px; }
+.qs-stat > .qs-link { font-size: 11px; padding: 0; }
+.qs-footer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 440px; background: white; border-top: 1px solid var(--mist); padding: 8px 16px max(6px, env(safe-area-inset-bottom)); z-index: 1100; box-shadow: 0 -3px 12px #00000008; }
+.qs-nav { margin: 0; grid-template-columns: 1fr 48px 1.25fr; gap: 6px; font-size: 13px; }
+.qs-nav button { min-height: 52px; padding: 6px; border-radius: 12px; font-size: 14px; }
+.qs-nav button:last-child { background: #f8dfe6; }
+.qs-end { margin: 0 auto; min-height: 44px; font-size: 12px !important; }
+.qs-error { font-size: 14px; margin: 6px 0; }
+.qs-modal input { display: block; width: 100%; font-size: 16px; padding: 12px; border: 2px solid var(--mist); border-radius: 10px; margin-top: 12px; }
+@media (max-width: 360px) {
+  .quick-score { padding-inline: 12px; }
+  .qs-stat h3 { flex-basis: 82px; font-size: 15px; }
+  .qs-stat { padding-inline: 8px; gap: 5px; }
+  .qs-brand strong { font-size: 17px; }
+}
+@media (max-height: 620px) {
+  .qs-counter .qs-total { height: 82px; font-size: 60px; }
+  .qs-title { margin-top: 2px; }
+}
