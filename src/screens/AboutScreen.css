@@ -1,0 +1,32 @@
+.tracker-about .tracker-about-title {
+  margin: 16px 0 28px;
+  line-height: 1.25;
+}
+
+.tracker-about .tracker-help-card > h2 {
+  margin: 0 0 20px;
+  line-height: 1.3;
+}
+
+.tracker-about .tracker-help-card > p {
+  margin: 0 0 20px;
+}
+
+.tracker-about .tracker-help-card > ol {
+  margin: 0 0 28px;
+}
+
+.tracker-about .tracker-help-card li {
+  margin: 0 0 14px;
+  padding-left: 4px;
+}
+
+.tracker-about .tracker-help-card li:last-child,
+.tracker-about .tracker-help-card > p:last-child {
+  margin-bottom: 0;
+}
+
+.tracker-about .tracker-help-card > a {
+  display: inline-block;
+  margin-top: 4px;
+}
