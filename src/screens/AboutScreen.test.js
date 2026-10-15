@@ -1,10 +1,10 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
+import AboutScreen from './AboutScreen';
+import { journalArticles } from '../data/journalArticles';
 jest.mock('react-router-dom', () => ({
   Link: ({ to, children }) => <a href={to}>{children}</a>,
 }), { virtual: true });
-import AboutScreen from './AboutScreen';
-import { journalArticles } from '../data/journalArticles';
 
 test('About contains the complete dated My Story article and returns directly to tracker home', () => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
