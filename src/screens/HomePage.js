@@ -3,6 +3,7 @@ import { COLORS } from '../constants';
 import logo from '../assets/images/Blushing_Birdie_Logo.png';
 import { Link } from 'react-router-dom';
 import { journalArticles } from '../data/journalArticles';
+import WhyIBuiltThis from '../components/WhyIBuiltThis';
 import screenHome from '../assets/images/screenHome.png';
 import screenHole1 from '../assets/images/screenHole1.png';
 import screenStats from '../assets/images/screenStats.png';
@@ -674,6 +675,13 @@ const toggleItem = (id) => {
         ))}
       </div>
     )}
+  </div>
+</section>
+
+<section id="why-i-built-this" style={sectionBaseStyle} aria-labelledby="website-why-title">
+  <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'left' }}>
+    <h2 id="website-why-title" style={{ ...sectionTitleStyle, marginBottom: 24 }}>Why I Built This</h2>
+    <WhyIBuiltThis />
   </div>
 </section>
 
