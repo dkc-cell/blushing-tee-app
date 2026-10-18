@@ -149,54 +149,6 @@ const featureDotStyle = {
   transition: 'all 0.3s ease',
 };
 
-const testimonialSectionStyle = {
-  padding: '96px 0',
-  background:
-    'linear-gradient(180deg, rgba(255,249,245,1) 0%, rgba(244,168,185,0.08) 100%)',
-};
-
-const testimonialSubtextStyle = {
-  fontSize: '1.02rem',
-  lineHeight: 1.7,
-  color: '#4E6A6E',
-  maxWidth: '760px',
-  margin: '0 auto',
-};
-
-const testimonialGridStyle = (isMobile) => ({
-  display: 'grid',
-  gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
-  gap: '24px',
-  marginTop: '42px',
-});
-
-const testimonialCardStyle = (isMobile) => ({
-  background: 'rgba(255,255,255,0.82)',
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  borderRadius: '24px',
-  padding: isMobile ? '22px 18px' : '28px 24px',
-  border: '1px solid rgba(172,200,200,0.32)',
-  borderTop: '2px solid #edd1d7ff',
-  boxShadow: '0 16px 40px rgba(16, 62, 67, 0.08)',
-});
-
-const testimonialMarkStyle = {
-  fontSize: '2.2rem',
-  lineHeight: 1,
-  color: '#F4A8B9',
-  fontWeight: 700,
-  marginBottom: '1px',
-  fontFamily: 'Georgia, serif',
-};
-
-const testimonialQuoteStyle = {
-  fontSize: '1.02rem',
-  lineHeight: 1.6,
-  color: '#36565A',
-  margin: 0,
-};
-
 const sectionStyle = {
   paddingTop: '60px',
   paddingBottom: '60px',
@@ -273,7 +225,7 @@ const faqItems = [
 
 export default function HomePage() {
   usePageSeo({
-    title: 'Blushing Birdie Golf Tracker for Women',
+    title: 'Blushing Birdie Golf Tracker',
     description: DEFAULT_DESCRIPTION,
     path: '/',
     structuredData: [
@@ -411,29 +363,6 @@ const handleSubmit = async (e) => {
   },
 ];
 
-  const testimonialItems = [
-  {
-    id: 1,
-    quote:
-      'I’ve tried a few golf apps before, but this is the first one that actually feels simple. I just track my round and move on.',
-    name: 'Jennifer',
-  },
-  {
-    id: 2,
-    quote:
-      'The stats are just enough to be helpful without getting in the way.',
-    name: 'Kristin',
-  },
-  {
-    id: 3,
-    quote:
-      'I love that I can play 9 holes and still log it without it feeling incomplete. That alone makes me want to keep using it.',
-    name: 'Michelle',
-  },
-];
-
-
-
 const [openItems, setOpenItems] = useState(['free']);
 
 const toggleItem = (id) => {
@@ -547,7 +476,6 @@ const toggleItem = (id) => {
           ) : (
             <nav style={{ display: 'flex', gap: '22px' }}>
               <a href="#features" style={navLinkStyle}>Features</a>
-              <a href="#reviews" style={navLinkStyle}>Reviews</a>
               <a href="#faq" style={navLinkStyle}>FAQ</a>
               <a href="#shop" style={navLinkStyle}>Birdie Shop</a>
               <a href="#journal" style={{ ...navLinkStyle, fontStyle: 'italic' }}>
@@ -575,7 +503,6 @@ const toggleItem = (id) => {
               }}
             >
               <a href="#features" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>Features</a>
-              <a href="#reviews" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>Reviews</a>
               <a href="#faq" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>FAQ</a>
               <a href="#shop" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>Birdie Shop</a>
               <a href="#journal" style={{ ...mobileNavLinkStyle, fontStyle: 'italic' }} onClick={() => setMenuOpen(false)}>
@@ -633,7 +560,7 @@ const toggleItem = (id) => {
             marginBottom: '18px',
           }}
         >
-          A simple, private golf tracker for women.
+          A simple, private golf tracker.
         </h1>
 
         <p
@@ -773,38 +700,6 @@ const toggleItem = (id) => {
         ))}
       </div>
     )}
-  </div>
-</section>
-
-    {/* REVIEWS */}
-<section id="reviews" style={testimonialSectionStyle}>
-  <div style={sectionWidth}>
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={sectionTitleStyle}>What Women Love About Blushing Birdie</h2>
-      <p style={testimonialSubtextStyle}>
-        Designed for everyday golfers who want to enjoy the game and build
-        confidence along the way.
-      </p>
-    </div>
-
-    <div style={testimonialGridStyle(isMobile)}>
-      {testimonialItems.map((item) => (
-        <div key={item.id} style={testimonialCardStyle(isMobile)}>
-          <div style={testimonialMarkStyle}>“</div>
-          <p style={testimonialQuoteStyle}>{item.quote}</p>
-          <p
-            style={{
-              marginTop: '14px',
-              fontSize: '0.92rem',
-              fontWeight: 600,
-              color: COLORS.darkTeal,
-            }}
-          >
-            — {item.name}
-          </p>
-        </div>
-      ))}
-    </div>
   </div>
 </section>
 
@@ -966,8 +861,8 @@ const toggleItem = (id) => {
         lineHeight: 1.7,
       }}
     >
-      Thoughtful notes, simple encouragement, and everyday reflections for women
-      who love the&nbsp;game.
+      Thoughtful notes, simple encouragement, and everyday reflections for the love
+      of the&nbsp;game.
     </p>
 
     <div
