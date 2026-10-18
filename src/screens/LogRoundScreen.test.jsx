@@ -1,13 +1,14 @@
+import { vi } from 'vitest';
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import LogRoundScreen from './LogRoundScreen';
 import ActiveRoundCard from '../components/ActiveRoundCard';
 import { loadActiveRound, saveActiveRound, saveHoleDraft } from '../utils/activeRoundStorage';
 
-jest.mock('canvas-confetti', () => ({ __esModule: true, default: Object.assign(jest.fn(), { reset: jest.fn() }) }));
+vi.mock('canvas-confetti', () => ({ __esModule: true, default: Object.assign(vi.fn(), { reset: vi.fn() }) }));
 let container, root;
 const recorded = { hole: 1, par: 4, total: 5, drive: 'left', approaches: 2, chips: 0, putts: 2, penalties: {}, notes: '' };
-const props = (hole = 2) => ({ currentHole: hole, setCurrentHole: jest.fn(), customPars: { 1: 4, 2: 4, 3: 4 }, setCustomPars: jest.fn(), customYardages: { 1: 300, 2: 300, 3: 300 }, setCustomYardages: jest.fn(), currentRound: [recorded], recordedHoles: new Set([1]), onRecordHole: jest.fn(), onUnrecordHole: jest.fn(), onCompleteRound: jest.fn(), onBack: jest.fn() });
+const props = (hole = 2) => ({ currentHole: hole, setCurrentHole: vi.fn(), customPars: { 1: 4, 2: 4, 3: 4 }, setCustomPars: vi.fn(), customYardages: { 1: 300, 2: 300, 3: 300 }, setCustomYardages: vi.fn(), currentRound: [recorded], recordedHoles: new Set([1]), onRecordHole: vi.fn(), onUnrecordHole: vi.fn(), onCompleteRound: vi.fn(), onBack: vi.fn() });
 const render = element => act(() => root.render(element));
 const click = text => {
   const button = [...container.querySelectorAll('button')].find(b => b.textContent.trim() === text);
@@ -55,8 +56,8 @@ test('changing holes restores the target draft without saving the prior hole inp
 
 test('ending early prompts about unfinished hole and excludes it from recorded holes', () => {
   saveHoleDraft(2, { hole: 2, drive: 'left', approaches: 2 });
-  const end = jest.fn();
-  render(<ActiveRoundCard activeRound={loadActiveRound()} onResume={jest.fn()} onEndRoundEarly={end} />);
+  const end = vi.fn();
+  render(<ActiveRoundCard activeRound={loadActiveRound()} onResume={vi.fn()} onEndRoundEarly={end} />);
   click('End Round Early');
   expect(container.textContent).toContain("Hole 2 isn't finished");
   click('End Round at Hole 1');

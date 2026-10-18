@@ -1,4 +1,4 @@
-import { exportToCSV, readBackupFile } from './index';
+import { exportToCSV, readBackupFile, exportHolesToCSV } from './index';
 const round = { id: 'r1', date: '2026-10-18', courseName: 'Test Course', holes: [
   { hole: 1, par: 4, total: 4, putts: 2, fairwayHit: true },
   { hole: 2, par: 4, total: 5, putts: null, fairwayHit: null },
@@ -56,7 +56,6 @@ test('JSON restore rejects display objects and preserves script-like strings as 
 });
 
 test('hole CSV preserves actual hole numbers, orders them, and leaves legacy unknown stats blank', () => {
-  const { exportHolesToCSV } = require('./index');
   const csv = exportHolesToCSV([{ ...round, holes: [
     { hole: 10, total: 5, par: 4, putts: 0, fairwayHit: false },
     { hole: 8, total: 4 },

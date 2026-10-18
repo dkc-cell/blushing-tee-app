@@ -1,5 +1,23 @@
 # Blushing Birdie Golf Tracker - Refactored
 
+## Development and verification
+
+Use Node.js 24 (`.nvmrc`) and run `npm ci` to install the locked dependencies.
+The app uses React with Vite and Vitest:
+
+- `npm run dev` — local development.
+- `npm run build` — production files in `build/` (the existing Netlify publish directory).
+- `npm run preview` — serve the production build locally.
+- `npm test` — run the tests once.
+- `npm run test:watch` — run tests while editing.
+- `npm audit` — check dependencies for known vulnerabilities.
+
+`index.html` at the repository root is the Vite entry, loading `src/index.jsx`.
+React components use `.jsx` extensions. Static files in `public/` are copied to
+the build, including the manifest, security headers, and SPA redirect rule.
+The migration preserves browser storage keys, record formats, and `/app`.
+Preview deployments must be reviewed before publishing production changes.
+
 This is the refactored version of the Blushing Birdie golf tracking app, reorganized from a single 3392-line App.js into a modular, maintainable codebase.
 
 ## Project Structure

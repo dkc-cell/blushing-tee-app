@@ -1,16 +1,13 @@
+import { vi } from 'vitest';
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import AboutScreen from './AboutScreen';
 import { journalArticles } from '../data/journalArticles';
-jest.mock('react-router-dom', () => ({
-  Link: ({ to, children }) => <a href={to}>{children}</a>,
-}), { virtual: true });
-
 test('About contains the complete dated My Story article and returns directly to tracker home', () => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   const container = document.createElement('div');
   const root = createRoot(container);
-  const navigate = jest.fn();
+  const navigate = vi.fn();
   act(() => root.render(<AboutScreen onNavigate={navigate} />));
   const story = journalArticles.find(article => article.slug === 'my-story');
   const article = container.querySelector('article');

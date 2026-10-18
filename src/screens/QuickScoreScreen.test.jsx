@@ -1,16 +1,17 @@
+import { vi } from 'vitest';
 import React, { act, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Simulate } from 'react-dom/test-utils';
 import QuickScoreScreen from './QuickScoreScreen';
 import { loadActiveRound, saveActiveRound } from '../utils/activeRoundStorage';
 import { calcStats, calcOverallStats, formatScoreToPar, exportToCSV } from '../utils';
-jest.mock('canvas-confetti', () => ({ __esModule: true, default: Object.assign(jest.fn(), { reset: jest.fn() }) }));
+vi.mock('canvas-confetti', () => ({ __esModule: true, default: Object.assign(vi.fn(), { reset: vi.fn() }) }));
 let container, root, recorded, completed;
 function Harness({ pars = { 1: 4, 2: 4, 3: 3 } }) {
   const [hole, setHole] = useState(1);
   const [round, setRound] = useState([]);
   const [courseName, setCourseName] = useState('Test Course');
-  return <QuickScoreScreen currentHole={hole} setCurrentHole={setHole} currentRound={round} customPars={pars} setCustomPars={jest.fn()} customYardages={{ 1: 297 }} courseName={courseName} setCourseName={setCourseName} onRecordHole={data => { recorded(data); setRound(r => [...r.filter(h => h.hole !== data.hole), data]); }} onCompleteRound={completed} onBack={jest.fn()} />;
+  return <QuickScoreScreen currentHole={hole} setCurrentHole={setHole} currentRound={round} customPars={pars} setCustomPars={vi.fn()} customYardages={{ 1: 297 }} courseName={courseName} setCourseName={setCourseName} onRecordHole={data => { recorded(data); setRound(r => [...r.filter(h => h.hole !== data.hole), data]); }} onCompleteRound={completed} onBack={vi.fn()} />;
 }
 const render = () => act(() => root.render(<Harness />));
 const click = name => {
@@ -19,7 +20,7 @@ const click = name => {
 };
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
-  localStorage.clear(); recorded = jest.fn(); completed = jest.fn();
+  localStorage.clear(); recorded = vi.fn(); completed = vi.fn();
   saveActiveRound({ currentHole: 1, currentRound: [], scoringMode: 'quick' });
   container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container);
 });
@@ -110,15 +111,15 @@ test('unknown pars are excluded from comparisons and export handicap is removed'
 });
 
 test('birdie uses artwork without duplicate caption and advances after four seconds', () => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   render(); for (let i = 0; i < 3; i++) click('Increase score'); click('Save & Next Hole →');
   const overlay = container.querySelector('.birdie-overlay');
   expect(overlay.querySelector('img').alt).toBe('Birdie');
   expect(overlay.textContent).toBe('');
-  act(() => jest.advanceTimersByTime(4000));
+  act(() => vi.advanceTimersByTime(4000));
   expect(container.querySelector('.birdie-overlay')).toBeNull();
   expect(container.querySelector('.qs-total').textContent).toBe('--');
-  jest.useRealTimers();
+  vi.useRealTimers();
 });
 
 test('requires par before saving a quick score', () => {
