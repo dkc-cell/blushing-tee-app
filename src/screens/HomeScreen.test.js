@@ -8,6 +8,8 @@ test('home prioritizes three actions and hides secondary options until More open
   const navigate = jest.fn();
   act(() => root.render(<HomeScreen onNavigate={navigate} savedCourses={[]} />));
   expect(container.textContent).not.toContain('Shop');
+  expect(container.querySelector('footer a').getAttribute('href')).toBe('/');
+  expect(container.querySelector('footer a').target).toBe('_blank');
   expect(container.textContent).not.toContain('About & Help');
   const buttons = [...container.querySelectorAll('button')];
   act(() => buttons.find(b => b.textContent.includes('My Courses')).click());

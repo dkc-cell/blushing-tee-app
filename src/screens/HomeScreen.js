@@ -18,6 +18,7 @@ export default function HomeScreen({ savedCourses = [], onNavigate, activeRound 
       <nav aria-label="Tracker actions" className="th-actions">{actions.map(([screen, title, description, Icon], i) => <button key={screen} className={i === 0 ? 'th-action th-primary' : 'th-action'} onClick={() => onNavigate(screen)}><Icon aria-hidden="true" size={25} /><span><strong>{title}</strong><small>{description}</small></span><ChevronRight aria-hidden="true" size={20} /></button>)}</nav>
       <button className="th-more" aria-expanded={moreOpen} aria-controls="th-more-options" onClick={() => setMoreOpen(!moreOpen)}>More {moreOpen ? '−' : '+'}</button>
       {moreOpen && <nav id="th-more-options" aria-label="More options" className="th-secondary"><button onClick={() => onNavigate('about')}>About & Help <ChevronRight aria-hidden="true" size={18} /></button><button onClick={() => onNavigate('accountBackup')}>Backup & Restore <ChevronRight aria-hidden="true" size={18} /></button><a href="mailto:hello@blushingbirdie.com?subject=Blushing%20Birdie%20Feedback">Share Feedback <ChevronRight aria-hidden="true" size={18} /></a></nav>}
+      <footer className="th-footer"><a href="/" target="_blank" rel="noopener noreferrer">Visit the Website ↗</a></footer>
     </div>
   </main>;
 }

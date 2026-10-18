@@ -19,3 +19,7 @@
 
 .th-secondary a { box-sizing: border-box; text-decoration: none; font-family: inherit; }
 .th-secondary a:focus-visible { outline: 3px solid #103e43; outline-offset: -3px; }
+
+.th-footer { margin-top: 28px; text-align: center; }
+.th-footer a { display: inline-flex; align-items: center; min-height: 44px; color: #103e43; font-size: 15px; text-underline-offset: 4px; }
+.th-footer a:focus-visible { outline: 3px solid #103e43; outline-offset: 4px; }

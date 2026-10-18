@@ -20,7 +20,8 @@ test('About contains the complete dated My Story article and returns directly to
   expect(article.querySelectorAll('p, h2').length).toBe(story.content.length + 3);
   expect(container.querySelector('a[href="/journal"]')).toBeNull();
   expect(container.querySelector('a[href="/our-story"]')).toBeNull();
-  expect(container.querySelector('a[href="/"]').target).toBe('_blank');
+  expect(container.querySelector('a[href="/"]')).toBeNull();
+  expect(container.querySelector('a[href="/privacy"]').target).toBe('_blank');
   act(() => [...container.querySelectorAll('button')].pop().click());
   expect(navigate).toHaveBeenCalledWith('home');
   act(() => root.unmount());
