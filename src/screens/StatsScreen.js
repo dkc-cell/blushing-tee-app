@@ -79,7 +79,7 @@ const handleExportBackup = () => {
     `blushing-birdie-backup-${new Date().toISOString().slice(0, 10)}.json`
   );
 
-  alert('Backup file downloaded successfully!');
+  alert('Backup download started. Save the JSON file in Files, iCloud Drive, or another safe location outside this browser.');
 };
 
 // ✅ Backup Import (NEW)
@@ -331,9 +331,10 @@ const handleImportBackup = async (event) => {
           lineHeight: 1.5,
         }}
       >
-        File export and import are separate from Account Sync. Export CSV creates a spreadsheet of
-        your rounds. Export Backup downloads a full backup file you can keep for yourself. Import
-        Backup restores from a saved backup file and may replace data on this device.
+        Export CSV creates a golf stats spreadsheet; it cannot restore the app. Export Backup saves
+        your rounds and courses in a restorable JSON file. Import Backup replaces saved rounds and
+        courses on this device. Back up after each round or course change and before switching phones
+        or clearing browser data. Keep the file outside this browser.
       </div>
      <div
         style={{
@@ -365,17 +366,17 @@ const handleImportBackup = async (event) => {
 
         <button
           onClick={handleExportBackup}
-          disabled={rounds.length === 0}
+          disabled={rounds.length === 0 && courses.length === 0}
           style={{
-            backgroundColor: rounds.length === 0 ? '#E0E4E5' : '#67999eff',
-            color: rounds.length === 0 ? '#8A9496' : COLORS.cream,
+            backgroundColor: rounds.length === 0 && courses.length === 0 ? '#E0E4E5' : '#67999eff',
+            color: rounds.length === 0 && courses.length === 0 ? '#8A9496' : COLORS.cream,
             padding: '12px 18px',
             borderRadius: '16px',
             border: 'none',
             fontSize: '15px',
             fontWeight: '600',
-            cursor: rounds.length === 0 ? 'not-allowed' : 'pointer',
-            opacity: rounds.length === 0 ? 0.6 : 1,
+            cursor: rounds.length === 0 && courses.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: rounds.length === 0 && courses.length === 0 ? 0.6 : 1,
             transition: 'all 0.2s ease',
           }}
         >

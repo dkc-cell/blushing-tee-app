@@ -237,7 +237,7 @@ export default function HomePage() {
             name: 'Where is Blushing Birdie data stored?',
             acceptedAnswer: {
               '@type': 'Answer',
-              text: 'Rounds and stats are stored locally on your device by default. Optional account sync is only used if you choose to sign in.',
+              text: 'Rounds and courses stay in this browser on your device. Save a backup file after each round to keep a separate copy.',
             },
           },
         ],
@@ -390,7 +390,7 @@ const handleSubmit = async (e) => {
     id: 'free',
     question: 'Is the app free? Do I need an account?',
     answer:
-      'Blushing Birdie is completely free to use.\n\nThere are no subscriptions or hidden fees, and you do not need an account to log rounds, view stats, or use the core app.\n\nYou can open the app and start right away. If you want account sync later, signing in is optional.',
+      'Blushing Birdie is completely free to use.\n\nThere are no subscriptions or hidden fees, and you do not need an account to log rounds, view stats, or use the core app.\n\nYou can open the app and start right away. No sign-in is needed.',
   },
   {
     id: 'phone',
@@ -420,13 +420,13 @@ const handleSubmit = async (e) => {
     id: 'privacy',
     question: 'Where is my data stored? Is it private?',
     answer:
-      'Your rounds and stats are stored locally on your device by default.\n\nYou do not need an account for local mode. Account sync is optional and only used if you choose to sign in.\n\nBlushing Birdie does not sell your golf data. Your information stays in your control.',
+      'Your rounds and stats are stored locally on your device by default.\n\nNo account is required. Your data does not automatically transfer between devices.\n\nBlushing Birdie does not sell your golf data. Your information stays in your control.',
   },
   {
     id: 'export-import',
     question: 'How do I export, import, or switch devices?',
     answer:
-      'You can export your rounds at any time as a CSV file—a simple spreadsheet format you can open in Excel, Google Sheets, or Numbers.\n\nExporting allows you to keep a personal backup of your data and makes it easy to move your rounds to a new device.\n\nYou can also create an optional account for sync. Rounds and courses you save while signed in can load when you sign in on another device.\n\nIf you switch phones or your browser storage is cleared, you can import a previously saved file or load your account data to get your rounds and stats back.',
+      'Export CSV creates a golf stats spreadsheet for Excel, Google Sheets, or Numbers. CSV files cannot restore the app.\n\nExport Backup saves your saved rounds and courses in a JSON file. Save it after each round or course change and before switching phones or clearing browser data. Keep your two most recent copies outside this browser, such as in Files or iCloud Drive.\n\nOn another device, use Import Backup to restore that JSON file. Importing replaces the saved rounds and courses on that device. There is no automatic device sync.',
   },
   {
     id: 'install',

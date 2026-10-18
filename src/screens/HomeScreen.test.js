@@ -18,7 +18,7 @@ test('home prioritizes three actions and hides secondary options until More open
   expect(navigate).toHaveBeenLastCalledWith('stats');
   act(() => buttons.find(b => b.textContent.startsWith('More')).click());
   expect(container.textContent).toContain('About & Help');
-  act(() => [...container.querySelectorAll('button')].find(b => b.textContent.includes('Backup & Account')).click());
+  act(() => [...container.querySelectorAll('button')].find(b => b.textContent.includes('Backup & Restore')).click());
   expect(navigate).toHaveBeenLastCalledWith('accountBackup');
 });
 test('in-progress round remains resumable from the redesigned home', () => {
