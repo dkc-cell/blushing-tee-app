@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { COLORS } from '../constants';
 import {
   calcStats,
@@ -23,6 +23,7 @@ const StatsScreen = ({
 }) => {
   const [selectedRound, setSelectedRound] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
+  const backupFileInput = useRef(null);
   const [exportType, setExportType] = useState('summary');
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
@@ -320,94 +321,23 @@ const handleImportBackup = async (event) => {
         </>
       )}
 
-      {/* Export / Backup Actions - ALWAYS VISIBLE */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          border: `1px solid ${COLORS.mistyBlue}66`,
-          borderRadius: '14px',
-          padding: '14px 16px',
-          marginBottom: '14px',
-          color: COLORS.charcoal,
-          fontSize: '14px',
-          lineHeight: 1.5,
-        }}
-      >
-        Export CSV creates a golf stats spreadsheet; it cannot restore the app. Export Backup saves
-        your rounds and courses in a restorable JSON file. Import Backup replaces saved rounds and
-        courses on this device. Back up after each round or course change and before switching phones
-        or clearing browser data. Keep the file outside this browser.
-      </div>
-     <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '12px',
-          flexWrap: 'wrap',
-          marginBottom: '24px',
-        }}
->
-        <button
-          onClick={() => setShowExportModal(true)}
-          disabled={rounds.length === 0}
-          style={{
-            backgroundColor: '#67999eff', // softened teal
-            color: COLORS.cream,
-            padding: '12px 18px',
-            borderRadius: '16px',
-            border: 'none',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: rounds.length === 0 ? 'not-allowed' : 'pointer',
-            opacity: rounds.length === 0 ? 0.5 : 1,
-            transition: 'all 0.2s ease',
-          }}
-        >
-          Export CSV
-        </button>
-
-        <button
-          onClick={handleExportBackup}
-          disabled={rounds.length === 0 && courses.length === 0}
-          style={{
-            backgroundColor: rounds.length === 0 && courses.length === 0 ? '#E0E4E5' : '#67999eff',
-            color: rounds.length === 0 && courses.length === 0 ? '#8A9496' : COLORS.cream,
-            padding: '12px 18px',
-            borderRadius: '16px',
-            border: 'none',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: rounds.length === 0 && courses.length === 0 ? 'not-allowed' : 'pointer',
-            opacity: rounds.length === 0 && courses.length === 0 ? 0.6 : 1,
-            transition: 'all 0.2s ease',
-          }}
-        >
-          Export Backup
-        </button>
-
-        <label
-          style={{
-            backgroundColor: '#f1d3d9ff', // softer blush
-            color: COLORS.darkTeal,
-            padding: '12px 18px',
-            borderRadius: '16px',
-            border: 'none',
-            fontSize: '15px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          Import Backup
-          <input
-            type="file"
-            accept="application/json,.json"
-            onChange={handleImportBackup}
-            style={{ display: 'none' }}
-          />
-        </label>
+      <div style={{ maxWidth: 560, margin: '0 auto 28px', display: 'grid', gap: 24 }}>
+        <section aria-labelledby="stats-csv-title" style={{ background: '#FFFFFF', border: `1px solid ${COLORS.mistyBlue}`, borderRadius: 16, padding: '24px 20px', color: COLORS.darkTeal }}>
+          <h3 id="stats-csv-title" style={{ margin: '0 0 18px', fontSize: 22 }}>Golf stats spreadsheet</h3>
+          <p style={{ margin: '0 0 24px', fontSize: 16, lineHeight: 1.7 }}>Export CSV creates a spreadsheet for reviewing your scores and progress. Choose Round Summary or Hole-by-Hole. CSV files cannot restore the app.</p>
+          <button onClick={() => setShowExportModal(true)} disabled={rounds.length === 0} style={{ width: '100%', minHeight: 54, border: 0, borderRadius: 12, padding: '14px 18px', background: COLORS.darkTeal, color: COLORS.cream, fontSize: 17, fontWeight: 700, cursor: rounds.length ? 'pointer' : 'not-allowed', opacity: rounds.length ? 1 : .65 }}>Export CSV</button>
+          {!rounds.length && <p style={{ margin: '12px 0 0', lineHeight: 1.6 }}>Save a round to export its stats.</p>}
+        </section>
+        <section aria-labelledby="stats-backup-title" style={{ background: '#FFFFFF', border: `1px solid ${COLORS.mistyBlue}`, borderRadius: 16, padding: '24px 20px', color: COLORS.darkTeal }}>
+          <h3 id="stats-backup-title" style={{ margin: '0 0 18px', fontSize: 22 }}>Backup & Restore</h3>
+          <p style={{ margin: '0 0 20px', fontSize: 16, lineHeight: 1.7 }}>Export Backup saves your saved rounds and courses in a restorable JSON file. Import Backup restores that file and replaces saved rounds and courses on this device.</p>
+          <p style={{ margin: '0 0 24px', fontSize: 16, lineHeight: 1.7 }}>Save a backup after each round or course change and before switching phones or clearing browser data. Keep your two most recent copies outside this browser, such as in Files or iCloud Drive.</p>
+          <div style={{ display: 'grid', gap: 16 }}>
+            <button onClick={handleExportBackup} disabled={!rounds.length && !courses.length} style={{ width: '100%', minHeight: 54, border: 0, borderRadius: 12, padding: '14px 18px', background: COLORS.darkTeal, color: COLORS.cream, fontSize: 17, fontWeight: 700, cursor: rounds.length || courses.length ? 'pointer' : 'not-allowed', opacity: rounds.length || courses.length ? 1 : .65 }}>Export Backup</button>
+            <button onClick={() => backupFileInput.current?.click()} style={{ width: '100%', minHeight: 54, border: `2px solid ${COLORS.darkTeal}`, borderRadius: 12, padding: '14px 18px', background: '#FFFFFF', color: COLORS.darkTeal, fontSize: 17, fontWeight: 700, cursor: 'pointer' }}>Import Backup</button>
+            <input ref={backupFileInput} aria-label="Choose backup file" type="file" accept="application/json,.json" onChange={handleImportBackup} hidden />
+          </div>
+        </section>
       </div>
 
       {/* Round History - ONLY WHEN ROUNDS EXIST */}
