@@ -19,15 +19,15 @@ const ManageCoursesScreen = ({
       {/* Header */}
       <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '8px' }}>← Back</button>
-        <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Manage Courses</h2>
-        <p style={{ color: COLORS.charcoal, fontSize: '18px', margin: '4px 0 0 0' }}>Edit or delete your saved courses</p>
+        <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: 0 }}>My Courses</h2>
+        <p style={{ color: COLORS.charcoal, fontSize: '18px', margin: '4px 0 0 0' }}>Add a course once, then choose it when starting a round.</p>
       </div>
       
       <div style={{ padding: '0 24px' }}>
         {courses.length === 0 ? (
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', textAlign: 'center' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>⛳</div>
-            <p style={{ color: COLORS.charcoal, fontSize: '16px' }}>No saved courses yet. Create your first course to get started!</p>
+            <p style={{ color: COLORS.charcoal, fontSize: '16px' }}>No saved courses yet. Tap Add a Course to save one for future rounds.</p>
           </div>
         ) : (
           <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
@@ -53,7 +53,9 @@ const ManageCoursesScreen = ({
                       {course.name}
                     </div>
                     <div style={{ color: COLORS.charcoal, fontSize: '14px' }}>
-                      18 holes • Custom pars & yardages
+                      {Object.values(course.pars || {}).filter(par => [3, 4, 5].includes(par)).length
+                        ? `Par entered for ${Object.values(course.pars || {}).filter(par => [3, 4, 5].includes(par)).length} holes`
+                        : 'Course name saved · Add hole details anytime'}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
@@ -94,7 +96,7 @@ const ManageCoursesScreen = ({
           </div>
         )}
         
-        {/* Create New Course Button */}
+        {/* Add a Course Button */}
         <button
           onClick={onCreateCourse}
           style={{
@@ -116,7 +118,7 @@ const ManageCoursesScreen = ({
           }}
         >
           <span style={{ fontSize: '24px' }}>➕</span>
-          <span>Create New Course</span>
+          <span>Add a Course</span>
         </button>
       </div>
     </div>

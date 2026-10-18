@@ -1,0 +1,8 @@
+.birdie-overlay { position: fixed; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: rgba(255,245,248,.88); display: flex; flex-direction: column; gap: 16px; justify-content: center; align-items: center; z-index: 9999; cursor: pointer; color: #103e43; font: inherit; }
+.birdie-overlay:focus-visible { outline: 3px solid #103e43; outline-offset: -6px; }
+.celebration-image { position: relative; z-index: 2; width: min(340px,85vw); height: auto; opacity: .95; animation: birdiePop var(--celebration-duration) ease-in-out forwards; }
+.celebration-image.eagle { width: min(360px,88vw); }
+.celebration-image.hio { width: min(400px,92vw); }
+.celebration-hint { font-size: 15px; }
+@keyframes birdiePop { 0% { opacity: 0; transform: scale(.9); } 15%,85% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.02); } }
+@media (prefers-reduced-motion: reduce) { .celebration-image { animation: none; } }

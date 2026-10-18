@@ -6,7 +6,7 @@ export const DEFAULT_IMAGE = `${SITE_URL}/Blushing-Birdie-Icon.png`;
 export const APP_URL = `${SITE_URL}/app`;
 
 export const DEFAULT_DESCRIPTION =
-  'Blushing Birdie is a simple, private golf tracker for women, built to help you track rounds and build confidence one swing at a time.';
+  'Blushing Birdie is a simple, private golf tracker, built to help you track rounds and build confidence one swing at a time.';
 
 const setMetaTag = ({ selector, attributes }) => {
   let element = document.head.querySelector(selector);
@@ -137,14 +137,13 @@ export const organizationSchema = {
   alternateName: [
     'The Blushing Birdie',
     'Blushing Birdie Golf Tracker',
-    'Blushing Birdie Golf Tracker for women',
     'Blushing Birdie Golf App',
     'Confidence, one swing at a time.',
   ],
   url: SITE_URL,
   logo: DEFAULT_IMAGE,
   description:
-    'Blushing Birdie creates simple, encouraging golf tools for women golfers with the promise: Confidence, one swing at a time.',
+    'Blushing Birdie creates simple, encouraging golf tools with the promise: Confidence, one swing at a time.',
 };
 
 export const websiteSchema = {
@@ -154,13 +153,12 @@ export const websiteSchema = {
   name: SITE_NAME,
   alternateName: [
     'Blushing Birdie golf app',
-    'Blushing Birdie Golf Tracker for women',
     'Confidence, one swing at a time.',
   ],
   url: SITE_URL,
   publisher: { '@id': `${SITE_URL}/#organization` },
   about: [
-    'women golf app',
+    'golf app',
     'golf round tracker',
     'private golf scorecard',
     'golf progress tracking',
@@ -175,7 +173,6 @@ export const softwareApplicationSchema = {
   alternateName: [
     'Blushing Birdie',
     'The Blushing Birdie',
-    'Blushing Birdie Golf Tracker for women',
     'Blushing Birdie golf scorecard app',
     'Confidence, one swing at a time.',
   ],
@@ -190,7 +187,7 @@ export const softwareApplicationSchema = {
   },
   audience: {
     '@type': 'Audience',
-    audienceType: 'Women golfers and everyday recreational golfers',
+    audienceType: 'Everyday recreational golfers',
   },
   description: DEFAULT_DESCRIPTION,
   publisher: { '@id': `${SITE_URL}/#organization` },

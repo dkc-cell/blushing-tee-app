@@ -2,12 +2,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { COLORS, ENCOURAGING_QUOTES } from '../constants';
 import { NumberPad, QuickCounter } from '../components';
-import confetti from 'canvas-confetti';
+import {
+  isHoleDraftMeaningful,
+  loadActiveRound,
+  saveHoleDraft,
+} from '../utils/activeRoundStorage';
 
-// Celebration images (you said you’ll add these to /assets/images)
-import birdieImg from '../assets/images/birdie.png';
-import eagleImg from '../assets/images/eagle.png';
-import hioImg from '../assets/images/hio.png';
+import RoundCelebration from '../components/RoundCelebration';
+
+const getSavedHoleDraft = (holeNumber) => {
+  const active = loadActiveRound();
+  const draft = active?.holeDrafts?.[holeNumber] || active?.holeDraft;
+  return draft?.hole === holeNumber ? draft : null;
+};
 
 const LogRoundScreen = ({
   currentHole,
@@ -23,68 +30,34 @@ const LogRoundScreen = ({
   onCompleteRound,
   onBack
 }) => {
+  const initialDraft = getSavedHoleDraft(currentHole);
+
   // Local state for current hole input
-  const [drive, setDrive] = useState('');
+  const [drive, setDrive] = useState(initialDraft?.drive || '');
   const [showDriveWarning, setShowDriveWarning] = useState(false);
   const [celebrationKind, setCelebrationKind] = useState(null); // 'birdie' | 'eagle' | 'hio' | null
+  const pendingFinish = useRef(null);
+  const advanceTimer = useRef(null);
+  useEffect(() => () => { clearTimeout(advanceTimer.current); pendingFinish.current = null; }, []);
+  const finishCelebration = () => {
+    const finish = pendingFinish.current;
+    pendingFinish.current = null;
+    setCelebrationKind(null);
+    finish?.();
+  };
   const driveSectionRef = useRef(null);
-    // Auto-hide celebration overlay after 4 seconds
-  useEffect(() => {
-    if (!celebrationKind) return;
-    const t = setTimeout(() => setCelebrationKind(null), CELEBRATION_MS);
-    return () => clearTimeout(t);
-  }, [celebrationKind]);
-  // Fire confetti burst when celebration starts
-useEffect(() => {
-  if (!celebrationKind) return;
-
-  const config =
-    celebrationKind === 'hio'
-      ? { particleCount: 260, spread: 120, startVelocity: 62, scalar: 1.2 }
-      : celebrationKind === 'eagle'
-      ? { particleCount: 200, spread: 105, startVelocity: 58, scalar: 1.1 }
-      : { particleCount: 170, spread: 95, startVelocity: 55, scalar: 1.05 };
-
-  // First burst
-  confetti({
-    particleCount: config.particleCount,
-    spread: config.spread,
-    startVelocity: config.startVelocity,
-    gravity: 0.85,
-    scalar: config.scalar,
-    ticks: 150,
-    origin: { x: 0.5, y: 0.38 },
-    colors: ['#F4A8B9', '#ACC8C8', '#103E43', '#FFF7F0'],
-    zIndex: 10050
-  });
-
-  // Second burst (adds punch)
-  const t2 = setTimeout(() => {
-    confetti({
-      particleCount: Math.round(config.particleCount * 0.65),
-      spread: config.spread + 10,
-      startVelocity: Math.max(40, config.startVelocity - 12),
-      gravity: 0.95,
-      scalar: Math.max(0.95, config.scalar - 0.1),
-      ticks: 130,
-      origin: { x: 0.5, y: 0.38 },
-      colors: ['#F4A8B9', '#ACC8C8', '#103E43', '#FFF7F0'],
-      zIndex: 10050
-    });
-  }, 180);
-
-  return () => clearTimeout(t2);
-}, [celebrationKind]);
-
     const handleDriveSelect = (value) => {
     setDrive(value);
     setShowDriveWarning(false);
   };
-  const [approaches, setApproaches] = useState(0);
-  const [chips, setChips] = useState(0);
-  const [putts, setPutts] = useState(0);
-  const [penalties, setPenalties] = useState({ water: false, lost: false, ob: false });
-  const [holeNotes, setHoleNotes] = useState('');
+  const [approaches, setApproaches] = useState(initialDraft?.approaches || 0);
+  const [chips, setChips] = useState(initialDraft?.chips || 0);
+  const [putts, setPutts] = useState(initialDraft?.putts || 0);
+  const [penalties, setPenalties] = useState(
+    initialDraft?.penalties || { water: false, lost: false, ob: false }
+  );
+  const [holeNotes, setHoleNotes] = useState(initialDraft?.notes || '');
+  const [showUnfinishedHoleModal, setShowUnfinishedHoleModal] = useState(false);
     // Penalty tip modal state (triggered when a penalty is toggled ON)
   const [showPenaltyTip, setShowPenaltyTip] = useState(false);
   const [penaltyTipType, setPenaltyTipType] = useState(null);
@@ -112,27 +85,72 @@ useEffect(() => {
     setShowPenaltyTip(false);
   };
   const [editingHole, setEditingHole] = useState(false);
-  
+
   // Modal state
   const [showParModal, setShowParModal] = useState(false);
   const [showYardageModal, setShowYardageModal] = useState(false);
   const [tempYardage, setTempYardage] = useState('');
 
     // Celebration overlay (Birdie / Eagle / HIO)
-  const CELEBRATION_MS = 4000;
-  
+
+
   const randomQuote = ENCOURAGING_QUOTES[currentHole % ENCOURAGING_QUOTES.length];
   const isHoleRecorded = recordedHoles.has(currentHole);
   const recordedData = currentRound.find(h => h.hole === currentHole);
 
   const getCurrentPar = () => customPars[currentHole] || null;
   const getCurrentYardage = () => customYardages[currentHole] || null;
-  const needsHoleSetup = () => getCurrentPar() === null || getCurrentYardage() === null;
+  const needsHoleSetup = () => ![3, 4, 5].includes(getCurrentPar());
   const holesLogged = recordedHoles.size;
   const isFinalHole = currentHole === 18;
 
   const totalShots = (drive ? 1 : 0) + approaches + chips + putts;
   const totalScore = totalShots; // penalties are reminders only
+
+  const currentHoleDraft = {
+    hole: currentHole,
+    drive,
+    approaches,
+    chips,
+    putts,
+    penalties,
+    notes: holeNotes,
+  };
+
+  const hydratedHoleRef = useRef(currentHole);
+
+  const clearCurrentHoleDraft = () => saveHoleDraft(currentHole, null);
+
+  useEffect(() => {
+    if (hydratedHoleRef.current === currentHole) return;
+    const savedDraft = getSavedHoleDraft(currentHole);
+    setDrive(savedDraft?.drive || '');
+    setApproaches(savedDraft?.approaches || 0);
+    setChips(savedDraft?.chips || 0);
+    setPutts(savedDraft?.putts || 0);
+    setPenalties(savedDraft?.penalties || { water: false, lost: false, ob: false });
+    setHoleNotes(savedDraft?.notes || '');
+    setShowDriveWarning(false);
+    setEditingHole(false);
+  }, [currentHole]);
+
+  useEffect(() => {
+    // On hole navigation, wait for restored inputs before saving the new hole.
+    if (hydratedHoleRef.current !== currentHole) {
+      hydratedHoleRef.current = currentHole;
+      return;
+    }
+    if (isHoleRecorded && !editingHole) return;
+    saveHoleDraft(currentHole, {
+      hole: currentHole,
+      drive,
+      approaches,
+      chips,
+      putts,
+      penalties,
+      notes: holeNotes,
+    });
+  }, [currentHole, drive, approaches, chips, putts, penalties, holeNotes, isHoleRecorded, editingHole]);
 
   const getNextHoleToLogAfterUpdate = () => {
     const recordedAfterSave = new Set(recordedHoles);
@@ -156,6 +174,7 @@ useEffect(() => {
 
   const completeHole = () => {
   const par = getCurrentPar();
+  if (![3, 4, 5].includes(par)) { setShowParModal(true); return; }
   const isPar3 = par === 3;
 
    // Require a selection before recording hole
@@ -193,6 +212,7 @@ useEffect(() => {
     greenInRegulation: isPar3 && drive === 'middle'
   };
 
+    clearCurrentHoleDraft();
     onRecordHole(newHoleData);
      // Celebration should be based on strokes (not penalties)
     const strokes = totalShots;
@@ -202,17 +222,11 @@ useEffect(() => {
   else if (par != null && strokes === par - 2) kind = 'eagle';
   else if (par != null && strokes === par - 1) kind = 'birdie';
 
-  if (kind) {
-    setCelebrationKind(kind);
-  }
 
     setEditingHole(false);
     resetInputs();
-    
-       const advanceDelay = kind ? CELEBRATION_MS : 800;
 
-    setTimeout(() => {
-     if (kind) confetti.reset(); // stops any lingering particles before next hole
+    const finish = () => {
 
       if (wasEditingHole && nextHoleToLogAfterUpdate) {
         setCurrentHole(nextHoleToLogAfterUpdate);
@@ -221,7 +235,9 @@ useEffect(() => {
       } else {
         onCompleteRound(newHoleData);
       }
-    }, advanceDelay);
+    };
+    if (kind) { pendingFinish.current = finish; setCelebrationKind(kind); }
+    else advanceTimer.current = setTimeout(finish, 800);
   };
 
   const enableEditHole = () => {
@@ -237,9 +253,20 @@ useEffect(() => {
     }
   };
 
+  const finishRoundEarly = () => {
+    clearCurrentHoleDraft();
+    setShowUnfinishedHoleModal(false);
+    onCompleteRound(null);
+  };
+
   const handleEndRoundEarly = () => {
     if (holesLogged === 0) {
       alert('Please log at least one hole before ending the round.');
+      return;
+    }
+
+    if (!isHoleRecorded && isHoleDraftMeaningful(currentHoleDraft)) {
+      setShowUnfinishedHoleModal(true);
       return;
     }
 
@@ -250,7 +277,7 @@ useEffect(() => {
     );
 
     if (confirmed) {
-      onCompleteRound(null);
+      finishRoundEarly();
     }
   };
 
@@ -260,13 +287,13 @@ useEffect(() => {
       <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '160px' }}>
         {/* Header */}
         <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <button 
+          <button
             onClick={onBack}
             style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}
           >
             ← Back to Home
           </button>
-          
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
             <div>
               <h2 style={{ color: COLORS.darkTeal, fontSize: '32px', fontWeight: 'bold', margin: 0 }}>Hole {currentHole}</h2>
@@ -303,7 +330,7 @@ useEffect(() => {
             <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', marginTop: 0, marginBottom: '24px', textAlign: 'center' }}>
               ⛳ Set Up Hole {currentHole}
             </h3>
-            
+
             {/* Par Selection */}
             <div style={{ marginBottom: '32px' }}>
               <label style={{ color: COLORS.charcoal, fontSize: '20px', fontWeight: 'bold', display: 'block', marginBottom: '16px' }}>
@@ -338,11 +365,11 @@ useEffect(() => {
                 </p>
               )}
             </div>
-            
+
             {/* Yardage Input */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{ color: COLORS.charcoal, fontSize: '20px', fontWeight: 'bold', display: 'block', marginBottom: '16px' }}>
-                What's the yardage?
+                Yardage (optional)
               </label>
               <button
                 onClick={() => {
@@ -366,13 +393,13 @@ useEffect(() => {
                 {getCurrentYardage() ? `${getCurrentYardage()} yards` : 'Tap to enter yardage'}
               </button>
             </div>
-            
+
             {/* Ready message */}
             {getCurrentPar() && getCurrentYardage() && (
-              <div style={{ 
-                backgroundColor: `${COLORS.blush}33`, 
-                padding: '16px', 
-                borderRadius: '12px', 
+              <div style={{
+                backgroundColor: `${COLORS.blush}33`,
+                padding: '16px',
+                borderRadius: '12px',
                 textAlign: 'center',
                 marginTop: '16px'
               }}>
@@ -385,9 +412,9 @@ useEffect(() => {
         </div>
 
         {/* Navigation buttons */}
-        <HoleNavigation 
-          currentHole={currentHole} 
-          setCurrentHole={setCurrentHole} 
+        <HoleNavigation
+          currentHole={currentHole}
+          setCurrentHole={setCurrentHole}
           recordedHoles={recordedHoles}
         />
 
@@ -417,13 +444,13 @@ useEffect(() => {
     <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '160px' }}>
       {/* Header */}
       <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        <button 
+        <button
           onClick={onBack}
           style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}
         >
           ← Back to Home
         </button>
-        
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '16px' }}>
           <div>
             <h2 style={{ color: COLORS.darkTeal, fontSize: '32px', fontWeight: 'bold', margin: 0 }}>Hole {currentHole}</h2>
@@ -499,9 +526,9 @@ useEffect(() => {
 
       {/* Hole Recap (if recorded) */}
       {isHoleRecorded && recordedData && !editingHole && (
-        <HoleRecap 
-          recordedData={recordedData} 
-          onEdit={enableEditHole} 
+        <HoleRecap
+          recordedData={recordedData}
+          onEdit={enableEditHole}
         />
       )}
 
@@ -557,8 +584,8 @@ useEffect(() => {
             Putts
           </label>
           <QuickCounter value={putts} onChange={setPutts} max={5} type="putt" />
-        </div>     
-        
+        </div>
+
         {/* Notes */}
         <div>
           <label style={{ color: COLORS.charcoal, fontSize: '22px', fontWeight: 'bold', display: 'block', marginBottom: '16px' }}>
@@ -630,13 +657,13 @@ useEffect(() => {
             </div>
           </div>
         </div>
-   
+
         {/* Hole Summary */}
         {totalShots > 0 && !isHoleRecorded && (
-          <HoleSummary 
-           par={getCurrentPar()} 
-           totalScore={totalScore} 
-           penalties={penalties} 
+          <HoleSummary
+           par={getCurrentPar()}
+           totalScore={totalScore}
+           penalties={penalties}
 />
         )}
 
@@ -675,9 +702,9 @@ useEffect(() => {
       </div>
 
       {/* Navigation buttons */}
-      <HoleNavigation 
-        currentHole={currentHole} 
-        setCurrentHole={setCurrentHole} 
+      <HoleNavigation
+        currentHole={currentHole}
+        setCurrentHole={setCurrentHole}
         recordedHoles={recordedHoles}
       />
        {/* Penalty Tip Modal */}
@@ -690,74 +717,17 @@ useEffect(() => {
         />
       )}
 
-      {/* Birdie celebration overlay */}
-      <style>{`
-    .birdie-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 245, 248, 0.88); /* soft blush */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  pointer-events: none;
-}
- .celebration-image {
-  position: relative;
-  z-index: 2;                 /* above confetti */
-  width: min(340px, 85vw);    /* phone-friendly */
-  height: auto;
-  opacity: 0.95;
-  animation: birdiePop 4s ease-in-out forwards;
-}
- /* Slightly bigger for Eagle */
-.celebration-image.eagle {
-  width: min(360px, 88vw);
-}
+      {showUnfinishedHoleModal && (
+        <UnfinishedHoleModal
+          currentHole={currentHole}
+          recordedHoles={recordedHoles}
+          onFinish={() => setShowUnfinishedHoleModal(false)}
+          onEnd={finishRoundEarly}
+          onCancel={() => setShowUnfinishedHoleModal(false)}
+        />
+      )}
 
-/* Biggest moment for Hole-in-One */
-.celebration-image.hio {
-  width: min(400px, 92vw);
-}
- @keyframes birdiePop {
-  0%   { opacity: 0; transform: scale(0.9); }
-  15%  { opacity: 1; transform: scale(1); }
-  85%  { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.02); }
-}
- `}</style>
-
-{celebrationKind && (
-  <div
-  className="birdie-overlay"
-  aria-label={
-    celebrationKind === 'hio'
-      ? 'Hole in One celebration'
-      : celebrationKind === 'eagle'
-      ? 'Eagle celebration'
-      : 'Birdie celebration'
-  }
->
-  <img
-    className={`celebration-image ${celebrationKind}`}
-  src={
-    celebrationKind === 'hio'
-      ? hioImg
-      : celebrationKind === 'eagle'
-      ? eagleImg
-      : birdieImg
-  }
-  alt={
-    celebrationKind === 'hio'
-      ? 'Hole in One'
-      : celebrationKind === 'eagle'
-      ? 'Eagle'
-      : 'Birdie'
-  }
-/>
- 
-    </div>
-)}
+      <RoundCelebration kind={celebrationKind} onDismiss={finishCelebration} />
 
       {/* Par Modal */}
       {showParModal && (
@@ -794,6 +764,94 @@ useEffect(() => {
 };
 
 // Sub-components
+
+const UnfinishedHoleModal = ({ currentHole, recordedHoles, onFinish, onEnd, onCancel }) => {
+  const priorRecordedHoles = [...recordedHoles].filter((hole) => hole < currentHole);
+  const lastRecordedHole = priorRecordedHoles.length > 0
+    ? Math.max(...priorRecordedHoles)
+    : Math.max(0, currentHole - 1);
+
+  return (
+    <div
+      onClick={onCancel}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.45)',
+        zIndex: 5000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+      }}
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: '420px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '20px',
+          padding: '22px',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.22)',
+        }}
+      >
+        <div style={{ color: COLORS.darkTeal, fontSize: '22px', fontWeight: 'bold', marginBottom: '10px' }}>
+          Hole {currentHole} isn't finished
+        </div>
+        <div style={{ color: COLORS.charcoal, fontSize: '16px', lineHeight: 1.45, marginBottom: '18px' }}>
+          You have information entered for Hole {currentHole}. Would you like to finish recording it or end your round after Hole {lastRecordedHole}?
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button
+            onClick={onFinish}
+            style={{
+              border: 'none',
+              borderRadius: '12px',
+              padding: '13px 14px',
+              backgroundColor: COLORS.blush,
+              color: COLORS.charcoal,
+              fontWeight: 'bold',
+              fontSize: '16px',
+              cursor: 'pointer',
+            }}
+          >
+            Finish Recording Hole {currentHole}
+          </button>
+          <button
+            onClick={onEnd}
+            style={{
+              border: `2px solid ${COLORS.mistyBlue}`,
+              borderRadius: '12px',
+              padding: '11px 14px',
+              backgroundColor: '#FFFFFF',
+              color: COLORS.darkTeal,
+              fontWeight: 'bold',
+              fontSize: '16px',
+              cursor: 'pointer',
+            }}
+          >
+            End Round at Hole {lastRecordedHole}
+          </button>
+          <button
+            onClick={onCancel}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: COLORS.darkTeal,
+              padding: '8px',
+              cursor: 'pointer',
+              fontSize: '15px',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ToggleSwitch = ({ checked, onChange, ariaLabel }) => (
   <button
@@ -1082,26 +1140,26 @@ const HoleSummary = ({ par, totalScore, penalties }) => (
 );
 
 const ParModal = ({ currentHole, currentPar, onClose, onSelect }) => (
-  <div 
-    style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0, 
-      backgroundColor: 'rgba(0,0,0,0.5)', 
-      display: 'flex', 
-      alignItems: 'center', 
+  <div
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
       justifyContent: 'center',
       zIndex: 2000,
       padding: '20px'
     }}
     onClick={onClose}
   >
-    <div 
-      style={{ 
-        backgroundColor: '#FFFFFF', 
-        borderRadius: '24px', 
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '24px',
         padding: '32px',
         maxWidth: '400px',
         width: '100%',
@@ -1156,26 +1214,26 @@ const ParModal = ({ currentHole, currentPar, onClose, onSelect }) => (
 );
 
 const YardageModal = ({ currentHole, tempYardage, setTempYardage, onClose, onSave }) => (
-  <div 
-    style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0, 
-      backgroundColor: 'rgba(0,0,0,0.5)', 
-      display: 'flex', 
-      alignItems: 'center', 
+  <div
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
       justifyContent: 'center',
       zIndex: 2000,
       padding: '20px'
     }}
     onClick={onClose}
   >
-    <div 
-      style={{ 
-        backgroundColor: '#FFFFFF', 
-        borderRadius: '24px', 
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '24px',
         maxWidth: '400px',
         width: '100%',
         boxShadow: '0 8px 32px rgba(0,0,0,0.2)'

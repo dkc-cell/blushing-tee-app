@@ -31,71 +31,15 @@ export const formatDateForDisplay = (dateString, options = {}) => {
 };
 const calcThreePuttPercentage = (holes = []) => {
   const holesWithPutts = holes.filter(h => Number.isFinite(h?.putts));
-  if (holesWithPutts.length === 0) return 0;
+  if (holesWithPutts.length === 0) return null;
 
   const threePuttHoles = holesWithPutts.filter(h => h.putts >= 3).length;
   return (threePuttHoles / holesWithPutts.length) * 100;
 };
 
-const hasRatingAndSlope = (round) => {
-  const courseRating = Number(round?.courseRating);
-  const slopeRating = Number(round?.slopeRating);
-
-  return (
-    Number.isFinite(courseRating) &&
-    Number.isFinite(slopeRating) &&
-    courseRating > 0 &&
-    slopeRating > 0
-  );
-};
-
-const calcRoundScore = (round) =>
-  (round?.holes || []).reduce((sum, h) => sum + (Number(h.total) || 0), 0);
-
-const calcHandicapDifferential = (score, courseRating, slopeRating) =>
-  ((score - courseRating) * 113) / slopeRating;
-
-export const calcUnofficialHandicap = (rounds = []) => {
-  const ratedRounds = rounds.filter((round) => hasRatingAndSlope(round));
-
-  const fullRounds = ratedRounds.filter((round) => round.holes?.length === 18);
-  const nineHoleRounds = ratedRounds.filter((round) => round.holes?.length === 9);
-
-  if (fullRounds.length < 3 && nineHoleRounds.length < 6) {
-    return null;
-  }
-
-  const fullRoundDifferentials =
-    fullRounds.length >= 3
-      ? fullRounds.map((round) =>
-          calcHandicapDifferential(
-            calcRoundScore(round),
-            Number(round.courseRating),
-            Number(round.slopeRating)
-          )
-        )
-      : [];
-
-  const nineHoleDifferentials =
-    nineHoleRounds.length >= 6
-      ? nineHoleRounds.map((round) =>
-          calcHandicapDifferential(
-            calcRoundScore(round) * 2,
-            Number(round.courseRating),
-            Number(round.slopeRating)
-          )
-        )
-      : [];
-
-  const differentials = [...fullRoundDifferentials, ...nineHoleDifferentials];
-
-  if (!differentials.length) return null;
-
-  return (
-    differentials.reduce((sum, differential) => sum + differential, 0) /
-    differentials.length
-  ).toFixed(1);
-};
+export const hasKnownPar = (hole) => [3, 4, 5].includes(hole?.par);
+export const getRoundPar = (holes = []) => holes.length && holes.every(hasKnownPar)
+  ? holes.reduce((sum, h) => sum + h.par, 0) : null;
 
 /**
  * Calculate statistics from an array of holes
@@ -104,12 +48,14 @@ export const calcStats = (holes) => {
   if (!holes || holes.length === 0) return null;
   
   const totalScore = holes.reduce((sum, h) => sum + h.total, 0);
-  const totalPar = holes.reduce((sum, h) => sum + h.par, 0);
+  const totalPar = getRoundPar(holes);
+  const knownParHoles = holes.filter(hasKnownPar);
   const totalPutts = holes.reduce((sum, h) => sum + (Number.isFinite(h?.putts) ? h.putts : 0), 0);
-  const fairwayHoles = holes.filter(h => h.par > 3);
+  const fairwayHoles = holes.filter(h => h.par > 3 && typeof h.fairwayHit === 'boolean');
   const fairwaysHit = holes.filter(h => h.fairwayHit && h.par > 3).length;
   
   const par3Holes = holes.filter(h => h.par === 3);
+  const par3GreenHoles = par3Holes.filter(h => typeof h.greenInRegulation === 'boolean');
   const par4Holes = holes.filter(h => h.par === 4);
   const par5Holes = holes.filter(h => h.par === 5);
   
@@ -117,18 +63,21 @@ export const calcStats = (holes) => {
     ? (arr.reduce((sum, h) => sum + h.total, 0) / arr.length).toFixed(1) 
     : 'N/A';
  
-  const threePuttPercentage = Math.round(calcThreePuttPercentage(holes));
-  const avgToParPerHole = ((totalScore - totalPar) / holes.length).toFixed(2);
+  const threePuttPercentage = calcThreePuttPercentage(holes) == null ? null : Math.round(calcThreePuttPercentage(holes));
+  const avgToParPerHole = knownParHoles.length ? (knownParHoles.reduce((sum, h) => sum + h.total - h.par, 0) / knownParHoles.length).toFixed(2) : null;
 
   return {
     totalScore,
     totalPar,
-    scoreToPar: totalScore - totalPar,
+    scoreToPar: totalPar == null ? null : totalScore - totalPar,
+    holeCount: holes.length,
+    knownParCount: knownParHoles.length,
+    par3GreenPct: par3GreenHoles.length ? Math.round(par3GreenHoles.filter(h => h.greenInRegulation).length / par3GreenHoles.length * 100) : null,
     avgToParPerHole,
 
 
-    totalPutts,
-    fairwayPct: fairwayHoles.length > 0 ? Math.round((fairwaysHit / fairwayHoles.length) * 100) : 0,
+    totalPutts: holes.some(h => Number.isFinite(h.putts)) ? totalPutts : null,
+    fairwayPct: fairwayHoles.length > 0 ? Math.round((fairwaysHit / fairwayHoles.length) * 100) : null,
     fairwaysHit,
     totalFairways: fairwayHoles.length,
     avgPar3: calcAvg(par3Holes),
@@ -145,23 +94,21 @@ export const calcOverallStats = (rounds) => {
   if (!rounds || rounds.length === 0) {
     return {
       fairwaysHit: 0,
-      threePuttPercentage: 0,
-      unofficialHandicap: null
+      threePuttPercentage: 0
     };
   }
 
   const allHoles = rounds.flatMap(r => r.holes || []);
-  const fairwayHoles = allHoles.filter(h => h.par > 3);
+  const fairwayHoles = allHoles.filter(h => h.par > 3 && typeof h.fairwayHit === 'boolean');
   const fairwaysHitCount = allHoles.filter(h => h.fairwayHit && h.par > 3).length;
 
-  const threePuttPercentage = Math.round(calcThreePuttPercentage(allHoles));
+  const threePuttPercentage = calcThreePuttPercentage(allHoles) == null ? null : Math.round(calcThreePuttPercentage(allHoles));
 
   return {
     fairwaysHit: fairwayHoles.length > 0
       ? Math.round((fairwaysHitCount / fairwayHoles.length) * 100)
-      : 0,
-    threePuttPercentage,
-    unofficialHandicap: calcUnofficialHandicap(rounds)
+      : null,
+    threePuttPercentage
   };
 };
 
@@ -169,148 +116,65 @@ export const calcOverallStats = (rounds) => {
  * Export round summary data to CSV format
  */
 export const exportToCSV = (rounds, startDate = null, endDate = null) => {
-  let filteredRounds = rounds;
-
-  if (startDate || endDate) {
-    filteredRounds = rounds.filter((r) => {
-      const roundDate = new Date(r.date);
-      const start = startDate ? new Date(startDate) : new Date('1900-01-01');
-      const end = endDate ? new Date(endDate) : new Date('2100-12-31');
-      end.setHours(23, 59, 59, 999);
-      return roundDate >= start && roundDate <= end;
-    });
-  }
-
-  if (!filteredRounds.length) {
-    return null;
-  }
-
-  const escapeCSV = (value) => {
-    if (value === null || value === undefined) return '""';
-    const stringValue = String(value).replace(/"/g, '""');
-    return `"${stringValue}"`;
+  const filtered = rounds.filter(round => {
+    const date = String(round.date || '').slice(0, 10);
+    return (!startDate || date >= startDate) && (!endDate || date <= endDate);
+  });
+  if (!filtered.length) return null;
+  const escape = value => {
+    let text = value == null ? '' : String(value);
+    // Treat user-entered spreadsheet text as text rather than formulas.
+    if (/^[\s]*[=+@-]/.test(text)) text = "'" + text;
+    return '"' + text.replace(/"/g, '""') + '"';
   };
-
-  const getPenaltyCount = (hole) => {
-    const water = hole.penalties?.water ? 1 : 0;
-    const lost = hole.penalties?.lost ? 1 : 0;
-    const ob = hole.penalties?.ob ? 1 : 0;
-    return water + lost + ob;
-  };
-
-  const getParBucketAverage = (holes, parValue) => {
-    const matching = holes.filter((hole) => Number(hole.par) === parValue);
-    if (!matching.length) return '';
-    const total = matching.reduce((sum, hole) => sum + (Number(hole.total) || 0), 0);
-    return (total / matching.length).toFixed(2);
-  };
-
-  const rows = filteredRounds.map((round) => {
+  const percent = (count, total) => total ? (100 * count / total).toFixed(1) + '%' : '';
+  const header = ['Date', 'Course', 'Holes Played', 'Score', 'Par', 'Score to Par',
+    'Putts (Recorded Holes)', 'Holes with Putts Recorded', 'Avg Putts per Recorded Hole',
+    '3+ Putts %', 'Fairways Hit', 'Fairways Recorded', 'Fairways %', 'Par 3 Greens %',
+    'Eagles or Better', 'Birdies', 'Pars', 'Bogeys', 'Double Bogey or Worse'];
+  const rows = filtered.map(round => {
     const holes = Array.isArray(round.holes) ? round.holes : [];
-
-    const holesPlayed = holes.length;
-
-    const totalScore = holes.reduce((sum, hole) => sum + (Number(hole.total) || 0), 0);
-    const totalPar = holes.reduce((sum, hole) => sum + (Number(hole.par) || 0), 0);
-    const scoreToPar = totalScore - totalPar;
-
-    const totalPutts = holes.reduce((sum, hole) => sum + (Number(hole.putts) || 0), 0);
-    const avgPuttsPerHole = holesPlayed ? (totalPutts / holesPlayed).toFixed(2) : '';
-
-    const fairwayOpportunities = holes.filter((hole) => Number(hole.par) > 3).length;
-    const fairwaysHit = holes.filter(
-      (hole) => Number(hole.par) > 3 && hole.fairwayHit
-    ).length;
-    const fairwayPct = fairwayOpportunities
-      ? ((fairwaysHit / fairwayOpportunities) * 100).toFixed(1)
-      : '';
-
-    const birdies = holes.filter(
-      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) === -1
-    ).length;
-
-    const pars = holes.filter(
-      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) === 0
-    ).length;
-
-    const bogeys = holes.filter(
-      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) === 1
-    ).length;
-
-    const doubleBogeyPlus = holes.filter(
-      (hole) => (Number(hole.total) || 0) - (Number(hole.par) || 0) >= 2
-    ).length;
-
-    const totalPenalties = holes.reduce((sum, hole) => sum + getPenaltyCount(hole), 0);
-
-    const notes = holes
-      .map((hole) => hole.notes?.trim())
-      .filter(Boolean)
-      .join(' | ');
-
-    return [
-      escapeCSV(round.date || ''),
-      escapeCSV(round.courseName || 'Unnamed Course'),
-      holesPlayed,
-
-      totalScore, 
-      totalPar,
-      scoreToPar > 0 ? `+${scoreToPar}` : scoreToPar,
-
-      totalPutts,
-      avgPuttsPerHole,
-
-      fairwaysHit,
-      fairwayOpportunities,
-      fairwayPct ? `${fairwayPct}%` : '',
-
-      birdies,
-      pars,
-      bogeys,
-      doubleBogeyPlus, // 👈 remove triple, combine into this
-
-      totalPenalties,
-
-      getParBucketAverage(holes, 3),
-      getParBucketAverage(holes, 4),
-      getParBucketAverage(holes, 5),
-
-      escapeCSV(round.unofficialHandicap ?? ''),
-      escapeCSV(notes),
+    const total = holes.reduce((sum, h) => sum + (Number(h.total) || 0), 0);
+    const par = getRoundPar(holes);
+    const putts = holes.filter(h => Number.isFinite(h.putts));
+    const puttTotal = putts.reduce((sum, h) => sum + h.putts, 0);
+    const fairways = holes.filter(h => h.par > 3 && typeof h.fairwayHit === 'boolean');
+    const greens = holes.filter(h => h.par === 3 && typeof h.greenInRegulation === 'boolean');
+    const knownPar = holes.filter(hasKnownPar);
+    const count = predicate => knownPar.length ? knownPar.filter(h => predicate(h.total - h.par)).length : '';
+    return [escape(round.date || ''), escape(round.courseName || 'Unnamed Course'), holes.length,
+      total, par ?? '', par == null ? '' : total - par,
+      putts.length ? puttTotal : '', putts.length || '', putts.length ? (puttTotal / putts.length).toFixed(2) : '',
+      percent(putts.filter(h => h.putts >= 3).length, putts.length),
+      fairways.length ? fairways.filter(h => h.fairwayHit).length : '', fairways.length || '',
+      percent(fairways.filter(h => h.fairwayHit).length, fairways.length),
+      percent(greens.filter(h => h.greenInRegulation).length, greens.length),
+      count(d => d <= -2), count(d => d === -1), count(d => d === 0), count(d => d === 1), count(d => d >= 2),
     ].join(',');
-      });
+  });
+  return [header.join(','), ...rows].join('\n');
+};
 
-  const header = [
-    'Date',
-  'Course',
-  'Holes Played',
-  'Score',
-  'Par',
-  'Score to Par',
-
-  'Putts',
-  'Avg Putts / Hole',
-
-  'Fairways Hit',
-  'Fairways Total',
-  'Fairways %',
-
-  'Birdies',
-  'Pars',
-  'Bogeys',
-  'Doubles+',
-
-  'Penalties',
-
-  'Avg Par 3',
-  'Avg Par 4',
-  'Avg Par 5',
-
-  'Unofficial Handicap',
-  'Notes',
-  ].join(',');
-
-  return [header, ...rows].join('\n');
+/** One row per recorded hole; legacy unknown details stay blank. */
+export const exportHolesToCSV = (rounds, startDate = null, endDate = null) => {
+  const text = value => {
+    let v = value == null ? '' : String(value);
+    if (/^\s*[=+@-]/.test(v)) v = "'" + v;
+    return '"' + v.replace(/"/g, '""') + '"';
+  };
+  const rows = rounds.filter(r => {
+    const date = String(r.date || '').slice(0, 10);
+    return (!startDate || date >= startDate) && (!endDate || date <= endDate);
+  }).flatMap(r => [...(r.holes || [])].sort((a, b) => a.hole - b.hole).map(h => {
+    const par = hasKnownPar(h) ? h.par : null;
+    return [text(r.id), text(r.date), text(r.courseName || 'Unnamed Course'), h.hole ?? '',
+      par ?? '', h.total ?? '', par == null ? '' : h.total - par,
+      h.yardage || r.customYardages?.[h.hole] || '', Number.isFinite(h.putts) ? h.putts : '',
+      par > 3 && typeof h.fairwayHit === 'boolean' ? (h.fairwayHit ? 'Yes' : 'No') : '',
+      par === 3 && typeof h.greenInRegulation === 'boolean' ? (h.greenInRegulation ? 'Yes' : 'No') : '',
+    ].join(',');
+  }));
+  return rows.length ? ['Round ID,Date,Course,Hole,Par,Score,Score to Par,Yardage,Putts,Fairway Hit,Par 3 Green Hit', ...rows].join('\n') : null;
 };
 
 /**
@@ -344,8 +208,37 @@ export const downloadBackupJSON = (backupData, fileName) => {
 };
 
 // ✅ Backup import (JSON)
+const MAX_BACKUP_BYTES = 2 * 1024 * 1024;
+const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const safeBackupTree = (value, depth = 0) => {
+  if (depth > 12) return false;
+  if (typeof value === 'string') return value.length <= 10000;
+  if (typeof value === 'number') return Number.isFinite(value);
+  if (value === null || typeof value === 'boolean') return true;
+  if (Array.isArray(value)) return value.length <= 10000 && value.every(item => safeBackupTree(item, depth + 1));
+  return isRecord(value) && Object.keys(value).length <= 200 && Object.entries(value).every(([key, item]) =>
+    !['__proto__', 'constructor', 'prototype'].includes(key) && safeBackupTree(item, depth + 1));
+};
+const optionalFields = (record, keys, type) => keys.every(key => record[key] == null || typeof record[key] === type);
+const numericMap = value => value == null || (isRecord(value) && Object.entries(value).every(([key, item]) =>
+  /^(?:[1-9]|1[0-8])$/.test(key) && (item === null || item === '' || Number.isFinite(item))));
+const validBackupRound = round => isRecord(round) &&
+  optionalFields(round, ['id', 'date', 'courseName', 'highlight', 'focusNextRound'], 'string') &&
+  numericMap(round.customPars) && numericMap(round.customYardages) &&
+  Array.isArray(round.holes) && round.holes.length <= 18 && round.holes.every(hole =>
+    isRecord(hole) && Number.isFinite(hole.total) && hole.total >= 0 &&
+    optionalFields(hole, ['drive', 'notes'], 'string') &&
+    optionalFields(hole, ['fairwayHit', 'greenInRegulation'], 'boolean') &&
+    (hole.penalties == null || (Number.isFinite(hole.penalties) && hole.penalties >= 0) ||
+      (isRecord(hole.penalties) && optionalFields(hole.penalties, ['water', 'lost', 'ob'], 'boolean'))) &&
+    ['hole', 'par', 'yardage', 'putts', 'approaches', 'chips'].every(key => hole[key] == null || (Number.isFinite(hole[key]) && hole[key] >= 0)));
+
 export const readBackupFile = (file) =>
   new Promise((resolve, reject) => {
+    if (!file || file.size > MAX_BACKUP_BYTES) {
+      reject(new Error('Backup file is too large. Please choose a file smaller than 2 MB.'));
+      return;
+    }
     const reader = new FileReader();
 
     reader.onload = (event) => {
@@ -353,10 +246,13 @@ export const readBackupFile = (file) =>
         const parsed = JSON.parse(event.target.result);
 
         if (
-          !parsed ||
+          !isRecord(parsed) || !safeBackupTree(parsed) ||
+          (parsed.version != null && parsed.version !== 1) ||
           parsed.app !== 'Blushing Birdie' ||
           !Array.isArray(parsed.rounds) ||
-          !Array.isArray(parsed.courses)
+          !Array.isArray(parsed.courses) ||
+          parsed.rounds.some(round => !validBackupRound(round)) ||
+          parsed.courses.some(course => !isRecord(course) || typeof course.name !== 'string' || !optionalFields(course, ['id'], 'string') || !numericMap(course.pars) || !numericMap(course.yardages))
         ) {
           reject(new Error('Invalid backup file.'));
           return;
@@ -376,6 +272,7 @@ export const readBackupFile = (file) =>
  * Format score relative to par
  */
 export const formatScoreToPar = (score, par) => {
+  if (par == null || !Number.isFinite(par)) return '—';
   const diff = score - par;
   if (diff > 0) return `+${diff}`;
   if (diff === 0) return 'E';

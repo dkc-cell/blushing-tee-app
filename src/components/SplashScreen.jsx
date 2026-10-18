@@ -7,7 +7,7 @@ const SplashScreen = () => {
   return (
     <div className="splash-screen">
       <div className="splash-container">
-        {/* Logo - First Screen (2 seconds) */}
+        {/* Logo and tagline shown together */}
         <div className="logo-screen">
           <img 
             src={logo} 
@@ -16,7 +16,7 @@ const SplashScreen = () => {
           />
         </div>
 
-        {/* Tagline - Second Screen (appears after 2 seconds) */}
+        {/* Tagline */}
         <div className="tagline-screen">
           <img 
             src={tagline} 

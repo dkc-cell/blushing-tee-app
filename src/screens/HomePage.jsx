@@ -3,6 +3,7 @@ import { COLORS } from '../constants';
 import logo from '../assets/images/Blushing_Birdie_Logo.png';
 import { Link } from 'react-router-dom';
 import { journalArticles } from '../data/journalArticles';
+import WhyIBuiltThis from '../components/WhyIBuiltThis';
 import screenHome from '../assets/images/screenHome.png';
 import screenHole1 from '../assets/images/screenHole1.png';
 import screenStats from '../assets/images/screenStats.png';
@@ -149,63 +150,83 @@ const featureDotStyle = {
   transition: 'all 0.3s ease',
 };
 
-const testimonialSectionStyle = {
-  padding: '96px 0',
-  background:
-    'linear-gradient(180deg, rgba(255,249,245,1) 0%, rgba(244,168,185,0.08) 100%)',
-};
-
-const testimonialSubtextStyle = {
-  fontSize: '1.02rem',
-  lineHeight: 1.7,
-  color: '#4E6A6E',
-  maxWidth: '760px',
-  margin: '0 auto',
-};
-
-const testimonialGridStyle = (isMobile) => ({
-  display: 'grid',
-  gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
-  gap: '24px',
-  marginTop: '42px',
-});
-
-const testimonialCardStyle = (isMobile) => ({
-  background: 'rgba(255,255,255,0.82)',
-  backdropFilter: 'blur(10px)',
-  WebkitBackdropFilter: 'blur(10px)',
-  borderRadius: '24px',
-  padding: isMobile ? '22px 18px' : '28px 24px',
-  border: '1px solid rgba(172,200,200,0.32)',
-  borderTop: '2px solid #edd1d7ff',
-  boxShadow: '0 16px 40px rgba(16, 62, 67, 0.08)',
-});
-
-const testimonialMarkStyle = {
-  fontSize: '2.2rem',
-  lineHeight: 1,
-  color: '#F4A8B9',
-  fontWeight: 700,
-  marginBottom: '1px',
-  fontFamily: 'Georgia, serif',
-};
-
-const testimonialQuoteStyle = {
-  fontSize: '1.02rem',
-  lineHeight: 1.6,
-  color: '#36565A',
-  margin: 0,
-};
-
 const sectionStyle = {
   paddingTop: '60px',
   paddingBottom: '60px',
   background: 'linear-gradient(180deg, #FFF9F5 0%, #ffffff 100%)',
 };
 
+const faqItems = [
+  {
+    "id": "free",
+    "question": "Is the app free? Do I need an account?",
+    "answer": "Blushing Birdie is free to use. No account or sign-in is required to record rounds, review stats, or save courses."
+  },
+  {
+    "id": "phone",
+    "question": "Can I use it on my phone while I’m on the course?",
+    "answer": "Yes. Blushing Birdie is designed to work on your phone while you play. Choose Quick Score or Detailed Tracking when starting a round."
+  },
+  {
+    "id": "scoring",
+    "question": "What’s the difference between Quick Score and Detailed Tracking?",
+    "answer": "Quick Score lets you enter your total score for each hole, including penalty strokes, with optional putts and fairway or par-3 green results. Those optional details do not change your entered score.\n\nDetailed Tracking records your shots and putts to calculate the hole score."
+  },
+  {
+    "id": "par-yardage",
+    "question": "Do I need to enter par and yardage?",
+    "answer": "Par is required before saving each new hole. Choose 3, 4, or 5, or use a saved course to fill it in when available.\n\nYardage is optional and hidden in Quick Score. Older saved holes without par remain available; missing details stay blank in exports."
+  },
+  {
+    "id": "courses",
+    "question": "How do I add or reuse a course?",
+    "answer": "From the tracker home, choose My Courses → Add a Course. Only the course name is required to save it. Adding pars makes future rounds quicker to record; yardages are optional.\n\nChoose your saved course when starting a round. Naming a Quick Score round does not automatically add a reusable course to My Courses."
+  },
+  {
+    "id": "holes",
+    "question": "Can I play a partial round or finish later?",
+    "answer": "Yes. You do not need to play a full 18 holes. Resume Round returns to an unfinished round on the same browser and device.\n\nEnd Round Early saves only the holes you have recorded. Finish recording a hole before ending if you want it included."
+  },
+  {
+    "id": "stats",
+    "question": "What statistics can I track?",
+    "answer": "Review scores, results relative to par, performance on par 3s, 4s, and 5s, putting, fairways, and par-3 greens.\n\nPutts and tee results are optional in Quick Score. Skipped details are excluded from the relevant statistics rather than counted as misses or zero putts."
+  },
+  {
+    "id": "handicap",
+    "question": "Does Blushing Birdie calculate an official handicap?",
+    "answer": "Blushing Birdie does not calculate an official handicap. Golfers who maintain one can post eligible scores through GHIN or their handicap service.\n\nThe Hole-by-Hole CSV provides your recorded scores to reference when entering them. It is not a direct GHIN import."
+  },
+  {
+    "id": "privacy",
+    "question": "Where is my data stored?",
+    "answer": "Your rounds and courses are stored in this browser on this device. No account is required, and there is no automatic backup or device sync.\n\nClearing browser data or losing access to your device can remove your local records. Keep a separate backup file so you can restore what you saved."
+  },
+  {
+    "id": "csv",
+    "question": "Can I download my scores?",
+    "answer": "Yes. Go to My Rounds & Stats → Export CSV. Choose Round Summary for one row per round, or Hole-by-Hole for individual hole numbers, pars, scores, and recorded details.\n\nBoth open in spreadsheet apps such as Excel, Google Sheets, or Numbers. You can export all rounds or select a date range. CSV files cannot restore the app."
+  },
+  {
+    "id": "export-import",
+    "question": "How do I back up, restore, or move my data?",
+    "answer": "Choose More → Backup & Restore. Export Backup saves your saved rounds and courses in a JSON file. Finish or end an active round before exporting to include it.\n\nOn the destination browser or device, open Blushing Birdie and choose Import Backup to select that JSON file. Importing replaces its saved rounds and courses; it does not combine records from two devices. Export a backup of the destination data first if you want to keep it."
+  },
+  {
+    "id": "backup-schedule",
+    "question": "When should I back up?",
+    "answer": "Save a backup after each round or course change, and before switching phones, changing browsers, or clearing browser data.\n\nKeep your two most recent copies outside this browser, such as in Files or iCloud Drive. A backup can only restore the data included when you saved it."
+  },
+  {
+    "id": "install",
+    "question": "How do I add it to my Home Screen?",
+    "answer": "On iPhone: Open the app in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the app in Chrome, tap the menu (three dots), then select “Add to Home Screen.”"
+  }
+];
+
 export default function HomePage() {
   usePageSeo({
-    title: 'Blushing Birdie Golf Tracker for Women',
+    title: 'Blushing Birdie Golf Tracker',
     description: DEFAULT_DESCRIPTION,
     path: '/',
     structuredData: [
@@ -215,32 +236,11 @@ export default function HomePage() {
       {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
-        mainEntity: [
-          {
-            '@type': 'Question',
-            name: 'Is Blushing Birdie free?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Blushing Birdie is free to use, with no subscriptions or hidden fees for the core golf round tracker.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'Who is Blushing Birdie designed for?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Blushing Birdie is designed for women golfers and everyday recreational golfers who want simple, private, encouraging golf progress tracking.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'Where is Blushing Birdie data stored?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Rounds and stats are stored locally on your device by default. Optional account sync is only used if you choose to sign in.',
-            },
-          },
-        ],
+        mainEntity: faqItems.map(item => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: { '@type': 'Answer', text: item.answer },
+        })),
       },
     ],
   });
@@ -251,7 +251,6 @@ export default function HomePage() {
   );
   const featuresScrollRef = useRef(null);
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
   const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -316,31 +315,6 @@ export default function HomePage() {
   });
 }, [isMobile]);
 
-// 👇 ADD THIS HERE
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-  const data = new FormData(form);
-
-  try {
-    const response = await fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(data).toString(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Signup failed with status ${response.status}`);
-    }
-
-    setSubmitted(true);
-    form.reset();
-  } catch (error) {
-    console.error('Form submission error:', error);
-  }
-};
-
   const featureSlides = [
   {
     image: screenHome,
@@ -364,84 +338,7 @@ const handleSubmit = async (e) => {
   },
 ];
 
-  const testimonialItems = [
-  {
-    id: 1,
-    quote:
-      'I’ve tried a few golf apps before, but this is the first one that actually feels simple. I just track my round and move on.',
-    name: 'Jennifer',
-  },
-  {
-    id: 2,
-    quote:
-      'The stats are just enough to be helpful without getting in the way.',
-    name: 'Kristin',
-  },
-  {
-    id: 3,
-    quote:
-      'I love that I can play 9 holes and still log it without it feeling incomplete. That alone makes me want to keep using it.',
-    name: 'Michelle',
-  },
-];
-
-  const faqItems = [
-  {
-    id: 'free',
-    question: 'Is the app free? Do I need an account?',
-    answer:
-      'Blushing Birdie is completely free to use.\n\nThere are no subscriptions or hidden fees, and you do not need an account to log rounds, view stats, or use the core app.\n\nYou can open the app and start right away. If you want account sync later, signing in is optional.',
-  },
-  {
-    id: 'phone',
-    question: 'Can I use it on my phone while I’m on the course?',
-    answer:
-      'Yes. Blushing Birdie is designed to work right on your phone while you play, so it’s easy to log your round as you go.',
-  },
-  {
-    id: 'holes',
-    question: 'Do I have to play a full 18 holes?',
-    answer:
-      'Not at all. Whether you play 3 holes, 9 holes, or a full round—it all counts. The app is designed to fit the way you actually play.',
-  },
-  {
-    id: 'stats',
-    question: 'What stats does it track?',
-    answer:
-      'Blushing Birdie focuses on simple, meaningful stats like fairways hit, putts, and overall progress—without getting in the way of your game.',
-  },
-  {
-    id: 'handicap',
-    question: 'What is an “Unofficial Handicap”?',
-    answer:
-      'Your Unofficial Handicap is a simple way to track your personal progress over time—without the pressure of official scoring systems.\n\nIt’s designed to give you a general sense of how you’re improving, round by round.\n\nYour handicap will appear after you’ve played:\n\n• At least 3 full rounds (18 holes)\n\n• 6 nine-hole rounds\n\nUnofficial Handicap is only calculated from rounds with both course rating and slope rating. This helps your handicap reflect the difficulty of the course.\n\nPartial rounds are not included in the calculation. You can still log and enjoy them, but your handicap is based only on completed rounds.\n\nThis is not an official USGA/GHIN handicap—just a personal, encouraging way to see your progress, one swing at a time. 🖤',
-  },
-  {
-    id: 'privacy',
-    question: 'Where is my data stored? Is it private?',
-    answer:
-      'Your rounds and stats are stored locally on your device by default.\n\nYou do not need an account for local mode. Account sync is optional and only used if you choose to sign in.\n\nBlushing Birdie does not sell your golf data. Your information stays in your control.',
-  },
-  {
-    id: 'export-import',
-    question: 'How do I export, import, or switch devices?',
-    answer:
-      'You can export your rounds at any time as a CSV file—a simple spreadsheet format you can open in Excel, Google Sheets, or Numbers.\n\nExporting allows you to keep a personal backup of your data and makes it easy to move your rounds to a new device.\n\nYou can also create an optional account for sync. Rounds and courses you save while signed in can load when you sign in on another device.\n\nIf you switch phones or your browser storage is cleared, you can import a previously saved file or load your account data to get your rounds and stats back.',
-  },
-  {
-    id: 'install',
-    question: 'How do I add it to my Home Screen?',
-    answer:
-      'On iPhone: Open the app in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the app in Chrome, tap the menu (three dots), then select “Add to Home Screen.”',
-  },
-];
-
-const [openItems, setOpenItems] = useState([
-  'free',
-  'account',
-  'storage',
-  'phone',
-]);
+const [openItems, setOpenItems] = useState(['free']);
 
 const toggleItem = (id) => {
   setOpenItems((prev) =>
@@ -554,7 +451,6 @@ const toggleItem = (id) => {
           ) : (
             <nav style={{ display: 'flex', gap: '22px' }}>
               <a href="#features" style={navLinkStyle}>Features</a>
-              <a href="#reviews" style={navLinkStyle}>Reviews</a>
               <a href="#faq" style={navLinkStyle}>FAQ</a>
               <a href="#shop" style={navLinkStyle}>Birdie Shop</a>
               <a href="#journal" style={{ ...navLinkStyle, fontStyle: 'italic' }}>
@@ -582,7 +478,6 @@ const toggleItem = (id) => {
               }}
             >
               <a href="#features" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>Features</a>
-              <a href="#reviews" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>Reviews</a>
               <a href="#faq" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>FAQ</a>
               <a href="#shop" style={mobileNavLinkStyle} onClick={() => setMenuOpen(false)}>Birdie Shop</a>
               <a href="#journal" style={{ ...mobileNavLinkStyle, fontStyle: 'italic' }} onClick={() => setMenuOpen(false)}>
@@ -640,7 +535,7 @@ const toggleItem = (id) => {
             marginBottom: '18px',
           }}
         >
-          A simple, private golf tracker for women.
+          A simple, private golf tracker.
         </h1>
 
         <p
@@ -783,35 +678,10 @@ const toggleItem = (id) => {
   </div>
 </section>
 
-    {/* REVIEWS */}
-<section id="reviews" style={testimonialSectionStyle}>
-  <div style={sectionWidth}>
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={sectionTitleStyle}>What Women Love About Blushing Birdie</h2>
-      <p style={testimonialSubtextStyle}>
-        Designed for everyday golfers who want to enjoy the game and build
-        confidence along the way.
-      </p>
-    </div>
-
-    <div style={testimonialGridStyle(isMobile)}>
-      {testimonialItems.map((item) => (
-        <div key={item.id} style={testimonialCardStyle(isMobile)}>
-          <div style={testimonialMarkStyle}>“</div>
-          <p style={testimonialQuoteStyle}>{item.quote}</p>
-          <p
-            style={{
-              marginTop: '14px',
-              fontSize: '0.92rem',
-              fontWeight: 600,
-              color: COLORS.darkTeal,
-            }}
-          >
-            — {item.name}
-          </p>
-        </div>
-      ))}
-    </div>
+<section id="why-i-built-this" style={sectionBaseStyle} aria-labelledby="website-why-title">
+  <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'left' }}>
+    <h2 id="website-why-title" style={{ ...sectionTitleStyle, marginBottom: 24 }}>Why I Built This</h2>
+    <WhyIBuiltThis />
   </div>
 </section>
 
@@ -973,8 +843,8 @@ const toggleItem = (id) => {
         lineHeight: 1.7,
       }}
     >
-      Thoughtful notes, simple encouragement, and everyday reflections for women
-      who love the&nbsp;game.
+      Thoughtful notes, simple encouragement, and everyday reflections for the love
+      of the&nbsp;game.
     </p>
 
     <div
@@ -1069,84 +939,6 @@ const toggleItem = (id) => {
   </div>
 </section>
 
-     {/* EMAIL */}
-<section
-  id="contact"
-  style={{
-    ...sectionBaseStyle,
-    paddingBottom: '80px',
-  }}
->
-  <div style={{ ...cardStyle, padding: '60px 40px', textAlign: 'center' }}>
-    <h3 style={{ color: COLORS.darkTeal, marginBottom: '12px' }}>
-      Stay in the Loop
-    </h3>
-
-    <p style={{ color: '#5F7C7F', marginBottom: '24px' }}>
-      Journal updates, thoughtful notes, and a few lovely things along the way.
-    </p>
-
-    {submitted ? (
-      <p
-        style={{
-          marginTop: '10px',
-          color: COLORS.darkTeal,
-          fontSize: '0.95rem',
-          fontWeight: 500,
-        }}
-      >
-        Thank you for signing up 💕
-      </p>
-    ) : (
-      <form
-        name="email-signup"
-        method="POST"
-        data-netlify="true"
-        onSubmit={handleSubmit}
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '12px',
-          flexWrap: 'wrap',
-          marginTop: '10px',
-        }}
-      >
-        <input type="hidden" name="form-name" value="email-signup" />
-
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="Enter your email"
-          style={{
-            padding: '14px 20px',
-            borderRadius: '16px',
-            border: '1px solid #ccc',
-            minWidth: '230px',
-            maxWidth: '290px',
-            width: '100%',
-          }}
-        />
-
-        <button
-          type="submit"
-          style={{
-            padding: '14px 26px',
-            borderRadius: '16px',
-            background: COLORS.darkTeal,
-            color: COLORS.cream,
-            border: '1px solid rgba(0,0,0,0.15)',
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          Sign Up
-        </button>
-      </form>
-    )}
-  </div>
-</section>
-
 {/* FINAL CTA */}
 <section
   style={{
@@ -1233,9 +1025,7 @@ const toggleItem = (id) => {
       Privacy
     </Link>
     <span>•</span>
-    <a href="#contact" style={footerLinkStyle}>
-      Contact
-    </a>
+    <a href="mailto:hello@blushingbirdie.com?subject=Blushing%20Birdie%20Feedback" style={footerLinkStyle}>Share Feedback</a>
   </div>
   © 2026 Blushing Birdie
 </footer>

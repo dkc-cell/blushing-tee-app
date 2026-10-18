@@ -23,7 +23,7 @@ export default function PrivacyPage() {
   usePageSeo({
     title: 'Privacy and Data - Blushing Birdie',
     description:
-      'How Blushing Birdie handles golf round data, local storage, optional account sync, and email signup information.',
+      'How Blushing Birdie handles golf round data, local storage, and file backups.',
     path: '/privacy',
   });
 
@@ -150,8 +150,8 @@ export default function PrivacyPage() {
             device you use.
           </p>
           <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            You do not need an account to use the core app. Your golf data is not uploaded to a
-            Blushing Birdie server during normal local use.
+            No account is required. Your saved rounds and courses stay in this browser on your
+            device. Use Export Backup to keep a separate copy of your data.
           </p>
         </section>
 
@@ -167,34 +167,19 @@ export default function PrivacyPage() {
             What to expect
           </h2>
           <p style={{ margin: '0 0 14px', color: COLORS.charcoal, lineHeight: 1.75 }}>
-            Because data is stored locally, it may not automatically appear on another device. If
+            Because data is stored locally, it does not automatically appear on another device. If
             browser storage is cleared, locally stored rounds and courses may be removed.
           </p>
           <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            The app includes export tools and optional account sync to help you keep copies of your
-            information. Account sync only applies if you choose to sign in.
+            Export Backup saves your saved rounds and courses in a JSON file. Import Backup restores
+            that file and replaces the saved rounds and courses on the destination device. CSV exports
+            are spreadsheets for reviewing golf stats and cannot restore the app.
           </p>
         </section>
 
         <section style={{ ...cardStyle, padding: '34px 30px', marginBottom: '22px' }}>
-          <h2
-            style={{
-              marginTop: 0,
-              marginBottom: '14px',
-              color: COLORS.darkTeal,
-              fontSize: '1.35rem',
-            }}
-          >
-            Email signup
-          </h2>
-          <p style={{ margin: '0 0 14px', color: COLORS.charcoal, lineHeight: 1.75 }}>
-            If you choose to join the email list, the information you provide is submitted for
-            mailing list communication and updates. That is separate from your in-app golf data.
-          </p>
-          <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            If you create an account for optional sync, that account is separate from the email
-            list and is used to connect your synced data to you.
-          </p>
+          <h2 style={{ margin: '0 0 14px', color: COLORS.darkTeal, fontSize: '1.35rem' }}>Sharing feedback</h2>
+          <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>Share Feedback opens your email app. If you send a message, we receive your email address and the information you choose to include. Your scores and courses are not attached automatically.</p>
         </section>
 
         <section style={{ ...cardStyle, padding: '34px 30px' }}>
@@ -206,11 +191,12 @@ export default function PrivacyPage() {
               fontSize: '1.35rem',
             }}
           >
-            Questions
+            Keeping a separate copy
           </h2>
           <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            If you add a dedicated support email or contact page later, this section should point
-            people there for privacy-related questions or requests.
+            Save a backup after each round or course change, and before switching phones or clearing
+            browser data. Store it outside this browser, such as in Files or iCloud Drive, and keep
+            your two most recent copies. A backup can only restore data included when it was saved.
           </p>
         </section>
       </main>

@@ -1,0 +1,25 @@
+.tracker-home { min-height: 100dvh; background: #fff9f5; color: #103e43; padding: 18px 18px max(24px,env(safe-area-inset-bottom)); box-sizing: border-box; }
+.tracker-home * { box-sizing: border-box; }
+.th-brand,.th-content { max-width: 460px; margin: auto; }
+.th-brand { display: flex; align-items: center; gap: 12px; padding: 8px 0 24px; }
+.th-brand img { width: 60px; height: 60px; object-fit: contain; flex-shrink: 0; }
+.th-brand h1 { font: 500 clamp(25px,7vw,34px) 'Playfair Display',Georgia,serif; margin: 0 0 4px; }
+.th-brand p { color: #bd6a81; font-size: clamp(12px,3.3vw,15px); margin: 0; }
+.th-actions { display: grid; gap: 12px; }
+.th-action { display: flex; align-items: center; gap: 12px; padding: 20px 16px; width: 100%; background: white; border: 1px solid #acc8c8; border-radius: 18px; text-align: left; color: #103e43; cursor: pointer; }
+.th-primary { background: #dcecec; border: 2px solid #acc8c8; }
+.th-action span { flex: 1; min-width: 0; }
+.th-action strong { display: block; font-size: 20px; }
+.th-action small { display: block; font-size: 14px; font-weight: 400; line-height: 1.4; margin-top: 5px; }
+.th-more { display: block; margin: 18px auto 0; min-height: 44px; border: 0; background: none; color: #103e43; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.th-secondary { margin-top: 6px; background: white; border-radius: 14px; border: 1px solid #acc8c8; overflow: hidden; }
+.th-secondary button, .th-secondary a { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 12px 16px; width: 100%; background: white; border: 0; color: #103e43; text-align: left; font-size: 15px; cursor: pointer; }
+.th-secondary button+button, .th-secondary button+a { border-top: 1px solid #e0ebeb; }
+.tracker-home button:focus-visible { outline: 3px solid #103e43; outline-offset: 3px; }
+
+.th-secondary a { box-sizing: border-box; text-decoration: none; font-family: inherit; }
+.th-secondary a:focus-visible { outline: 3px solid #103e43; outline-offset: -3px; }
+
+.th-footer { margin-top: 28px; text-align: center; }
+.th-footer a { display: inline-flex; align-items: center; min-height: 44px; color: #103e43; font-size: 15px; text-underline-offset: 4px; }
+.th-footer a:focus-visible { outline: 3px solid #103e43; outline-offset: 4px; }
