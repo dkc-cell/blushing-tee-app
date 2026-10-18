@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { COLORS } from '../constants';
 import { NumberPad } from '../components';
 import { loadActiveRound, saveHoleDraft, isHoleDraftMeaningful } from '../utils/activeRoundStorage';
-import RoundCelebration, { CELEBRATION_MS } from '../components/RoundCelebration';
+import RoundCelebration from '../components/RoundCelebration';
 import './QuickScoreScreen.css';
 
 const readInputs = (hole, round) => {
@@ -33,8 +33,14 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
     if (hydrated.current !== currentHole) { hydrated.current = currentHole; return; }
     saveHoleDraft(currentHole, { hole: currentHole, scoringMode: 'quick', ...inputs });
   }, [currentHole, inputs]);
-  const advanceTimer = useRef(null);
-  useEffect(() => () => clearTimeout(advanceTimer.current), []);
+  const pendingFinish = useRef(null);
+  useEffect(() => () => { pendingFinish.current = null; }, []);
+  const finishCelebration = () => {
+    const finish = pendingFinish.current;
+    pendingFinish.current = null;
+    setCelebration(null);
+    finish?.();
+  };
 
   const change = (key, value) => { setInputs(i => ({ ...i, [key]: value })); setError(''); };
   const openPad = (kind, value) => { setDigits(value == null ? '' : String(value)); setModal(kind); };
@@ -50,13 +56,12 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
     saveHoleDraft(currentHole, null);
     onRecordHole(hole);
     const kind = inputs.score === 1 ? 'hio' : par && inputs.score === par - 2 ? 'eagle' : par && inputs.score === par - 1 ? 'birdie' : null;
-    setCelebration(kind);
     const finish = () => {
       if (advance && currentHole === 18) onCompleteRound(hole);
       else if (advance) setCurrentHole(currentHole + 1);
       else onBack();
     };
-    if (kind) advanceTimer.current = setTimeout(finish, CELEBRATION_MS);
+    if (kind) { pendingFinish.current = finish; setCelebration(kind); }
     else finish();
   };
   const endEarly = () => {
@@ -85,7 +90,7 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
     </details>
     <footer className="qs-footer"><nav className="qs-nav" aria-label="Hole navigation"><button disabled={currentHole === 1 || Boolean(celebration)} onClick={() => setCurrentHole(currentHole - 1)}>← Previous Hole</button><span>{currentHole} / 18</span><button disabled={Boolean(celebration)} onClick={() => save(true)}>{currentHole === 18 ? 'Save & Finish' : 'Save & Next Hole →'}</button></nav>
     <button className="qs-link qs-end" onClick={endEarly}>End Round Early</button></footer>
-    <RoundCelebration kind={celebration} onDismiss={() => setCelebration(null)} />
+    <RoundCelebration kind={celebration} onDismiss={finishCelebration} />
     {modal && <div className="qs-overlay"><section role="dialog" aria-modal="true" aria-label={modal === 'par' ? 'Select par' : modal === 'end' ? 'Unfinished hole' : modal === 'help' ? 'Scoring help' : `Enter ${modal}`} className="qs-modal"><button className="qs-link" onClick={() => { setModal(null); setError(''); }}>Close</button>
       {modal === 'course' ? <><h2>Course name</h2><label htmlFor="qs-course-input">Where are you playing?</label><input id="qs-course-input" autoFocus maxLength={100} value={nameDraft} onChange={e => setNameDraft(e.target.value)} placeholder="e.g. Olympic Hills" /><button onClick={() => { setCourseName(nameDraft.trim()); setModal(null); }}>Save Name</button></> : modal === 'par' ? <><h2>Select par for Hole {currentHole}</h2><div className="qs-choices">{[3, 4, 5].map(p => <button key={p} onClick={() => { setCustomPars({ ...customPars, [currentHole]: p }); setModal(null); }}>{p}</button>)}</div></> : modal === 'help' ? <><h2>Your hole score</h2><p>Enter all strokes for this hole, including any penalty strokes. Use + as you play, or tap the score to enter the total.</p><p>Optional putts and tee-result details do not add strokes to your total. On par 3s, “Green hit?” means your tee shot finished on the putting green.</p></> : modal === 'end' ? <><h2>Hole {currentHole} isn’t finished</h2><p>Finish saving this hole, or end your round with only the {currentRound.length} recorded hole{currentRound.length === 1 ? '' : 's'}.</p><button onClick={() => setModal(null)}>Finish Recording Hole {currentHole}</button><button onClick={() => { saveHoleDraft(currentHole, null); onCompleteRound(null); }}>End with Recorded Holes</button></> : <><h2>Enter {modal}</h2><NumberPad value={digits} maxLength={2} onNumberClick={n => setDigits(digits + n)} onBackspace={() => setDigits(digits.slice(0, -1))} onClear={() => setDigits('')} onDone={applyDigits} />{error && <p role="alert">{error}</p>}</>}
     </section></div>}

@@ -7,9 +7,8 @@ import {
   loadActiveRound,
   saveHoleDraft,
 } from '../utils/activeRoundStorage';
-import confetti from 'canvas-confetti';
 
-import RoundCelebration, { CELEBRATION_MS } from '../components/RoundCelebration';
+import RoundCelebration from '../components/RoundCelebration';
 
 const getSavedHoleDraft = (holeNumber) => {
   const active = loadActiveRound();
@@ -37,6 +36,15 @@ const LogRoundScreen = ({
   const [drive, setDrive] = useState(initialDraft?.drive || '');
   const [showDriveWarning, setShowDriveWarning] = useState(false);
   const [celebrationKind, setCelebrationKind] = useState(null); // 'birdie' | 'eagle' | 'hio' | null
+  const pendingFinish = useRef(null);
+  const advanceTimer = useRef(null);
+  useEffect(() => () => { clearTimeout(advanceTimer.current); pendingFinish.current = null; }, []);
+  const finishCelebration = () => {
+    const finish = pendingFinish.current;
+    pendingFinish.current = null;
+    setCelebrationKind(null);
+    finish?.();
+  };
   const driveSectionRef = useRef(null);
     const handleDriveSelect = (value) => {
     setDrive(value);
@@ -214,17 +222,11 @@ const LogRoundScreen = ({
   else if (par != null && strokes === par - 2) kind = 'eagle';
   else if (par != null && strokes === par - 1) kind = 'birdie';
 
-  if (kind) {
-    setCelebrationKind(kind);
-  }
 
     setEditingHole(false);
     resetInputs();
 
-       const advanceDelay = kind ? CELEBRATION_MS : 800;
-
-    setTimeout(() => {
-     if (kind) confetti.reset(); // stops any lingering particles before next hole
+    const finish = () => {
 
       if (wasEditingHole && nextHoleToLogAfterUpdate) {
         setCurrentHole(nextHoleToLogAfterUpdate);
@@ -233,7 +235,9 @@ const LogRoundScreen = ({
       } else {
         onCompleteRound(newHoleData);
       }
-    }, advanceDelay);
+    };
+    if (kind) { pendingFinish.current = finish; setCelebrationKind(kind); }
+    else advanceTimer.current = setTimeout(finish, 800);
   };
 
   const enableEditHole = () => {
@@ -723,7 +727,7 @@ const LogRoundScreen = ({
         />
       )}
 
-      <RoundCelebration kind={celebrationKind} onDismiss={() => setCelebrationKind(null)} />
+      <RoundCelebration kind={celebrationKind} onDismiss={finishCelebration} />
 
       {/* Par Modal */}
       {showParModal && (

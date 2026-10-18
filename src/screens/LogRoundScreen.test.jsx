@@ -81,3 +81,35 @@ test('detailed scoring requires valid par but does not require yardage', () => {
   expect(container.textContent).not.toContain("What's the par for this hole?");
   expect(container.textContent).toContain('Approach Shots');
 });
+
+
+test.each([[1, 3000], [2, 2000], [3, 1500]])('detailed score %i advances once at the matching celebration duration', (score, duration) => {
+  vi.useFakeTimers();
+  try {
+    saveHoleDraft(2, { hole: 2, drive: 'middle', approaches: score - 1, putts: 0 });
+    const p = props();
+    render(<LogRoundScreen {...p} />);
+    click('Record Hole 2 & Continue');
+    act(() => vi.advanceTimersByTime(duration - 1));
+    expect(p.setCurrentHole).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(1));
+    expect(p.setCurrentHole).toHaveBeenCalledExactlyOnceWith(3);
+    expect(container.querySelector('.birdie-overlay')).toBeNull();
+  } finally { vi.useRealTimers(); }
+});
+
+test.each([1, 2, 3])('tapping detailed score %i celebration advances without a second delayed advance', score => {
+  vi.useFakeTimers();
+  try {
+    saveHoleDraft(2, { hole: 2, drive: 'middle', approaches: score - 1, putts: 0 });
+    const p = props();
+    render(<LogRoundScreen {...p} />);
+    click('Record Hole 2 & Continue');
+    act(() => container.querySelector('.birdie-overlay').click());
+    expect(container.querySelector('.birdie-overlay')).toBeNull();
+    expect(p.setCurrentHole).toHaveBeenCalledExactlyOnceWith(3);
+    act(() => vi.advanceTimersByTime(5000));
+    expect(p.setCurrentHole).toHaveBeenCalledTimes(1);
+    expect(p.onRecordHole).toHaveBeenCalledTimes(1);
+  } finally { vi.useRealTimers(); }
+});

@@ -110,13 +110,13 @@ test('unknown pars are excluded from comparisons and export handicap is removed'
   expect(exportToCSV([{ holes }])).not.toContain('Unofficial Handicap');
 });
 
-test('birdie uses artwork without duplicate caption and advances after four seconds', () => {
+test('birdie uses artwork without duplicate caption and advances after 1.5 seconds', () => {
   vi.useFakeTimers();
   render(); for (let i = 0; i < 3; i++) click('Increase score'); click('Save & Next Hole →');
   const overlay = container.querySelector('.birdie-overlay');
   expect(overlay.querySelector('img').alt).toBe('Birdie');
-  expect(overlay.textContent).toBe('');
-  act(() => vi.advanceTimersByTime(4000));
+  expect(overlay.textContent).toBe('Tap to continue');
+  act(() => vi.advanceTimersByTime(1500));
   expect(container.querySelector('.birdie-overlay')).toBeNull();
   expect(container.querySelector('.qs-total').textContent).toBe('--');
   vi.useRealTimers();
@@ -128,4 +128,35 @@ test('requires par before saving a quick score', () => {
   expect(recorded).not.toHaveBeenCalled();
   expect(container.textContent).toContain('Select par for Hole 1');
   expect(container.textContent).not.toContain('Leave par blank');
+});
+
+
+test.each([[1, 3000], [2, 2000], [3, 1500]])('quick score %i advances once at the matching celebration duration', (score, duration) => {
+  vi.useFakeTimers();
+  try {
+    render();
+    for (let i = 0; i < score; i++) click('Increase score');
+    click('Save & Next Hole →');
+    act(() => vi.advanceTimersByTime(duration - 1));
+    expect(container.querySelector('.birdie-overlay')).not.toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(container.querySelector('.birdie-overlay')).toBeNull();
+    expect(container.querySelector('.qs-total').textContent).toBe('--');
+    expect(recorded).toHaveBeenCalledTimes(1);
+  } finally { vi.useRealTimers(); }
+});
+
+test.each([1, 2, 3])('tapping quick score %i celebration advances without a second delayed advance', score => {
+  vi.useFakeTimers();
+  try {
+    render();
+    for (let i = 0; i < score; i++) click('Increase score');
+    click('Save & Next Hole →');
+    act(() => container.querySelector('.birdie-overlay').click());
+    expect(container.querySelector('.birdie-overlay')).toBeNull();
+    expect(container.querySelector('.qs-course-grid').textContent).toContain('Hole 2');
+    act(() => vi.advanceTimersByTime(5000));
+    expect(container.querySelector('.qs-course-grid').textContent).toContain('Hole 2');
+    expect(recorded).toHaveBeenCalledTimes(1);
+  } finally { vi.useRealTimers(); }
 });

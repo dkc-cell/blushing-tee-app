@@ -29,7 +29,7 @@ test('CSV escapes text that could be interpreted as a spreadsheet formula', () =
   expect(exportToCSV([{ ...round, courseName: 'A, "B"' }])).toContain('"A, ""B"""');
 });
 test('JSON backup round trips full records, including optional details and reflections', async () => {
-  const backup = { app: 'Blushing Birdie', version: 1, rounds: [{ ...round, highlight: 'Great ace' }], courses: [{ id: 'c1', name: 'Test Course', pars: { 1: 4 }, yardages: {} }] };
+  const backup = { app: 'Blushing Birdie', version: 1, rounds: [{ ...round, highlight: 'Great ace', holes: round.holes.map(hole => ({ ...hole, penalties: { water: false, lost: false, ob: false } })) }], courses: [{ id: 'c1', name: 'Test Course', pars: { 1: 4 }, yardages: {} }] };
   await expect(readBackupFile(new File([JSON.stringify(backup)], 'backup.json'))).resolves.toEqual(backup);
 });
 test('JSON restore rejects CSV and malformed records', async () => {

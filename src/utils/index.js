@@ -229,7 +229,9 @@ const validBackupRound = round => isRecord(round) &&
     isRecord(hole) && Number.isFinite(hole.total) && hole.total >= 0 &&
     optionalFields(hole, ['drive', 'notes'], 'string') &&
     optionalFields(hole, ['fairwayHit', 'greenInRegulation'], 'boolean') &&
-    ['hole', 'par', 'yardage', 'putts', 'approaches', 'chips', 'penalties'].every(key => hole[key] == null || (Number.isFinite(hole[key]) && hole[key] >= 0)));
+    (hole.penalties == null || (Number.isFinite(hole.penalties) && hole.penalties >= 0) ||
+      (isRecord(hole.penalties) && optionalFields(hole.penalties, ['water', 'lost', 'ob'], 'boolean'))) &&
+    ['hole', 'par', 'yardage', 'putts', 'approaches', 'chips'].every(key => hole[key] == null || (Number.isFinite(hole[key]) && hole[key] >= 0)));
 
 export const readBackupFile = (file) =>
   new Promise((resolve, reject) => {

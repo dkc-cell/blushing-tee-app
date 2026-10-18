@@ -63,9 +63,9 @@ export default function AppPage() {
   // Course editing state
   const [editingCourse, setEditingCourse] = useState(null);
 
-  // Hide splash after 4 seconds
+  // Hide the combined splash after 1.5 seconds
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 4000);
+    const timer = setTimeout(() => setShowSplash(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
