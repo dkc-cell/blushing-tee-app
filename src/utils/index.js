@@ -208,8 +208,35 @@ export const downloadBackupJSON = (backupData, fileName) => {
 };
 
 // ✅ Backup import (JSON)
+const MAX_BACKUP_BYTES = 2 * 1024 * 1024;
+const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const safeBackupTree = (value, depth = 0) => {
+  if (depth > 12) return false;
+  if (typeof value === 'string') return value.length <= 10000;
+  if (typeof value === 'number') return Number.isFinite(value);
+  if (value === null || typeof value === 'boolean') return true;
+  if (Array.isArray(value)) return value.length <= 10000 && value.every(item => safeBackupTree(item, depth + 1));
+  return isRecord(value) && Object.keys(value).length <= 200 && Object.entries(value).every(([key, item]) =>
+    !['__proto__', 'constructor', 'prototype'].includes(key) && safeBackupTree(item, depth + 1));
+};
+const optionalFields = (record, keys, type) => keys.every(key => record[key] == null || typeof record[key] === type);
+const numericMap = value => value == null || (isRecord(value) && Object.entries(value).every(([key, item]) =>
+  /^(?:[1-9]|1[0-8])$/.test(key) && (item === null || item === '' || Number.isFinite(item))));
+const validBackupRound = round => isRecord(round) &&
+  optionalFields(round, ['id', 'date', 'courseName', 'highlight', 'focusNextRound'], 'string') &&
+  numericMap(round.customPars) && numericMap(round.customYardages) &&
+  Array.isArray(round.holes) && round.holes.length <= 18 && round.holes.every(hole =>
+    isRecord(hole) && Number.isFinite(hole.total) && hole.total >= 0 &&
+    optionalFields(hole, ['drive', 'notes'], 'string') &&
+    optionalFields(hole, ['fairwayHit', 'greenInRegulation'], 'boolean') &&
+    ['hole', 'par', 'yardage', 'putts', 'approaches', 'chips', 'penalties'].every(key => hole[key] == null || (Number.isFinite(hole[key]) && hole[key] >= 0)));
+
 export const readBackupFile = (file) =>
   new Promise((resolve, reject) => {
+    if (!file || file.size > MAX_BACKUP_BYTES) {
+      reject(new Error('Backup file is too large. Please choose a file smaller than 2 MB.'));
+      return;
+    }
     const reader = new FileReader();
 
     reader.onload = (event) => {
@@ -217,12 +244,13 @@ export const readBackupFile = (file) =>
         const parsed = JSON.parse(event.target.result);
 
         if (
-          !parsed ||
+          !isRecord(parsed) || !safeBackupTree(parsed) ||
+          (parsed.version != null && parsed.version !== 1) ||
           parsed.app !== 'Blushing Birdie' ||
           !Array.isArray(parsed.rounds) ||
           !Array.isArray(parsed.courses) ||
-          parsed.rounds.some(round => !round || typeof round !== 'object' || !Array.isArray(round.holes) || round.holes.some(hole => !hole || !Number.isFinite(hole.total))) ||
-          parsed.courses.some(course => !course || typeof course.name !== 'string')
+          parsed.rounds.some(round => !validBackupRound(round)) ||
+          parsed.courses.some(course => !isRecord(course) || typeof course.name !== 'string' || !optionalFields(course, ['id'], 'string') || !numericMap(course.pars) || !numericMap(course.yardages))
         ) {
           reject(new Error('Invalid backup file.'));
           return;

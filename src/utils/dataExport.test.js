@@ -37,6 +37,24 @@ test('JSON restore rejects CSV and malformed records', async () => {
   await expect(readBackupFile(new File([JSON.stringify({ app: 'Blushing Birdie', rounds: [null], courses: [] })], 'bad.json'))).rejects.toThrow();
 });
 
+test('JSON restore rejects oversized, deeply nested and dangerous-key backups before importing', async () => {
+  await expect(readBackupFile(new File([' '.repeat(2 * 1024 * 1024 + 1)], 'large.json'))).rejects.toThrow('too large');
+  const base = { app: 'Blushing Birdie', version: 1, rounds: [round], courses: [] };
+  const unsafe = JSON.stringify(base).replace('"version":1', '"version":1,"__proto__":{"polluted":true}');
+  await expect(readBackupFile(new File([unsafe], 'unsafe.json'))).rejects.toThrow('Invalid');
+  let nested = {};
+  for (let i = 0; i < 15; i++) nested = { nested };
+  await expect(readBackupFile(new File([JSON.stringify({ ...base, extra: nested })], 'deep.json'))).rejects.toThrow('Invalid');
+  expect({}.polluted).toBeUndefined();
+});
+
+test('JSON restore rejects display objects and preserves script-like strings as inert text', async () => {
+  const backup = { app: 'Blushing Birdie', version: 1, rounds: [{ ...round, courseName: { malicious: true } }], courses: [] };
+  await expect(readBackupFile(new File([JSON.stringify(backup)], 'bad.json'))).rejects.toThrow('Invalid');
+  backup.rounds[0].courseName = '<script>alert(1)</script>';
+  await expect(readBackupFile(new File([JSON.stringify(backup)], 'text.json'))).resolves.toEqual(backup);
+});
+
 test('hole CSV preserves actual hole numbers, orders them, and leaves legacy unknown stats blank', () => {
   const { exportHolesToCSV } = require('./index');
   const csv = exportHolesToCSV([{ ...round, holes: [
