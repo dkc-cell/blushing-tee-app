@@ -150,8 +150,8 @@ export default function PrivacyPage() {
             device you use.
           </p>
           <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            You do not need an account to use the core app. Your golf data is not uploaded to a
-            Blushing Birdie server during normal local use.
+            No account is required. Your saved rounds and courses stay in this browser on your
+            device. Use Export Backup to keep a separate copy of your data.
           </p>
         </section>
 
