@@ -1,0 +1,20 @@
+.backup-restore section > h2 {
+  margin: 0 0 20px;
+  font-size: 22px;
+  line-height: 1.35;
+}
+.backup-restore section > p {
+  margin: 0 0 20px;
+  font-size: 16px;
+}
+.backup-restore section > p:last-child { margin-bottom: 0; }
+.backup-restore section > ul { margin: 0 0 24px; }
+.backup-restore section li { margin-bottom: 16px; }
+.backup-restore section li:last-child { margin-bottom: 0; }
+.backup-restore .backup-actions { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: 24px; }
+.backup-restore .backup-actions button,
+.backup-restore section > button { width: 100%; min-height: 54px !important; }
+.backup-restore .backup-action-help { margin: 10px 0 24px; font-size: 15px; line-height: 1.6; color: #415759; }
+.backup-restore .backup-action-help:last-of-type { margin-bottom: 0; }
+.backup-restore button:focus-visible { outline: 3px solid #103e43; outline-offset: 4px; }
+.backup-restore button:disabled { opacity: .65; cursor: wait; }
