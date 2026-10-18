@@ -155,6 +155,28 @@ export const exportToCSV = (rounds, startDate = null, endDate = null) => {
   return [header.join(','), ...rows].join('\n');
 };
 
+/** One row per recorded hole; legacy unknown details stay blank. */
+export const exportHolesToCSV = (rounds, startDate = null, endDate = null) => {
+  const text = value => {
+    let v = value == null ? '' : String(value);
+    if (/^\s*[=+@-]/.test(v)) v = "'" + v;
+    return '"' + v.replace(/"/g, '""') + '"';
+  };
+  const rows = rounds.filter(r => {
+    const date = String(r.date || '').slice(0, 10);
+    return (!startDate || date >= startDate) && (!endDate || date <= endDate);
+  }).flatMap(r => [...(r.holes || [])].sort((a, b) => a.hole - b.hole).map(h => {
+    const par = hasKnownPar(h) ? h.par : null;
+    return [text(r.id), text(r.date), text(r.courseName || 'Unnamed Course'), h.hole ?? '',
+      par ?? '', h.total ?? '', par == null ? '' : h.total - par,
+      h.yardage || r.customYardages?.[h.hole] || '', Number.isFinite(h.putts) ? h.putts : '',
+      par > 3 && typeof h.fairwayHit === 'boolean' ? (h.fairwayHit ? 'Yes' : 'No') : '',
+      par === 3 && typeof h.greenInRegulation === 'boolean' ? (h.greenInRegulation ? 'Yes' : 'No') : '',
+    ].join(',');
+  }));
+  return rows.length ? ['Round ID,Date,Course,Hole,Par,Score,Score to Par,Yardage,Putts,Fairway Hit,Par 3 Green Hit', ...rows].join('\n') : null;
+};
+
 /**
  * Download CSV content as a file
  */

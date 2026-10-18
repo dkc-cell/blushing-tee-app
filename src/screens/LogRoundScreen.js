@@ -92,7 +92,7 @@ const LogRoundScreen = ({
 
   const getCurrentPar = () => customPars[currentHole] || null;
   const getCurrentYardage = () => customYardages[currentHole] || null;
-  const needsHoleSetup = () => getCurrentPar() === null || getCurrentYardage() === null;
+  const needsHoleSetup = () => ![3, 4, 5].includes(getCurrentPar());
   const holesLogged = recordedHoles.size;
   const isFinalHole = currentHole === 18;
 
@@ -166,6 +166,7 @@ const LogRoundScreen = ({
 
   const completeHole = () => {
   const par = getCurrentPar();
+  if (![3, 4, 5].includes(par)) { setShowParModal(true); return; }
   const isPar3 = par === 3;
 
    // Require a selection before recording hole
@@ -364,7 +365,7 @@ const LogRoundScreen = ({
             {/* Yardage Input */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{ color: COLORS.charcoal, fontSize: '20px', fontWeight: 'bold', display: 'block', marginBottom: '16px' }}>
-                What's the yardage?
+                Yardage (optional)
               </label>
               <button
                 onClick={() => {

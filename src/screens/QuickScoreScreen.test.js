@@ -70,17 +70,17 @@ test('missing fairway and putt stats do not dilute detailed statistics', () => {
 test('unknown par prompts for par and par 3 asks about the green', () => {
   act(() => root.render(<Harness pars={{}} />));
   act(() => container.querySelector('summary').click());
-  expect(container.textContent).toContain('Add par to track fairways or greens');
+  expect(container.textContent).toContain('Select par (required)');
   act(() => root.render(<Harness pars={{ 1: 3 }} />));
   expect(container.textContent).not.toContain('Fairway hit?');
   expect(container.textContent).toContain('Green hit?');
 });
 
-test('saves score with no par or yardage and no birdie/eagle celebration', () => {
+test('does not save or celebrate a score without par', () => {
   act(() => root.render(<Harness pars={{}} />));
   for (let i = 0; i < 4; i++) click('Increase score');
   click('Save & Next Hole →');
-  expect(recorded).toHaveBeenCalledWith(expect.objectContaining({ total: 4, par: null, yardage: 297 }));
+  expect(recorded).not.toHaveBeenCalled();
   expect(container.querySelector('.birdie-overlay')).toBeNull();
 });
 
@@ -119,4 +119,12 @@ test('birdie uses artwork without duplicate caption and advances after four seco
   expect(container.querySelector('.birdie-overlay')).toBeNull();
   expect(container.querySelector('.qs-total').textContent).toBe('--');
   jest.useRealTimers();
+});
+
+test('requires par before saving a quick score', () => {
+  act(() => root.render(<Harness pars={{}} />));
+  click('Increase score'); click('Save & Next Hole →');
+  expect(recorded).not.toHaveBeenCalled();
+  expect(container.textContent).toContain('Select par for Hole 1');
+  expect(container.textContent).not.toContain('Leave par blank');
 });

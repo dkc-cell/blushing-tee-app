@@ -6,6 +6,7 @@ import {
   formatDateForDisplay,
   formatScoreToPar,
   exportToCSV,
+  exportHolesToCSV,
   downloadCSV,
   downloadBackupJSON,
   readBackupFile,
@@ -22,6 +23,7 @@ const StatsScreen = ({
 }) => {
   const [selectedRound, setSelectedRound] = useState(null);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [exportType, setExportType] = useState('summary');
   const [exportStartDate, setExportStartDate] = useState('');
   const [exportEndDate, setExportEndDate] = useState('');
   const [isEditingRound, setIsEditingRound] = useState(false);
@@ -49,14 +51,14 @@ const recentRoundCount = recentRounds.length;
 
 // ✅ CSV Export (existing)
 const handleExport = () => {
-  const csvContent = exportToCSV(rounds, exportStartDate || null, exportEndDate || null);
+  const csvContent = (exportType === 'holes' ? exportHolesToCSV : exportToCSV)(rounds, exportStartDate || null, exportEndDate || null);
   if (!csvContent) {
     alert('No rounds found in the selected date range.');
     return;
   }
   downloadCSV(
     csvContent,
-    `blushing-birdie-stats-${new Date().toISOString().slice(0, 10)}.csv`
+    `blushing-birdie-${exportType === 'holes' ? 'hole-by-hole' : 'round-summary'}-${new Date().toISOString().slice(0, 10)}.csv`
   );
   setShowExportModal(false);
   setExportStartDate('');
@@ -545,6 +547,8 @@ const handleImportBackup = async (event) => {
       {/* Export Modal */}
       {showExportModal && (
         <ExportModal
+          exportType={exportType}
+          setExportType={setExportType}
           startDate={exportStartDate}
           endDate={exportEndDate}
           setStartDate={setExportStartDate}
@@ -776,11 +780,15 @@ const RoundDetailModal = ({
   );
 };
 
-const ExportModal = ({ startDate, endDate, setStartDate, setEndDate, onClose, onExport }) => (
+const ExportModal = ({ exportType, setExportType, startDate, endDate, setStartDate, setEndDate, onClose, onExport }) => (
   <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '20px' }} onClick={onClose}>
-    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', padding: '32px', maxWidth: '500px', width: '100%', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
+    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', padding: '32px', maxWidth: '500px', width: '100%', maxHeight: '90dvh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
       <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', marginTop: 0, marginBottom: '16px' }}>📥 Export Data</h3>
       <p style={{ color: COLORS.charcoal, fontSize: '16px', marginBottom: '24px' }}>Export your round data to CSV. Leave dates empty to export all rounds.</p>
+      <fieldset style={{ border: 0, padding: 0, margin: '0 0 24px', color: COLORS.darkTeal }}><legend style={{ fontWeight: 700, marginBottom: 14 }}>Choose your CSV</legend>
+        <label style={{ display: 'block', marginBottom: 16 }}><input type="radio" name="csv-type" value="summary" checked={exportType === 'summary'} onChange={() => setExportType('summary')} /> Round Summary — one row per round</label>
+        <label style={{ display: 'block' }}><input type="radio" name="csv-type" value="holes" checked={exportType === 'holes'} onChange={() => setExportType('holes')} /> Hole-by-Hole — one row per recorded hole</label>
+      </fieldset>
       <div style={{ marginBottom: '16px' }}>
         <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px' }}>Start Date (optional)</label>
         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ width: '100%', padding: '12px', fontSize: '16px', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '8px', fontFamily: 'inherit' }} />

@@ -36,3 +36,19 @@ test('JSON restore rejects CSV and malformed records', async () => {
   await expect(readBackupFile(new File(['Date,Course\n2026-10-18,Test'], 'stats.csv'))).rejects.toThrow();
   await expect(readBackupFile(new File([JSON.stringify({ app: 'Blushing Birdie', rounds: [null], courses: [] })], 'bad.json'))).rejects.toThrow();
 });
+
+test('hole CSV preserves actual hole numbers, orders them, and leaves legacy unknown stats blank', () => {
+  const { exportHolesToCSV } = require('./index');
+  const csv = exportHolesToCSV([{ ...round, holes: [
+    { hole: 10, total: 5, par: 4, putts: 0, fairwayHit: false },
+    { hole: 8, total: 4 },
+    { hole: 9, total: 3, par: 3, greenInRegulation: true },
+  ] }]);
+  const rows = csv.split('\n').slice(1).map(line => line.split(','));
+  expect(rows.map(r => r[3])).toEqual(['8', '9', '10']);
+  expect(rows[0].slice(4)).toEqual(['', '4', '', '', '', '', '']);
+  expect(rows[1][10]).toBe('Yes');
+  expect(rows[2][8]).toBe('0');
+  expect(rows[2][9]).toBe('No');
+  expect(exportHolesToCSV([round], '2026-10-19')).toBeNull();
+});

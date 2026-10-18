@@ -72,3 +72,11 @@ test('recording a resumed hole saves its complete score and clears its draft', (
   expect(p.onRecordHole).toHaveBeenCalledWith(expect.objectContaining({ hole: 2, total: 5, drive: 'left', approaches: 2, putts: 2 }));
   expect(loadActiveRound().holeDraft).toBeNull();
 });
+
+test('detailed scoring requires valid par but does not require yardage', () => {
+  render(<LogRoundScreen {...props()} customPars={{}} customYardages={{}} />);
+  expect(container.textContent).toContain("What's the par for this hole?");
+  render(<LogRoundScreen {...props()} customPars={{ 2: 4 }} customYardages={{}} />);
+  expect(container.textContent).not.toContain("What's the par for this hole?");
+  expect(container.textContent).toContain('Approach Shots');
+});
