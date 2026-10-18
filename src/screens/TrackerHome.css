@@ -13,6 +13,9 @@
 .th-action small { display: block; font-size: 14px; font-weight: 400; line-height: 1.4; margin-top: 5px; }
 .th-more { display: block; margin: 18px auto 0; min-height: 44px; border: 0; background: none; color: #103e43; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
 .th-secondary { margin-top: 6px; background: white; border-radius: 14px; border: 1px solid #acc8c8; overflow: hidden; }
-.th-secondary button { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 12px 16px; width: 100%; background: white; border: 0; color: #103e43; text-align: left; font-size: 15px; cursor: pointer; }
-.th-secondary button+button { border-top: 1px solid #e0ebeb; }
+.th-secondary button, .th-secondary a { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 12px 16px; width: 100%; background: white; border: 0; color: #103e43; text-align: left; font-size: 15px; cursor: pointer; }
+.th-secondary button+button, .th-secondary button+a { border-top: 1px solid #e0ebeb; }
 .tracker-home button:focus-visible { outline: 3px solid #103e43; outline-offset: 3px; }
+
+.th-secondary a { box-sizing: border-box; text-decoration: none; font-family: inherit; }
+.th-secondary a:focus-visible { outline: 3px solid #103e43; outline-offset: -3px; }

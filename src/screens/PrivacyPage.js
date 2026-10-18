@@ -177,6 +177,11 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section style={{ ...cardStyle, padding: '34px 30px', marginBottom: '22px' }}>
+          <h2 style={{ margin: '0 0 14px', color: COLORS.darkTeal, fontSize: '1.35rem' }}>Sharing feedback</h2>
+          <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>Share Feedback opens your email app. If you send a message, we receive your email address and the information you choose to include. Your scores and courses are not attached automatically.</p>
+        </section>
+
         <section style={{ ...cardStyle, padding: '34px 30px' }}>
           <h2
             style={{

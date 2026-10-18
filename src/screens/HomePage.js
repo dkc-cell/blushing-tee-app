@@ -1016,6 +1016,8 @@ const toggleItem = (id) => {
     <Link to="/privacy" style={footerLinkStyle}>
       Privacy
     </Link>
+    <span>•</span>
+    <a href="mailto:hello@blushingbirdie.com?subject=Blushing%20Birdie%20Feedback" style={footerLinkStyle}>Share Feedback</a>
   </div>
   © 2026 Blushing Birdie
 </footer>
