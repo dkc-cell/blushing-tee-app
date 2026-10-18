@@ -250,7 +250,6 @@ export default function HomePage() {
   );
   const featuresScrollRef = useRef(null);
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
   const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -314,31 +313,6 @@ export default function HomePage() {
     });
   });
 }, [isMobile]);
-
-// 👇 ADD THIS HERE
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const form = e.target;
-  const data = new FormData(form);
-
-  try {
-    const response = await fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(data).toString(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Signup failed with status ${response.status}`);
-    }
-
-    setSubmitted(true);
-    form.reset();
-  } catch (error) {
-    console.error('Form submission error:', error);
-  }
-};
 
   const featureSlides = [
   {
@@ -957,84 +931,6 @@ const toggleItem = (id) => {
   </div>
 </section>
 
-     {/* EMAIL */}
-<section
-  id="contact"
-  style={{
-    ...sectionBaseStyle,
-    paddingBottom: '80px',
-  }}
->
-  <div style={{ ...cardStyle, padding: '60px 40px', textAlign: 'center' }}>
-    <h3 style={{ color: COLORS.darkTeal, marginBottom: '12px' }}>
-      Stay in the Loop
-    </h3>
-
-    <p style={{ color: '#5F7C7F', marginBottom: '24px' }}>
-      Journal updates, thoughtful notes, and a few lovely things along the way.
-    </p>
-
-    {submitted ? (
-      <p
-        style={{
-          marginTop: '10px',
-          color: COLORS.darkTeal,
-          fontSize: '0.95rem',
-          fontWeight: 500,
-        }}
-      >
-        Thank you for signing up 💕
-      </p>
-    ) : (
-      <form
-        name="email-signup"
-        method="POST"
-        data-netlify="true"
-        onSubmit={handleSubmit}
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '12px',
-          flexWrap: 'wrap',
-          marginTop: '10px',
-        }}
-      >
-        <input type="hidden" name="form-name" value="email-signup" />
-
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="Enter your email"
-          style={{
-            padding: '14px 20px',
-            borderRadius: '16px',
-            border: '1px solid #ccc',
-            minWidth: '230px',
-            maxWidth: '290px',
-            width: '100%',
-          }}
-        />
-
-        <button
-          type="submit"
-          style={{
-            padding: '14px 26px',
-            borderRadius: '16px',
-            background: COLORS.darkTeal,
-            color: COLORS.cream,
-            border: '1px solid rgba(0,0,0,0.15)',
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          Sign Up
-        </button>
-      </form>
-    )}
-  </div>
-</section>
-
 {/* FINAL CTA */}
 <section
   style={{
@@ -1120,10 +1016,6 @@ const toggleItem = (id) => {
     <Link to="/privacy" style={footerLinkStyle}>
       Privacy
     </Link>
-    <span>•</span>
-    <a href="#contact" style={footerLinkStyle}>
-      Contact
-    </a>
   </div>
   © 2026 Blushing Birdie
 </footer>

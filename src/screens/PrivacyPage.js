@@ -23,7 +23,7 @@ export default function PrivacyPage() {
   usePageSeo({
     title: 'Privacy and Data - Blushing Birdie',
     description:
-      'How Blushing Birdie handles golf round data, local storage, file backups, and email signup information.',
+      'How Blushing Birdie handles golf round data, local storage, and file backups.',
     path: '/privacy',
   });
 
@@ -174,27 +174,6 @@ export default function PrivacyPage() {
             Export Backup saves your saved rounds and courses in a JSON file. Import Backup restores
             that file and replaces the saved rounds and courses on the destination device. CSV exports
             are spreadsheets for reviewing golf stats and cannot restore the app.
-          </p>
-        </section>
-
-        <section style={{ ...cardStyle, padding: '34px 30px', marginBottom: '22px' }}>
-          <h2
-            style={{
-              marginTop: 0,
-              marginBottom: '14px',
-              color: COLORS.darkTeal,
-              fontSize: '1.35rem',
-            }}
-          >
-            Email signup
-          </h2>
-          <p style={{ margin: '0 0 14px', color: COLORS.charcoal, lineHeight: 1.75 }}>
-            If you choose to join the email list, the information you provide is submitted for
-            mailing list communication and updates. That is separate from your in-app golf data.
-          </p>
-          <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
-            No tracker account or sign-in is required. Your rounds and courses are not automatically
-            uploaded or synchronized between devices.
           </p>
         </section>
 
