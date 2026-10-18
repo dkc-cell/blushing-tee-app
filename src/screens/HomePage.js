@@ -203,6 +203,74 @@ const sectionStyle = {
   background: 'linear-gradient(180deg, #FFF9F5 0%, #ffffff 100%)',
 };
 
+const faqItems = [
+  {
+    "id": "free",
+    "question": "Is the app free? Do I need an account?",
+    "answer": "Blushing Birdie is free to use. No account or sign-in is required to record rounds, review stats, or save courses."
+  },
+  {
+    "id": "phone",
+    "question": "Can I use it on my phone while I’m on the course?",
+    "answer": "Yes. Blushing Birdie is designed to work on your phone while you play. Choose Quick Score or Detailed Tracking when starting a round."
+  },
+  {
+    "id": "scoring",
+    "question": "What’s the difference between Quick Score and Detailed Tracking?",
+    "answer": "Quick Score lets you enter your total score for each hole, including penalty strokes, with optional putts and fairway or par-3 green results. Those optional details do not change your entered score.\n\nDetailed Tracking records your shots and putts to calculate the hole score."
+  },
+  {
+    "id": "par-yardage",
+    "question": "Do I need to enter par and yardage?",
+    "answer": "Par is required before saving each new hole. Choose 3, 4, or 5, or use a saved course to fill it in when available.\n\nYardage is optional and hidden in Quick Score. Older saved holes without par remain available; missing details stay blank in exports."
+  },
+  {
+    "id": "courses",
+    "question": "How do I add or reuse a course?",
+    "answer": "From the tracker home, choose My Courses → Add a Course. Only the course name is required to save it. Adding pars makes future rounds quicker to record; yardages are optional.\n\nChoose your saved course when starting a round. Naming a Quick Score round does not automatically add a reusable course to My Courses."
+  },
+  {
+    "id": "holes",
+    "question": "Can I play a partial round or finish later?",
+    "answer": "Yes. You do not need to play a full 18 holes. Resume Round returns to an unfinished round on the same browser and device.\n\nEnd Round Early saves only the holes you have recorded. Finish recording a hole before ending if you want it included."
+  },
+  {
+    "id": "stats",
+    "question": "What statistics can I track?",
+    "answer": "Review scores, results relative to par, performance on par 3s, 4s, and 5s, putting, fairways, and par-3 greens.\n\nPutts and tee results are optional in Quick Score. Skipped details are excluded from the relevant statistics rather than counted as misses or zero putts."
+  },
+  {
+    "id": "handicap",
+    "question": "Does Blushing Birdie calculate an official handicap?",
+    "answer": "Blushing Birdie does not calculate an official handicap. Golfers who maintain one can post eligible scores through GHIN or their handicap service.\n\nThe Hole-by-Hole CSV provides your recorded scores to reference when entering them. It is not a direct GHIN import."
+  },
+  {
+    "id": "privacy",
+    "question": "Where is my data stored?",
+    "answer": "Your rounds and courses are stored in this browser on this device. No account is required, and there is no automatic backup or device sync.\n\nClearing browser data or losing access to your device can remove your local records. Keep a separate backup file so you can restore what you saved."
+  },
+  {
+    "id": "csv",
+    "question": "Can I download my scores?",
+    "answer": "Yes. Go to My Rounds & Stats → Export CSV. Choose Round Summary for one row per round, or Hole-by-Hole for individual hole numbers, pars, scores, and recorded details.\n\nBoth open in spreadsheet apps such as Excel, Google Sheets, or Numbers. You can export all rounds or select a date range. CSV files cannot restore the app."
+  },
+  {
+    "id": "export-import",
+    "question": "How do I back up, restore, or move my data?",
+    "answer": "Choose More → Backup & Restore. Export Backup saves your saved rounds and courses in a JSON file. Finish or end an active round before exporting to include it.\n\nOn the destination browser or device, open Blushing Birdie and choose Import Backup to select that JSON file. Importing replaces its saved rounds and courses; it does not combine records from two devices. Export a backup of the destination data first if you want to keep it."
+  },
+  {
+    "id": "backup-schedule",
+    "question": "When should I back up?",
+    "answer": "Save a backup after each round or course change, and before switching phones, changing browsers, or clearing browser data.\n\nKeep your two most recent copies outside this browser, such as in Files or iCloud Drive. A backup can only restore the data included when you saved it."
+  },
+  {
+    "id": "install",
+    "question": "How do I add it to my Home Screen?",
+    "answer": "On iPhone: Open the app in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the app in Chrome, tap the menu (three dots), then select “Add to Home Screen.”"
+  }
+];
+
 export default function HomePage() {
   usePageSeo({
     title: 'Blushing Birdie Golf Tracker for Women',
@@ -215,32 +283,11 @@ export default function HomePage() {
       {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
-        mainEntity: [
-          {
-            '@type': 'Question',
-            name: 'Is Blushing Birdie free?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Blushing Birdie is free to use, with no subscriptions or hidden fees for the core golf round tracker.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'Who is Blushing Birdie designed for?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Blushing Birdie is designed for women golfers and everyday recreational golfers who want simple, private, encouraging golf progress tracking.',
-            },
-          },
-          {
-            '@type': 'Question',
-            name: 'Where is Blushing Birdie data stored?',
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: 'Rounds and courses stay in this browser on your device. Save a backup file after each round to keep a separate copy.',
-            },
-          },
-        ],
+        mainEntity: faqItems.map(item => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: { '@type': 'Answer', text: item.answer },
+        })),
       },
     ],
   });
@@ -385,63 +432,9 @@ const handleSubmit = async (e) => {
   },
 ];
 
-  const faqItems = [
-  {
-    id: 'free',
-    question: 'Is the app free? Do I need an account?',
-    answer:
-      'Blushing Birdie is completely free to use.\n\nThere are no subscriptions or hidden fees, and you do not need an account to log rounds, view stats, or use the core app.\n\nYou can open the app and start right away. No sign-in is needed.',
-  },
-  {
-    id: 'phone',
-    question: 'Can I use it on my phone while I’m on the course?',
-    answer:
-      'Yes. Blushing Birdie is designed to work right on your phone while you play, so it’s easy to log your round as you go.',
-  },
-  {
-    id: 'holes',
-    question: 'Do I have to play a full 18 holes?',
-    answer:
-      'Not at all. Whether you play 3 holes, 9 holes, or a full round—it all counts. The app is designed to fit the way you actually play.',
-  },
-  {
-    id: 'stats',
-    question: 'What stats does it track?',
-    answer:
-      'Blushing Birdie focuses on simple, meaningful stats like fairways hit, putts, and overall progress—without getting in the way of your game.',
-  },
-  {
-    id: 'handicap',
-    question: 'Does Blushing Birdie calculate an official handicap?',
-    answer:
-      'Blushing Birdie does not calculate an official handicap. Golfers who maintain one can post eligible scores through GHIN or their handicap service.',
-  },
-  {
-    id: 'privacy',
-    question: 'Where is my data stored? Is it private?',
-    answer:
-      'Your rounds and stats are stored locally on your device by default.\n\nNo account is required. Your data does not automatically transfer between devices.\n\nBlushing Birdie does not sell your golf data. Your information stays in your control.',
-  },
-  {
-    id: 'export-import',
-    question: 'How do I export, import, or switch devices?',
-    answer:
-      'Export CSV creates a golf stats spreadsheet for Excel, Google Sheets, or Numbers. CSV files cannot restore the app.\n\nExport Backup saves your saved rounds and courses in a JSON file. Save it after each round or course change and before switching phones or clearing browser data. Keep your two most recent copies outside this browser, such as in Files or iCloud Drive.\n\nOn another device, use Import Backup to restore that JSON file. Importing replaces the saved rounds and courses on that device. There is no automatic device sync.',
-  },
-  {
-    id: 'install',
-    question: 'How do I add it to my Home Screen?',
-    answer:
-      'On iPhone: Open the app in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the app in Chrome, tap the menu (three dots), then select “Add to Home Screen.”',
-  },
-];
 
-const [openItems, setOpenItems] = useState([
-  'free',
-  'account',
-  'storage',
-  'phone',
-]);
+
+const [openItems, setOpenItems] = useState(['free']);
 
 const toggleItem = (id) => {
   setOpenItems((prev) =>
