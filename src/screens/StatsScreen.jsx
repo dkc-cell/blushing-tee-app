@@ -418,7 +418,7 @@ const handleImportBackup = async (event) => {
                         style={{
                           fontSize: '28px',
                           fontWeight: 'bold',
-                          color: COLORS.blush,
+                          color: COLORS.darkTeal,
                         }}
                       >
                         {roundScore}
@@ -426,7 +426,7 @@ const handleImportBackup = async (event) => {
                       <div
                         style={{
                           fontSize: '14px',
-                          color: COLORS.mistyBlue,
+                          color: COLORS.darkTeal,
                         }}
                       >
                         {formatScoreToPar(roundScore, roundPar)}
@@ -566,7 +566,7 @@ const RoundDetailModal = ({
           {!isEditing ? (
             <>
               <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0' }}>{formatDateForDisplay(round.date)}</h3>
-              <p style={{ color: COLORS.mistyBlue, fontSize: '16px', margin: '0 0 16px 0' }}>{round.courseName || 'Unnamed Course'}</p>
+              <p style={{ color: COLORS.darkTeal, fontSize: '16px', margin: '0 0 16px 0' }}>{round.courseName || 'Unnamed Course'}</p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={onStartEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: `${COLORS.mistyBlue}66`,
                   color: COLORS.darkTeal, border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>✏️ Edit Info</button>
@@ -686,11 +686,11 @@ const RoundDetailModal = ({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
                   <div>
                     <span style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold' }}>Hole {hole.hole}</span>
-                    <span style={{ color: COLORS.mistyBlue, fontSize: '14px', marginLeft: '8px' }}>Par {hole.par ?? '—'} • {hole.yardage ?? '—'} yds</span>
+                    <span style={{ color: COLORS.darkTeal, fontSize: '14px', marginLeft: '8px' }}>Par {hole.par ?? '—'} • {hole.yardage ?? '—'} yds</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.blush }}>{hole.total}</div>
-                    <div style={{ fontSize: '12px', color: COLORS.mistyBlue }}>{formatScoreToPar(hole.total, hole.par)}</div>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.darkTeal }}>{hole.total}</div>
+                    <div style={{ fontSize: '12px', color: COLORS.darkTeal }}>{formatScoreToPar(hole.total, hole.par)}</div>
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px', color: COLORS.charcoal }}>

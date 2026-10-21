@@ -67,7 +67,7 @@ const RoundCompleteScreen = ({
         <h1 style={{ color: COLORS.darkTeal, fontSize: '36px', fontWeight: 'bold', margin: '0 0 8px 0' }}>
           {isFullRound ? 'Round Complete!' : 'Round Saved'}
         </h1>
-        <p style={{ color: COLORS.mistyBlue, fontSize: '20px', margin: 0 }}>
+        <p style={{ color: COLORS.darkTeal, fontSize: '20px', margin: 0 }}>
           {isFullRound
             ? 'You completed all 18 holes.'
             : `You saved a ${holesPlayed}-hole round.`}
@@ -77,10 +77,10 @@ const RoundCompleteScreen = ({
       {/* Score Card */}
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', padding: '32px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', marginBottom: '24px' }}>
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div style={{ fontSize: '56px', fontWeight: 'bold', color: COLORS.blush, marginBottom: '8px' }}>{totalScore}</div>
+          <div style={{ fontSize: '56px', fontWeight: 'bold', color: COLORS.darkTeal, marginBottom: '8px' }}>{totalScore}</div>
           <div style={{ color: COLORS.darkTeal, fontSize: '20px' }}>
             {scoreToPar == null ? '—' : scoreToPar > 0 ? `+${scoreToPar}` : scoreToPar === 0 ? 'Even' : scoreToPar}
-            {totalPar != null && <span style={{ color: COLORS.mistyBlue, marginLeft: '8px' }}>(Par {totalPar})</span>}
+            {totalPar != null && <span style={{ color: COLORS.darkTeal, marginLeft: '8px' }}>(Par {totalPar})</span>}
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', paddingTop: '16px', borderTop: `2px solid ${COLORS.mistyBlue}33` }}>
@@ -88,12 +88,12 @@ const RoundCompleteScreen = ({
             <div style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.darkTeal, marginBottom: '4px' }}>
               {possibleFairways > 0 ? `${Math.round((fairwaysHit / possibleFairways) * 100)}%` : '—'}
             </div>
-            <div style={{ fontSize: '14px', color: COLORS.mistyBlue }}>Fairways Hit</div>
+            <div style={{ fontSize: '14px', color: COLORS.darkTeal }}>Fairways Hit</div>
             <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginTop: '4px' }}>{fairwaysHit}/{possibleFairways}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '28px', fontWeight: 'bold', color: COLORS.darkTeal, marginBottom: '4px' }}>{holesWithPutts.length ? `${threePuttPercentage}%` : '—'}</div>
-            <div style={{ fontSize: '14px', color: COLORS.mistyBlue }}>3-Putt %</div>
+            <div style={{ fontSize: '14px', color: COLORS.darkTeal }}>3-Putt %</div>
             <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginTop: '4px' }}>{threePuttCount} of {holesWithPutts.length} holes</div>
           </div>
         </div>

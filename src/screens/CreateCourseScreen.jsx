@@ -89,7 +89,7 @@ if (
         
         {/* Par Selection */}
         <div>
-          <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Par</div>
+          <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginBottom: '4px', fontWeight: '600' }}>Par</div>
           <div style={{ display: 'flex', gap: '6px' }}>
             {[3, 4, 5].map(par => (
               <button
@@ -116,7 +116,7 @@ if (
         
         {/* Yardage */}
         <div className="course-hole-yardage">
-          <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Yardage (optional)</div>
+          <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginBottom: '4px', fontWeight: '600' }}>Yardage (optional)</div>
           <button
             onClick={() => {
               setShowYardageModalForHole(hole);
@@ -197,6 +197,16 @@ if (
       }}
     />
   </div>
+
+  <button
+    className="course-save-top"
+    onClick={handleSave}
+    disabled={!courseName.trim()}
+  >
+    <CheckCircle2 size={20} aria-hidden="true" />
+    {isEditing ? 'Update Course' : 'Save Course'}
+  </button>
+  <p className="course-save-help">Save with just a name. You can add pars and optional details now or later.</p>
 
   {/* Optional course metadata */}
   <details className="course-metadata" style={{ marginTop: '20px' }}>
@@ -293,7 +303,7 @@ if (
           {[1,2,3,4,5,6,7,8,9].map(renderHoleRow)}
           <div style={{ marginTop: '16px', padding: '12px', backgroundColor: `${COLORS.mistyBlue}33`, borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>Front 9 Total:</span>
-            <span style={{ color: COLORS.blush, fontSize: '20px', fontWeight: 'bold' }}>{front9Yardage} yds</span>
+            <span style={{ color: COLORS.darkTeal, fontSize: '20px', fontWeight: 'bold' }}>{front9Yardage} yds</span>
           </div>
         </div>
 
@@ -305,7 +315,7 @@ if (
           {[10,11,12,13,14,15,16,17,18].map(renderHoleRow)}
           <div style={{ marginTop: '16px', padding: '12px', backgroundColor: `${COLORS.mistyBlue}33`, borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>Back 9 Total:</span>
-            <span style={{ color: COLORS.blush, fontSize: '20px', fontWeight: 'bold' }}>{back9Yardage} yds</span>
+            <span style={{ color: COLORS.darkTeal, fontSize: '20px', fontWeight: 'bold' }}>{back9Yardage} yds</span>
           </div>
         </div>
 
@@ -313,7 +323,7 @@ if (
         <div style={{ backgroundColor: COLORS.darkTeal, borderRadius: '16px', padding: '20px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: COLORS.cream, fontSize: '20px', fontWeight: 'bold' }}>Total Course Yardage:</span>
-            <span style={{ color: COLORS.blush, fontSize: '28px', fontWeight: 'bold' }}>{totalYardage} yds</span>
+            <span style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold' }}>{totalYardage} yds</span>
           </div>
         </div>
 
