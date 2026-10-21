@@ -323,7 +323,7 @@ if (
         <div style={{ backgroundColor: COLORS.darkTeal, borderRadius: '16px', padding: '20px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: COLORS.cream, fontSize: '20px', fontWeight: 'bold' }}>Total Course Yardage:</span>
-            <span style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold' }}>{totalYardage} yds</span>
+            <span style={{ color: COLORS.cream, fontSize: '28px', fontWeight: 'bold' }}>{totalYardage} yds</span>
           </div>
         </div>
 
