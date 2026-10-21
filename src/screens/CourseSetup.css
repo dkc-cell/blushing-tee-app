@@ -1,0 +1,12 @@
+
+.course-metadata summary { cursor: pointer; color: #1d3e43; font-size: 16px; font-weight: 600; padding: 12px 0; min-height: 44px; line-height: 1.5; }
+.course-metadata[open] summary { margin-bottom: 12px; }
+.course-setup-body > p { margin: 0 0 24px; }
+@media (max-width: 600px) {
+  .course-setup-header { position: static !important; padding: 20px !important; }
+  .course-setup-body { padding: 24px 16px !important; }
+  .course-hole-row { grid-template-columns: 36px minmax(0, 1fr) !important; gap: 12px !important; padding: 14px !important; margin-bottom: 16px !important; }
+  .course-hole-row button { min-height: 44px; }
+  .course-hole-row .course-hole-yardage { grid-column: 2; }
+  .course-hole-row .course-hole-yardage button { font-weight: 500 !important; }
+}

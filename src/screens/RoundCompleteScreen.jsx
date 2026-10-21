@@ -1,3 +1,4 @@
+import './ScreenSpacing.css';
 import React, { useState } from 'react';
 import { getRoundPar } from '../utils';
 import { COLORS } from '../constants';
@@ -105,7 +106,7 @@ const RoundCompleteScreen = ({
         </p>
       </div>
       {/* Round Reflection */}
-      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
+      <div className="round-reflection" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
         <h3 style={{ color: COLORS.darkTeal, fontWeight: 'bold', fontSize: '20px', marginTop: 0, marginBottom: '8px' }}>
           🌸 Round Reflection
         </h3>

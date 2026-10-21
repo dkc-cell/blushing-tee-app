@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { COLORS } from '../constants';
 import { NumberPad } from '../components';
+import './CourseSetup.css';
 
 const CreateCourseScreen = ({
   initialCourse = null,
@@ -70,6 +71,7 @@ if (
     return (
       <div 
         key={hole}
+        className="course-hole-row"
         style={{ 
           display: 'grid',
           gridTemplateColumns: '60px 1fr 1fr',
@@ -113,8 +115,8 @@ if (
         </div>
         
         {/* Yardage */}
-        <div>
-          <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Yardage</div>
+        <div className="course-hole-yardage">
+          <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Yardage (optional)</div>
           <button
             onClick={() => {
               setShowYardageModalForHole(hole);
@@ -141,9 +143,10 @@ if (
   };
  
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '120px' }}>
+    <div className="course-setup" style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '120px' }}>
       {/* Header */}
 <div
+  className="course-setup-header"
   style={{
     backgroundColor: '#FFFFFF',
     padding: '20px 24px',
@@ -196,7 +199,8 @@ if (
   </div>
 
   {/* Optional course metadata */}
-  <div style={{ marginTop: '14px' }}>
+  <details className="course-metadata" style={{ marginTop: '20px' }}>
+    <summary>Course rating and slope (optional)</summary>
     <div
       style={{
         display: 'flex',
@@ -208,7 +212,7 @@ if (
       }}
     >
       <div style={{ color: COLORS.darkTeal, fontWeight: 800, fontSize: '16px' }}>
-        Course rating and slope (optional)
+        Scorecard information
       </div>
 
       <div style={{ color: COLORS.charcoal, fontSize: '12px', fontWeight: 600 }}>
@@ -269,15 +273,15 @@ if (
     <div style={{ marginTop: '10px', fontSize: '12px', color: COLORS.charcoal, textAlign: 'center', lineHeight: 1.4 }}>
       Optional scorecard information. These fields are not needed to track your rounds.
     </div>
-  </div>
+  </details>
 </div>
    
-      <div style={{ padding: '24px' }}>
+      <div className="course-setup-body" style={{ padding: '24px' }}>
         <p style={{ color: COLORS.darkTeal, lineHeight: 1.5 }}>Only the course name is needed to save. Add pars now or later; yardages are optional. This course will appear in My Courses and when you start a round.</p>
         {/* Tip */}
         <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.mistyBlue}33 100%)`, padding: '16px', borderRadius: '16px', marginBottom: '24px' }}>
           <p style={{ color: COLORS.darkTeal, fontSize: '16px', textAlign: 'center', fontWeight: '500', margin: 0 }}>
-            Set the par and yardage for each hole below 💚
+            Add pars below. Yardage is optional. 💚
           </p>
         </div>
 
