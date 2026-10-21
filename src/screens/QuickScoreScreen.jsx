@@ -84,6 +84,7 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
     <p className="qs-hint">Tap + to count, or tap the score to enter</p>
     {error && <p role="alert" className="qs-error">{error}</p>}
     <details open={statsOpen} onToggle={e => setStatsOpen(e.currentTarget.open)} className="qs-stats"><summary>Quick Stats · Optional</summary>
+      <p className="qs-stats-note">These details are for your stats only. They don’t change your score.</p>
       {par == null && <button className="qs-link" onClick={() => setModal('par')}>Select par (required)</button>}
       {par != null && <div className="qs-stat qs-tee"><h3>{par === 3 ? 'Green hit?' : 'Fairway hit?'}</h3><div className="qs-choices">{[true, false].map(v => <button key={String(v)} aria-pressed={(par === 3 ? inputs.greenInRegulation : inputs.fairwayHit) === v} onClick={() => { const key = par === 3 ? 'greenInRegulation' : 'fairwayHit'; change(key, inputs[key] === v ? null : v); }}>{v ? '✓ Yes' : '× No'}</button>)}</div></div>}
       <div className="qs-stat"><h3>Putts</h3><div className="qs-putts"><button aria-label="Decrease putts" disabled={inputs.putts == null || inputs.putts === 0} onClick={() => change('putts', inputs.putts - 1)}>−</button><strong>{inputs.putts ?? '--'}</strong><button aria-label="Increase putts" onClick={() => change('putts', inputs.putts == null ? 1 : Math.min(99, inputs.putts + 1))}>+</button></div><button className="qs-link" aria-label="Clear putts" onClick={() => change('putts', null)}>Clear</button></div>
