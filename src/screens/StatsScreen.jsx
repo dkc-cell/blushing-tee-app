@@ -1,3 +1,4 @@
+import './ScreenSpacing.css';
 import React, { useRef, useState } from 'react';
 import { COLORS } from '../constants';
 import {
@@ -417,7 +418,7 @@ const handleImportBackup = async (event) => {
                         style={{
                           fontSize: '28px',
                           fontWeight: 'bold',
-                          color: COLORS.blush,
+                          color: COLORS.darkTeal,
                         }}
                       >
                         {roundScore}
@@ -425,7 +426,7 @@ const handleImportBackup = async (event) => {
                       <div
                         style={{
                           fontSize: '14px',
-                          color: COLORS.mistyBlue,
+                          color: COLORS.darkTeal,
                         }}
                       >
                         {formatScoreToPar(roundScore, roundPar)}
@@ -565,7 +566,7 @@ const RoundDetailModal = ({
           {!isEditing ? (
             <>
               <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0' }}>{formatDateForDisplay(round.date)}</h3>
-              <p style={{ color: COLORS.mistyBlue, fontSize: '16px', margin: '0 0 16px 0' }}>{round.courseName || 'Unnamed Course'}</p>
+              <p style={{ color: COLORS.darkTeal, fontSize: '16px', margin: '0 0 16px 0' }}>{round.courseName || 'Unnamed Course'}</p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={onStartEdit} style={{ flex: 1, padding: '10px 16px', backgroundColor: `${COLORS.mistyBlue}66`,
                   color: COLORS.darkTeal, border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>✏️ Edit Info</button>
@@ -685,11 +686,11 @@ const RoundDetailModal = ({
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
                   <div>
                     <span style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold' }}>Hole {hole.hole}</span>
-                    <span style={{ color: COLORS.mistyBlue, fontSize: '14px', marginLeft: '8px' }}>Par {hole.par ?? '—'} • {hole.yardage ?? '—'} yds</span>
+                    <span style={{ color: COLORS.darkTeal, fontSize: '14px', marginLeft: '8px' }}>Par {hole.par ?? '—'} • {hole.yardage ?? '—'} yds</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.blush }}>{hole.total}</div>
-                    <div style={{ fontSize: '12px', color: COLORS.mistyBlue }}>{formatScoreToPar(hole.total, hole.par)}</div>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: COLORS.darkTeal }}>{hole.total}</div>
+                    <div style={{ fontSize: '12px', color: COLORS.darkTeal }}>{formatScoreToPar(hole.total, hole.par)}</div>
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px', color: COLORS.charcoal }}>
@@ -712,7 +713,7 @@ const RoundDetailModal = ({
 
 const ExportModal = ({ exportType, setExportType, startDate, endDate, setStartDate, setEndDate, onClose, onExport }) => (
   <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: '20px' }} onClick={onClose}>
-    <div style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', padding: '32px', maxWidth: '500px', width: '100%', maxHeight: '90dvh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
+    <div className="csv-export-dialog" style={{ backgroundColor: '#FFFFFF', borderRadius: '24px', padding: '32px', maxWidth: '500px', width: '100%', maxHeight: '90dvh', overflowY: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
       <h3 style={{ color: COLORS.darkTeal, fontSize: '24px', fontWeight: 'bold', marginTop: 0, marginBottom: '16px' }}>📥 Export Data</h3>
       <p style={{ color: COLORS.charcoal, fontSize: '16px', marginBottom: '24px' }}>Export your round data to CSV. Leave dates empty to export all rounds.</p>
       <fieldset style={{ border: 0, padding: 0, margin: '0 0 24px', color: COLORS.darkTeal }}><legend style={{ fontWeight: 700, marginBottom: 14 }}>Choose your CSV</legend>
@@ -727,7 +728,7 @@ const ExportModal = ({ exportType, setExportType, startDate, endDate, setStartDa
         <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '8px' }}>End Date (optional)</label>
         <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ width: '100%', padding: '12px', fontSize: '16px', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '8px', fontFamily: 'inherit' }} />
       </div>
-      <div style={{ display: 'flex', gap: '12px' }}>
+      <div className="csv-export-actions" style={{ display: 'flex', gap: '12px' }}>
         <button onClick={onClose} style={{ flex: 1, padding: '16px', fontSize: '18px', fontWeight: 'bold', backgroundColor: COLORS.mistyBlue, color: COLORS.charcoal, border: 'none', borderRadius: '12px', cursor: 'pointer' }}>Cancel</button>
         <button onClick={onExport} style={{ flex: 1, padding: '16px', fontSize: '18px', fontWeight: 'bold', backgroundColor: COLORS.darkTeal, color: COLORS.cream, border: 'none', borderRadius: '12px', cursor: 'pointer' }}>Export CSV</button>
       </div>

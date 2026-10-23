@@ -28,7 +28,8 @@ const LogRoundScreen = ({
   onRecordHole,
   onUnrecordHole,
   onCompleteRound,
-  onBack
+  onBack,
+  onCancelRound
 }) => {
   const initialDraft = getSavedHoleDraft(currentHole);
 
@@ -101,7 +102,7 @@ const LogRoundScreen = ({
   const getCurrentPar = () => customPars[currentHole] || null;
   const getCurrentYardage = () => customYardages[currentHole] || null;
   const needsHoleSetup = () => ![3, 4, 5].includes(getCurrentPar());
-  const holesLogged = recordedHoles.size;
+  const holesLogged = currentRound.length;
   const isFinalHole = currentHole === 18;
 
   const totalShots = (drive ? 1 : 0) + approaches + chips + putts;
@@ -261,7 +262,7 @@ const LogRoundScreen = ({
 
   const handleEndRoundEarly = () => {
     if (holesLogged === 0) {
-      alert('Please log at least one hole before ending the round.');
+      onCancelRound?.();
       return;
     }
 
@@ -312,7 +313,7 @@ const LogRoundScreen = ({
                 cursor: 'pointer'
               }}
             >
-              End Round Early
+              {holesLogged === 0 ? 'Cancel Round' : 'End Round Early'}
             </button>
           </div>
         </div>
@@ -511,7 +512,7 @@ const LogRoundScreen = ({
                 cursor: 'pointer'
               }}
             >
-              End Round Early
+              {holesLogged === 0 ? 'Cancel Round' : 'End Round Early'}
             </button>
           </div>
         </div>

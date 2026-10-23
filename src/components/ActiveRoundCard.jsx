@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { COLORS } from '../constants';
 import { isHoleDraftMeaningful, loadActiveRound } from '../utils/activeRoundStorage';
 
-const ActiveRoundCard = ({ activeRound, onResume, onEndRoundEarly }) => {
+const ActiveRoundCard = ({ activeRound, onResume, onEndRoundEarly, onCancelRound }) => {
   const [showEndModal, setShowEndModal] = useState(false);
 
   if (!activeRound) return null;
@@ -23,7 +23,7 @@ const ActiveRoundCard = ({ activeRound, onResume, onEndRoundEarly }) => {
 
   const handleEndClick = () => {
     if (holesRecorded === 0) {
-      alert('Please log at least one hole before ending the round.');
+      onCancelRound?.();
       return;
     }
 
@@ -92,7 +92,7 @@ const ActiveRoundCard = ({ activeRound, onResume, onEndRoundEarly }) => {
               cursor: 'pointer',
             }}
           >
-            End Round Early
+            {holesRecorded === 0 ? 'Cancel Round' : 'End Round Early'}
           </button>
         </div>
       </div>
