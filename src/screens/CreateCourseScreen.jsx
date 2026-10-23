@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { COLORS } from '../constants';
 import { NumberPad } from '../components';
+import './CourseSetup.css';
 
 const CreateCourseScreen = ({
   initialCourse = null,
@@ -70,6 +71,7 @@ if (
     return (
       <div 
         key={hole}
+        className="course-hole-row"
         style={{ 
           display: 'grid',
           gridTemplateColumns: '60px 1fr 1fr',
@@ -87,7 +89,7 @@ if (
         
         {/* Par Selection */}
         <div>
-          <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Par</div>
+          <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginBottom: '4px', fontWeight: '600' }}>Par</div>
           <div style={{ display: 'flex', gap: '6px' }}>
             {[3, 4, 5].map(par => (
               <button
@@ -113,8 +115,8 @@ if (
         </div>
         
         {/* Yardage */}
-        <div>
-          <div style={{ fontSize: '12px', color: COLORS.mistyBlue, marginBottom: '4px', fontWeight: '600' }}>Yardage</div>
+        <div className="course-hole-yardage">
+          <div style={{ fontSize: '12px', color: COLORS.darkTeal, marginBottom: '4px', fontWeight: '600' }}>Yardage (optional)</div>
           <button
             onClick={() => {
               setShowYardageModalForHole(hole);
@@ -141,9 +143,10 @@ if (
   };
  
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '120px' }}>
+    <div className="course-setup" style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '120px' }}>
       {/* Header */}
 <div
+  className="course-setup-header"
   style={{
     backgroundColor: '#FFFFFF',
     padding: '20px 24px',
@@ -195,8 +198,19 @@ if (
     />
   </div>
 
+  <button
+    className="course-save-top"
+    onClick={handleSave}
+    disabled={!courseName.trim()}
+  >
+    <CheckCircle2 size={20} aria-hidden="true" />
+    {isEditing ? 'Update Course' : 'Save Course'}
+  </button>
+  <p className="course-save-help">Save with just a name. You can add pars and optional details now or later.</p>
+
   {/* Optional course metadata */}
-  <div style={{ marginTop: '14px' }}>
+  <details className="course-metadata" style={{ marginTop: '20px' }}>
+    <summary>Course rating and slope (optional)</summary>
     <div
       style={{
         display: 'flex',
@@ -208,7 +222,7 @@ if (
       }}
     >
       <div style={{ color: COLORS.darkTeal, fontWeight: 800, fontSize: '16px' }}>
-        Course rating and slope (optional)
+        Scorecard information
       </div>
 
       <div style={{ color: COLORS.charcoal, fontSize: '12px', fontWeight: 600 }}>
@@ -269,15 +283,15 @@ if (
     <div style={{ marginTop: '10px', fontSize: '12px', color: COLORS.charcoal, textAlign: 'center', lineHeight: 1.4 }}>
       Optional scorecard information. These fields are not needed to track your rounds.
     </div>
-  </div>
+  </details>
 </div>
    
-      <div style={{ padding: '24px' }}>
+      <div className="course-setup-body" style={{ padding: '24px' }}>
         <p style={{ color: COLORS.darkTeal, lineHeight: 1.5 }}>Only the course name is needed to save. Add pars now or later; yardages are optional. This course will appear in My Courses and when you start a round.</p>
         {/* Tip */}
         <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.mistyBlue}33 100%)`, padding: '16px', borderRadius: '16px', marginBottom: '24px' }}>
           <p style={{ color: COLORS.darkTeal, fontSize: '16px', textAlign: 'center', fontWeight: '500', margin: 0 }}>
-            Set the par and yardage for each hole below 💚
+            Add pars below. Yardage is optional. 💚
           </p>
         </div>
 
@@ -289,7 +303,7 @@ if (
           {[1,2,3,4,5,6,7,8,9].map(renderHoleRow)}
           <div style={{ marginTop: '16px', padding: '12px', backgroundColor: `${COLORS.mistyBlue}33`, borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>Front 9 Total:</span>
-            <span style={{ color: COLORS.blush, fontSize: '20px', fontWeight: 'bold' }}>{front9Yardage} yds</span>
+            <span style={{ color: COLORS.darkTeal, fontSize: '20px', fontWeight: 'bold' }}>{front9Yardage} yds</span>
           </div>
         </div>
 
@@ -301,7 +315,7 @@ if (
           {[10,11,12,13,14,15,16,17,18].map(renderHoleRow)}
           <div style={{ marginTop: '16px', padding: '12px', backgroundColor: `${COLORS.mistyBlue}33`, borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>Back 9 Total:</span>
-            <span style={{ color: COLORS.blush, fontSize: '20px', fontWeight: 'bold' }}>{back9Yardage} yds</span>
+            <span style={{ color: COLORS.darkTeal, fontSize: '20px', fontWeight: 'bold' }}>{back9Yardage} yds</span>
           </div>
         </div>
 
@@ -309,7 +323,7 @@ if (
         <div style={{ backgroundColor: COLORS.darkTeal, borderRadius: '16px', padding: '20px', marginBottom: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: COLORS.cream, fontSize: '20px', fontWeight: 'bold' }}>Total Course Yardage:</span>
-            <span style={{ color: COLORS.blush, fontSize: '28px', fontWeight: 'bold' }}>{totalYardage} yds</span>
+            <span style={{ color: COLORS.cream, fontSize: '28px', fontWeight: 'bold' }}>{totalYardage} yds</span>
           </div>
         </div>
 

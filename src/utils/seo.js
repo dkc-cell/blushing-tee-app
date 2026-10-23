@@ -182,7 +182,7 @@ export const softwareApplicationSchema = {
   ],
   url: APP_URL,
   applicationCategory: 'SportsApplication',
-  operatingSystem: 'Web, iOS, Android',
+  operatingSystem: 'Any operating system with a modern web browser',
   isAccessibleForFree: true,
   offers: {
     '@type': 'Offer',

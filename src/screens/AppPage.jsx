@@ -126,6 +126,13 @@ export default function AppPage() {
     clearActiveRound();
   };
 
+  const handleCancelRound = () => {
+    if (currentRound.length) return;
+    if (!window.confirm('Cancel this round? No holes have been recorded. Any unfinished hole entries will be discarded.')) return;
+    resetRoundState();
+    setCurrentScreen('home');
+  };
+
   const confirmReplaceActiveRound = () => {
     if (!roundIsActive) return true;
 
@@ -289,6 +296,7 @@ setCurrentScreen('roundComplete');
           activeRound={getActiveRoundSnapshot()}
           onResumeRound={() => setCurrentScreen('logRound')}
           onEndActiveRound={() => handleCompleteRound(null)}
+          onCancelRound={handleCancelRound}
         />
       );
 
@@ -337,6 +345,7 @@ setCurrentScreen('roundComplete');
           setCustomYardages={setCustomYardages}
           currentRound={currentRound}
           recordedHoles={recordedHoles}
+          onCancelRound={handleCancelRound}
           onRecordHole={handleRecordHole}
           onUnrecordHole={handleUnrecordHole}
           onCompleteRound={handleCompleteRound}
@@ -466,6 +475,7 @@ case 'about':
           activeRound={getActiveRoundSnapshot()}
           onResumeRound={() => setCurrentScreen('logRound')}
           onEndActiveRound={() => handleCompleteRound(null)}
+          onCancelRound={handleCancelRound}
         />
       );
   }

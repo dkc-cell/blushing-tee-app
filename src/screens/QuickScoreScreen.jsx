@@ -12,7 +12,7 @@ const readInputs = (hole, round) => {
   return { score: data?.score ?? data?.total ?? null, fairwayHit: typeof data?.fairwayHit === 'boolean' ? data.fairwayHit : null, putts: Number.isFinite(data?.putts) ? data.putts : null, greenInRegulation: typeof data?.greenInRegulation === 'boolean' ? data.greenInRegulation : null };
 };
 
-export default function QuickScoreScreen({ currentHole, setCurrentHole, currentRound, customPars, setCustomPars, customYardages, courseName, setCourseName, onRecordHole, onCompleteRound, onBack }) {
+export default function QuickScoreScreen({ currentHole, setCurrentHole, currentRound, customPars, setCustomPars, customYardages, courseName, setCourseName, onRecordHole, onCompleteRound, onBack, onCancelRound }) {
   const [inputs, setInputs] = useState(() => readInputs(currentHole, currentRound));
   const [statsOpen, setStatsOpen] = useState(false);
   const [modal, setModal] = useState(null);
@@ -65,7 +65,7 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
     else finish();
   };
   const endEarly = () => {
-    if (!currentRound.length) { setError('Save at least one hole before ending your round.'); return; }
+    if (!currentRound.length) { onCancelRound?.(); return; }
     if (isHoleDraftMeaningful(draft)) setModal('end');
     else if (window.confirm('End this round and save only recorded holes?')) onCompleteRound(null);
   };
@@ -81,15 +81,16 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
     <section className="qs-course"><button className="qs-course-name" aria-label="Edit course name" onClick={() => { setNameDraft(courseName || ''); setModal('course'); }}>{courseName || 'Add course name'} <span aria-hidden="true">✎</span></button><div className="qs-course-grid"><div>Hole <strong>{currentHole}</strong></div><button aria-label="Edit par" onClick={() => setModal('par')}>Par <strong>{par || '--'}</strong><span className="qs-par-edit"> · Edit</span></button></div></section>
     <div className="qs-title"><h2>Score</h2><button aria-label="Score help" onClick={() => setModal('help')}>ⓘ</button></div>
     <div className="qs-counter"><button aria-label="Decrease score" disabled={inputs.score == null || inputs.score <= 1} onClick={() => change('score', inputs.score - 1)}>−</button><button className="qs-total" aria-label="Enter score manually" onClick={() => openPad('score', inputs.score)}>{inputs.score ?? '--'}</button><button aria-label="Increase score" onClick={() => change('score', Math.min(99, (inputs.score || 0) + 1))}>+</button></div>
-    <p className="qs-hint">Tap + as you play, or tap the score to enter</p>
+    <p className="qs-hint">Tap + to count, or tap the score to enter</p>
     {error && <p role="alert" className="qs-error">{error}</p>}
     <details open={statsOpen} onToggle={e => setStatsOpen(e.currentTarget.open)} className="qs-stats"><summary>Quick Stats · Optional</summary>
+      <p className="qs-stats-note">These details are for your stats only. They don’t change your score.</p>
       {par == null && <button className="qs-link" onClick={() => setModal('par')}>Select par (required)</button>}
       {par != null && <div className="qs-stat qs-tee"><h3>{par === 3 ? 'Green hit?' : 'Fairway hit?'}</h3><div className="qs-choices">{[true, false].map(v => <button key={String(v)} aria-pressed={(par === 3 ? inputs.greenInRegulation : inputs.fairwayHit) === v} onClick={() => { const key = par === 3 ? 'greenInRegulation' : 'fairwayHit'; change(key, inputs[key] === v ? null : v); }}>{v ? '✓ Yes' : '× No'}</button>)}</div></div>}
-      <div className="qs-stat"><h3>Putts</h3><div className="qs-putts"><button aria-label="Decrease putts" disabled={inputs.putts == null || inputs.putts === 0} onClick={() => change('putts', inputs.putts - 1)}>−</button><strong>{inputs.putts ?? '--'}</strong><button aria-label="Increase putts" onClick={() => change('putts', inputs.putts == null ? 1 : Math.min(99, inputs.putts + 1))}>+</button></div><button className="qs-link" onClick={() => change('putts', null)}>Clear putts</button></div>
+      <div className="qs-stat"><h3>Putts</h3><div className="qs-putts"><button aria-label="Decrease putts" disabled={inputs.putts == null || inputs.putts === 0} onClick={() => change('putts', inputs.putts - 1)}>−</button><strong>{inputs.putts ?? '--'}</strong><button aria-label="Increase putts" onClick={() => change('putts', inputs.putts == null ? 1 : Math.min(99, inputs.putts + 1))}>+</button></div><button className="qs-link" aria-label="Clear putts" onClick={() => change('putts', null)}>Clear</button></div>
     </details>
-    <footer className="qs-footer"><nav className="qs-nav" aria-label="Hole navigation"><button disabled={currentHole === 1 || Boolean(celebration)} onClick={() => setCurrentHole(currentHole - 1)}>← Previous Hole</button><span>{currentHole} / 18</span><button disabled={Boolean(celebration)} onClick={() => save(true)}>{currentHole === 18 ? 'Save & Finish' : 'Save & Next Hole →'}</button></nav>
-    <button className="qs-link qs-end" onClick={endEarly}>End Round Early</button></footer>
+    <footer className="qs-footer"><nav className="qs-nav" aria-label="Hole navigation"><button disabled={currentHole === 1 || Boolean(celebration)} onClick={() => setCurrentHole(currentHole - 1)}>← Previous</button><span>{currentHole} / 18</span><button disabled={Boolean(celebration)} onClick={() => save(true)}>{currentHole === 18 ? 'Save & Finish' : 'Save & Next →'}</button></nav>
+    <button className="qs-link qs-end" onClick={endEarly}>{currentRound.length ? 'End Round Early' : 'Cancel Round'}</button></footer>
     <RoundCelebration kind={celebration} onDismiss={finishCelebration} />
     {modal && <div className="qs-overlay"><section role="dialog" aria-modal="true" aria-label={modal === 'par' ? 'Select par' : modal === 'end' ? 'Unfinished hole' : modal === 'help' ? 'Scoring help' : `Enter ${modal}`} className="qs-modal"><button className="qs-link" onClick={() => { setModal(null); setError(''); }}>Close</button>
       {modal === 'course' ? <><h2>Course name</h2><label htmlFor="qs-course-input">Where are you playing?</label><input id="qs-course-input" autoFocus maxLength={100} value={nameDraft} onChange={e => setNameDraft(e.target.value)} placeholder="e.g. Olympic Hills" /><button onClick={() => { setCourseName(nameDraft.trim()); setModal(null); }}>Save Name</button></> : modal === 'par' ? <><h2>Select par for Hole {currentHole}</h2><div className="qs-choices">{[3, 4, 5].map(p => <button key={p} onClick={() => { setCustomPars({ ...customPars, [currentHole]: p }); setModal(null); }}>{p}</button>)}</div></> : modal === 'help' ? <><h2>Your hole score</h2><p>Enter all strokes for this hole, including any penalty strokes. Use + as you play, or tap the score to enter the total.</p><p>Optional putts and tee-result details do not add strokes to your total. On par 3s, “Green hit?” means your tee shot finished on the putting green.</p></> : modal === 'end' ? <><h2>Hole {currentHole} isn’t finished</h2><p>Finish saving this hole, or end your round with only the {currentRound.length} recorded hole{currentRound.length === 1 ? '' : 's'}.</p><button onClick={() => setModal(null)}>Finish Recording Hole {currentHole}</button><button onClick={() => { saveHoleDraft(currentHole, null); onCompleteRound(null); }}>End with Recorded Holes</button></> : <><h2>Enter {modal}</h2><NumberPad value={digits} maxLength={2} onNumberClick={n => setDigits(digits + n)} onBackspace={() => setDigits(digits.slice(0, -1))} onClear={() => setDigits('')} onDone={applyDigits} />{error && <p role="alert">{error}</p>}</>}
