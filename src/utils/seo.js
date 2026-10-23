@@ -1,4 +1,7 @@
-import { useEffect } from 'react';
+import { createContext, useContext, useEffect } from 'react';
+
+// Build-time rendering collects the same metadata used by client navigation.
+export const SeoContext = createContext(null);
 
 export const SITE_URL = 'https://blushingbirdie.com';
 export const SITE_NAME = 'Blushing Birdie';
@@ -56,7 +59,7 @@ export const absoluteUrl = (path = '/') => {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 };
 
-export const usePageSeo = ({
+export const applyPageSeo = ({
   title,
   description = DEFAULT_DESCRIPTION,
   path = '/',
@@ -65,68 +68,72 @@ export const usePageSeo = ({
   robots = 'index,follow',
   structuredData = [],
 }) => {
-  useEffect(() => {
-    const canonicalUrl = absoluteUrl(path);
-    const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+  const canonicalUrl = absoluteUrl(path);
+  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
 
-    document.title = fullTitle;
+  document.title = fullTitle;
 
-    setMetaTag({
-      selector: 'meta[name="description"]',
-      attributes: { name: 'description', content: description },
-    });
-    setMetaTag({
-      selector: 'meta[name="robots"]',
-      attributes: { name: 'robots', content: robots },
-    });
-    setMetaTag({
-      selector: 'meta[property="og:site_name"]',
-      attributes: { property: 'og:site_name', content: SITE_NAME },
-    });
-    setMetaTag({
-      selector: 'meta[property="og:title"]',
-      attributes: { property: 'og:title', content: fullTitle },
-    });
-    setMetaTag({
-      selector: 'meta[property="og:description"]',
-      attributes: { property: 'og:description', content: description },
-    });
-    setMetaTag({
-      selector: 'meta[property="og:type"]',
-      attributes: { property: 'og:type', content: type },
-    });
-    setMetaTag({
-      selector: 'meta[property="og:url"]',
-      attributes: { property: 'og:url', content: canonicalUrl },
-    });
-    setMetaTag({
-      selector: 'meta[property="og:image"]',
-      attributes: { property: 'og:image', content: image },
-    });
-    setMetaTag({
-      selector: 'meta[name="twitter:card"]',
-      attributes: { name: 'twitter:card', content: 'summary_large_image' },
-    });
-    setMetaTag({
-      selector: 'meta[name="twitter:title"]',
-      attributes: { name: 'twitter:title', content: fullTitle },
-    });
-    setMetaTag({
-      selector: 'meta[name="twitter:description"]',
-      attributes: { name: 'twitter:description', content: description },
-    });
-    setMetaTag({
-      selector: 'meta[name="twitter:image"]',
-      attributes: { name: 'twitter:image', content: image },
-    });
-    setLinkTag({
-      selector: 'link[rel="canonical"]',
-      attributes: { rel: 'canonical', href: canonicalUrl },
-    });
+  setMetaTag({
+    selector: 'meta[name="description"]',
+    attributes: { name: 'description', content: description },
+  });
+  setMetaTag({
+    selector: 'meta[name="robots"]',
+    attributes: { name: 'robots', content: robots },
+  });
+  setMetaTag({
+    selector: 'meta[property="og:site_name"]',
+    attributes: { property: 'og:site_name', content: SITE_NAME },
+  });
+  setMetaTag({
+    selector: 'meta[property="og:title"]',
+    attributes: { property: 'og:title', content: fullTitle },
+  });
+  setMetaTag({
+    selector: 'meta[property="og:description"]',
+    attributes: { property: 'og:description', content: description },
+  });
+  setMetaTag({
+    selector: 'meta[property="og:type"]',
+    attributes: { property: 'og:type', content: type },
+  });
+  setMetaTag({
+    selector: 'meta[property="og:url"]',
+    attributes: { property: 'og:url', content: canonicalUrl },
+  });
+  setMetaTag({
+    selector: 'meta[property="og:image"]',
+    attributes: { property: 'og:image', content: image },
+  });
+  setMetaTag({
+    selector: 'meta[name="twitter:card"]',
+    attributes: { name: 'twitter:card', content: 'summary_large_image' },
+  });
+  setMetaTag({
+    selector: 'meta[name="twitter:title"]',
+    attributes: { name: 'twitter:title', content: fullTitle },
+  });
+  setMetaTag({
+    selector: 'meta[name="twitter:description"]',
+    attributes: { name: 'twitter:description', content: description },
+  });
+  setMetaTag({
+    selector: 'meta[name="twitter:image"]',
+    attributes: { name: 'twitter:image', content: image },
+  });
+  setLinkTag({
+    selector: 'link[rel="canonical"]',
+    attributes: { rel: 'canonical', href: canonicalUrl },
+  });
 
-    removeStructuredData();
-    addStructuredData(structuredData);
-  }, [description, image, path, robots, structuredData, title, type]);
+  removeStructuredData();
+  addStructuredData(structuredData);
+};
+
+export const usePageSeo = (options) => {
+  const collector = useContext(SeoContext);
+  if (collector) collector.current = options;
+  useEffect(() => { applyPageSeo(options); }, [options]);
 };
 
 export const organizationSchema = {
@@ -138,7 +145,6 @@ export const organizationSchema = {
     'The Blushing Birdie',
     'Blushing Birdie Golf Tracker',
     'Blushing Birdie Golf App',
-    'Confidence, one swing at a time.',
   ],
   url: SITE_URL,
   logo: DEFAULT_IMAGE,
@@ -153,7 +159,6 @@ export const websiteSchema = {
   name: SITE_NAME,
   alternateName: [
     'Blushing Birdie golf app',
-    'Confidence, one swing at a time.',
   ],
   url: SITE_URL,
   publisher: { '@id': `${SITE_URL}/#organization` },
@@ -174,11 +179,10 @@ export const softwareApplicationSchema = {
     'Blushing Birdie',
     'The Blushing Birdie',
     'Blushing Birdie golf scorecard app',
-    'Confidence, one swing at a time.',
   ],
   url: APP_URL,
   applicationCategory: 'SportsApplication',
-  operatingSystem: 'Web, iOS, Android',
+  operatingSystem: 'Any operating system with a modern web browser',
   isAccessibleForFree: true,
   offers: {
     '@type': 'Offer',
