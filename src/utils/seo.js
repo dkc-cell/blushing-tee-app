@@ -9,7 +9,7 @@ export const DEFAULT_IMAGE = `${SITE_URL}/Blushing-Birdie-Icon.png`;
 export const APP_URL = `${SITE_URL}/app`;
 
 export const DEFAULT_DESCRIPTION =
-  'Blushing Birdie is a simple, private golf tracker, built to help you track rounds and build confidence one swing at a time.';
+  'Blushing Birdie is a simple golf tracker for women learning the game. Record your shots or enter your score, save your rounds, and see your progress—all at your own pace.';
 
 const setMetaTag = ({ selector, attributes }) => {
   let element = document.head.querySelector(selector);
@@ -165,7 +165,7 @@ export const websiteSchema = {
   about: [
     'golf app',
     'golf round tracker',
-    'private golf scorecard',
+    'simple golf score tracker',
     'golf progress tracking',
   ],
 };

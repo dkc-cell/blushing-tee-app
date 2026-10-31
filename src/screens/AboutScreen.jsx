@@ -11,6 +11,7 @@ export default function AboutScreen({ onNavigate }) {
   return <main className="tracker-about" style={{ background: COLORS.cream, minHeight: '100dvh', color: COLORS.darkTeal, padding: '20px 18px' }}><div style={{ maxWidth: 560, margin: 'auto' }}>
     <button onClick={() => onNavigate('home')} style={{ border: 0, background: 'none', color: COLORS.darkTeal, minHeight: 44, padding: 0 }}>← Back to Home</button>
     <h1 className="tracker-about-title">About & Help</h1>
+    <section style={card}><h2>A simple golf tracker for women learning the game.</h2><p>Record your shots or enter your score, save your rounds, and see your progress—all at your own pace.</p></section>
     <article style={card} aria-labelledby="tracker-story-title">
       <h2 id="tracker-story-title" style={{ fontFamily: "'Playfair Display', serif", fontSize: '2rem', marginBottom: 16 }}>{story.title}</h2>
       <p style={{ color: '#7a8b8d', fontSize: '0.92rem', marginBottom: 30 }}>March 6, 2026</p>

@@ -535,7 +535,7 @@ const toggleItem = (id) => {
             marginBottom: '18px',
           }}
         >
-          A simple, private golf tracker.
+          A simple golf tracker for women learning the game.
         </h1>
 
         <p
@@ -547,9 +547,8 @@ const toggleItem = (id) => {
             color: '#35565A',
           }}
         >
-          Blushing Birdie helps you track your rounds, reflect on your
-          progress, and enjoy the game without pressure. Everything stays on
-          your device — simple, personal, and completely yours.
+          Record your shots or enter your score, save your rounds, and see your
+          progress—all at your own pace.
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '80px'}}>
