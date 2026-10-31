@@ -4,10 +4,10 @@ import logo from '../assets/images/Blushing_Birdie_Logo.png';
 import { Link } from 'react-router-dom';
 import { journalArticles } from '../data/journalArticles';
 import WhyIBuiltThis from '../components/WhyIBuiltThis';
-import screenHome from '../assets/images/screenHome.png';
-import screenHole1 from '../assets/images/screenHole1.png';
-import screenStats from '../assets/images/screenStats.png';
-import screenExport from '../assets/images/screenExport.png';
+import screenHome from '../assets/images/screenHome.webp';
+import screenHole1 from '../assets/images/screenHole1.webp';
+import screenStats from '../assets/images/screenStats.webp';
+import screenExport from '../assets/images/screenExport.webp';
 import {
   DEFAULT_DESCRIPTION,
   organizationSchema,
@@ -113,7 +113,7 @@ const featureSlideStyle = {
 const featureImageStyle = {
   width: '100%',
   height: '520px',
-  objectFit: 'cover',
+  objectFit: 'contain',
   borderRadius: '28px',
   border: '1.5px solid rgba(31, 43, 45, 0.18)',
   boxShadow: '0 12px 30px rgba(0,0,0,0.06)',
@@ -319,21 +319,25 @@ export default function HomePage() {
   {
     image: screenHome,
     title: 'Start here',
+    alt: 'Blushing Birdie Home with Start a Round, My Courses, and My Rounds & Stats',
     text: 'A calm, simple home for your game — nothing extra, nothing confusing.',
   },
   {
     image: screenHole1,
     title: 'Log your round',
+    alt: 'Quick Score at Glen Lake, showing hole 1, par 3, score 4, and optional putting stats',
     text: 'Track each hole in seconds with a flow that feels natural and easy.',
   },
   {
     image: screenStats,
     title: 'See your progress',
+    alt: 'My Rounds & Stats showing recent rounds and golf progress statistics',
     text: 'Clear, helpful insights — designed to support your experience, not interrupt it.',
   },
   {
     image: screenExport,
     title: 'Keep your rounds',
+    alt: 'CSV export and JSON backup and restore controls',
     text: 'Your rounds stay yours — simple to view, export, and back up when you choose.',
   },
 ];
@@ -616,7 +620,7 @@ const toggleItem = (id) => {
               >
                 <img
                   src={slide.image}
-                  alt={slide.title}
+                  alt={slide.alt}
                   style={featureImageStyle}
                 />
                 <h3 style={featureSlideTitleStyle}>{slide.title}</h3>
@@ -661,7 +665,7 @@ const toggleItem = (id) => {
           >
             <img
               src={slide.image}
-              alt={slide.title}
+              alt={slide.alt}
               style={{
                 ...featureImageStyle,
                 height: '520px',
