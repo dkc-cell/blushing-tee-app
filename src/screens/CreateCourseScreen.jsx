@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React, { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { COLORS } from '../constants';
@@ -156,20 +157,7 @@ if (
     zIndex: 100
   }}
 >
-  <button
-    onClick={onBack}
-    style={{
-      background: 'none',
-      border: 'none',
-      color: COLORS.darkTeal,
-      fontSize: '18px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      marginBottom: '12px'
-    }}
-  >
-    ← Back
-  </button>
+  <BackButton onClick={onBack}>Back</BackButton>
 
   <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: '0 0 16px 0' }}>
     {isEditing ? 'Edit Course' : 'Create New Course'}

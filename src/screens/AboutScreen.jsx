@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React from 'react';
 import JournalArticleBody from '../components/JournalArticleBody';
 import WhyIBuiltThis from '../components/WhyIBuiltThis';
@@ -9,7 +10,7 @@ export default function AboutScreen({ onNavigate }) {
   const story = journalArticles.find(article => article.slug === 'my-story');
   const card = { background: 'white', padding: 20, borderRadius: 16, marginBottom: 24, lineHeight: 1.6 };
   return <main className="tracker-about" style={{ background: COLORS.cream, minHeight: '100dvh', color: COLORS.darkTeal, padding: '20px 18px' }}><div style={{ maxWidth: 560, margin: 'auto' }}>
-    <button onClick={() => onNavigate('home')} style={{ border: 0, background: 'none', color: COLORS.darkTeal, minHeight: 44, padding: 0 }}>← Back to Home</button>
+    <BackButton onClick={() => onNavigate('home')}>Back to Home</BackButton>
     <h1 className="tracker-about-title">About & Help</h1>
     <section style={card}><h2>A simple golf tracker for women learning the game.</h2><p>Record your shots or enter your score, save your rounds, and see your progress—all at your own pace.</p></section>
     <article style={card} aria-labelledby="tracker-story-title">
@@ -27,6 +28,6 @@ export default function AboutScreen({ onNavigate }) {
     <section className="tracker-help-card" style={card}><h2>Tracking your progress</h2><p>Blushing Birdie does not calculate an official handicap. Golfers who maintain one can post eligible scores through GHIN or their handicap service.</p></section>
     <section className="tracker-help-card" style={card}><h2>Your data & backups</h2><p>No account is required. Your rounds and courses are stored in this browser on this device by default. Data does not automatically transfer between devices.</p><p>Use <strong>More → Backup & Restore</strong> to save or restore a backup file. </p><p><strong>Recommended schedule:</strong> Save a backup after each round or course change, and before changing phones or clearing browser data. Keep it in Files, iCloud Drive, or another location outside this browser. Keep your two most recent copies.</p><p><strong>Export Backup:</strong> Save a backup of your saved rounds and courses.</p><p><strong>Export CSV:</strong> Choose Round Summary for totals or Hole-by-Hole for individual hole scores and stats. Older holes without par stay blank.</p><p><strong>Import Backup:</strong> read the confirmation before importing, since it may replace device data.</p><a href="/privacy" target="_blank" rel="noopener noreferrer">Read the privacy information ↗</a></section>
 
-    <button onClick={() => onNavigate('home')} style={{ border: 0, background: 'none', color: COLORS.darkTeal, minHeight: 44, padding: 0 }}>← Back to Home</button>
+    <BackButton onClick={() => onNavigate('home')}>Back to Home</BackButton>
   </div></main>;
 }

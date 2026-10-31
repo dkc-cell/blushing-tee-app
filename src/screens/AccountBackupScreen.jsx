@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React, { useRef, useState } from 'react';
 import './BackupRestore.css';
 import { COLORS } from '../constants';
@@ -29,7 +30,7 @@ export default function AccountBackupScreen({ rounds, courses, onRestoreData, on
     } finally { setBusy(false); }
   };
   return <main className="backup-restore" style={{ background: COLORS.cream, color: COLORS.darkTeal, minHeight: '100dvh', padding: '20px 18px' }}><div style={{ maxWidth: 560, margin: 'auto' }}>
-    <button onClick={onBack} style={{ ...button, background: 'none', color: COLORS.darkTeal, paddingLeft: 0 }}>← Back to Home</button>
+    <BackButton onClick={onBack}>Back to Home</BackButton>
     <h1 style={{ margin: '16px 0 28px' }}>Backup & Restore</h1>
     <section style={card}><h2 style={{ marginTop: 0 }}>Your data stays on this device</h2><p>{rounds.length} saved rounds · {courses.length} saved courses</p><p>No account is required. There is no automatic backup or device sync. Clearing browser data or losing your phone can remove your local data.</p></section>
     <section style={card}><h2 style={{ marginTop: 0 }}>Recommended backup schedule</h2><ul style={{ paddingLeft: 22 }}><li style={{ marginBottom: 12 }}>After each saved round or course change.</li><li style={{ marginBottom: 12 }}>Before switching phones, changing browsers, or clearing browser data.</li><li>Keep your two most recent backup files in Files, iCloud Drive, or another location outside this browser.</li></ul><p>Backups include saved rounds and courses. Finish or end an active round before exporting to include it. A backup only restores what was saved when you created it.</p></section>

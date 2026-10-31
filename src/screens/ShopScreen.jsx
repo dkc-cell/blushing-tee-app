@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React from 'react';
 import { Heart } from 'lucide-react';
 import { COLORS } from '../constants';
@@ -12,20 +13,7 @@ const ShopScreen = ({ onBack }) => {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)', 
         marginBottom: '24px' 
       }}>
-        <button 
-          onClick={onBack} 
-          style={{ 
-            background: 'none', 
-            border: 'none', 
-            color: COLORS.darkTeal, 
-            fontSize: '18px', 
-            fontWeight: '600', 
-            cursor: 'pointer', 
-            marginBottom: '8px' 
-          }}
-        >
-          ← Back
-        </button>
+        <BackButton onClick={onBack}>Back</BackButton>
         <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: 0 }}>
           Shop the Collection
         </h2>

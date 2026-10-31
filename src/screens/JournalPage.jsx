@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { journalArticles } from '../data/journalArticles';
@@ -90,19 +91,7 @@ export default function JournalPage() {
   return (
     <div style={{ padding: '72px 24px', background: '#f8f5f2' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        <Link
-            to="/"
-            style={{
-                display: 'inline-block',
-                marginBottom: '26px',
-                color: COLORS.darkTeal,
-                textDecoration: 'none',
-                fontWeight: 700,
-                fontSize: '0.95rem',
-            }}
-            >
-            ← Back to Home
-            </Link>
+        <BackButton to="/">Back to Home</BackButton>
 
         {/* HEADER */}
         <p style={{

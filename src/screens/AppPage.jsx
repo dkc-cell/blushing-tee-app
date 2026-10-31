@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React, { useState, useEffect, useRef } from 'react';
 import QuickScoreScreen from './QuickScoreScreen';
 import { COLORS } from '../constants';
@@ -326,7 +327,7 @@ setCurrentScreen('roundComplete');
 
     case 'chooseScoring':
       return <main style={{ maxWidth: 520, margin: 'auto', padding: 24, color: COLORS.darkTeal }}>
-        <button onClick={() => setCurrentScreen('selectCourse')}>← Back</button>
+        <BackButton onClick={() => setCurrentScreen('selectCourse')}>Back</BackButton>
         <h1>How would you like to score?</h1>
         <p>Choose what works for you today.</p>
         {[['quick', 'Quick Score', 'Enter your total. Add fairway and putt stats if you like.'], ['detailed', 'Detailed Tracking', 'Record your tee shot, approaches, short game and putts. We calculate your score.']].map(([mode, title, description]) => <button key={mode} onClick={() => { setScoringMode(mode); localStorage.setItem('bb_scoringMode', mode); setCurrentScreen('logRound'); }} style={{ display: 'block', width: '100%', textAlign: 'left', background: mode === (localStorage.getItem('bb_scoringMode') || 'quick') ? '#f8dfe6' : '#eff8f8', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: 18, padding: 20, margin: '16px 0', color: COLORS.darkTeal, cursor: 'pointer' }}><strong style={{ fontSize: 22 }}>{title}</strong><p>{description}</p>{mode === localStorage.getItem('bb_scoringMode') && <span>Last used</span>}</button>)}
@@ -458,7 +459,7 @@ setCurrentScreen('roundComplete');
       // Placeholder for journal screen
       return (
         <div style={{ padding: '24px' }}>
-          <button onClick={() => setCurrentScreen('home')}>← Back</button>
+          <BackButton onClick={() => setCurrentScreen('home')}>Back to Home</BackButton>
           <h2>Tips & Journal - Coming Soon!</h2>
         </div>
       );

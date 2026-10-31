@@ -1,0 +1,4 @@
+.bb-back:focus-visible { outline: 3px solid #103E43; outline-offset: 4px; }
+.bb-back:hover { box-shadow: 0 0 0 1px #103E43; }
+.bb-back:active { transform: translateY(1px); }
+@media (forced-colors: active) { .bb-back { border-color: ButtonText; } }
