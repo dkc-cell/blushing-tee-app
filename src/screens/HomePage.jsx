@@ -6,6 +6,7 @@ import { journalArticles } from '../data/journalArticles';
 import WhyIBuiltThis from '../components/WhyIBuiltThis';
 import screenHome from '../assets/images/screenHome.webp';
 import screenHole1 from '../assets/images/screenHole1.webp';
+import screenDetailed from '../assets/images/screenHole1.png';
 import screenStats from '../assets/images/screenStats.webp';
 import screenExport from '../assets/images/screenExport.webp';
 import {
@@ -324,9 +325,15 @@ export default function HomePage() {
   },
   {
     image: screenHole1,
-    title: 'Log your round',
+    title: 'Quick Score',
     alt: 'Quick Score at Glen Lake, showing hole 1, par 3, score 4, and optional putting stats',
-    text: 'Track each hole in seconds with a flow that feels natural and easy.',
+    text: 'Enter your score and optional stats.',
+  },
+  {
+    image: screenDetailed,
+    title: 'Detailed Tracking',
+    alt: 'Detailed Tracking showing tee-shot direction and approach-shot controls',
+    text: 'Record your shots for more detail about your game.',
   },
   {
     image: screenStats,
@@ -650,7 +657,7 @@ const toggleItem = (id) => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
           gap: '28px',
           marginTop: '36px',
           alignItems: 'start',
