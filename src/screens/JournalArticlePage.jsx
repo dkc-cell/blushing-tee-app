@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import JournalArticleBody from '../components/JournalArticleBody';
@@ -92,20 +93,7 @@ export default function JournalArticlePage() {
             This article could not be found.
           </p>
 
-          <button
-            onClick={() => navigate('/journal')}
-            style={{
-              background: COLORS.darkTeal,
-              color: COLORS.cream,
-              border: 'none',
-              borderRadius: '999px',
-              padding: '14px 22px',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            Back to Journal
-          </button>
+          <BackButton onClick={() => navigate('/journal')}>Back to Journal</BackButton>
         </div>
       </div>
     );
@@ -120,21 +108,7 @@ export default function JournalArticlePage() {
       }}
     >
       <div style={{ maxWidth: '820px', margin: '0 auto' }}>
-        <button
-          onClick={() => navigate('/journal')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            marginBottom: '28px',
-            color: COLORS.darkTeal,
-            fontWeight: 700,
-            fontSize: '0.95rem',
-            cursor: 'pointer',
-          }}
-        >
-          ← Back to Journal
-        </button>
+        <BackButton onClick={() => navigate('/journal')}>Back to Journal</BackButton>
 
        <article
   style={{
@@ -274,20 +248,7 @@ export default function JournalArticlePage() {
           </div>
 
           <div style={{ marginTop: '26px' }}>
-            <button
-              onClick={() => navigate('/journal')}
-              style={{
-                background: COLORS.darkTeal,
-                color: COLORS.cream,
-                border: 'none',
-                borderRadius: '999px',
-                padding: '14px 24px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Back to all articles
-            </button>
+            <BackButton onClick={() => navigate('/journal')}>Back to Journal</BackButton>
           </div>
         </div>
       </div>

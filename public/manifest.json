@@ -1,7 +1,7 @@
 {
   "name": "Blushing Birdie",
   "short_name": "Blushing Birdie",
-  "description": "Blushing Birdie is a simple, private golf tracker for women, built to help you track rounds and build confidence one swing at a time.",
+  "description": "Blushing Birdie is a simple golf tracker for women learning the game. Record your shots or enter your score, save your rounds, and see your progress—all at your own pace.",
   "id": "/app",
   "start_url": "/app",
   "scope": "/app",

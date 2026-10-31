@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React from 'react';
 import { COLORS } from '../constants';
 
@@ -18,7 +19,7 @@ const ManageCoursesScreen = ({
     <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '80px' }}>
       {/* Header */}
       <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '8px' }}>← Back</button>
+        <BackButton onClick={onBack}>Back</BackButton>
         <h2 style={{ color: COLORS.darkTeal, fontSize: '28px', fontWeight: 'bold', margin: 0 }}>My Courses</h2>
         <p style={{ color: COLORS.charcoal, fontSize: '18px', margin: '4px 0 0 0' }}>Add a course once, then choose it when starting a round.</p>
       </div>

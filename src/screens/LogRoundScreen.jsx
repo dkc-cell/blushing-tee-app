@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React, { useEffect, useState, useRef } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { COLORS, ENCOURAGING_QUOTES } from '../constants';
@@ -288,12 +289,7 @@ const LogRoundScreen = ({
       <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '160px' }}>
         {/* Header */}
         <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <button
-            onClick={onBack}
-            style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}
-          >
-            ← Back to Home
-          </button>
+          <BackButton onClick={onBack}>Back to Home</BackButton>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
             <div>
@@ -445,12 +441,7 @@ const LogRoundScreen = ({
     <div style={{ minHeight: '100vh', backgroundColor: COLORS.cream, paddingBottom: '160px' }}>
       {/* Header */}
       <div style={{ backgroundColor: '#FFFFFF', padding: '20px 24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        <button
-          onClick={onBack}
-          style={{ background: 'none', border: 'none', color: COLORS.darkTeal, fontSize: '18px', fontWeight: '600', cursor: 'pointer', marginBottom: '12px' }}
-        >
-          ← Back to Home
-        </button>
+        <BackButton onClick={onBack}>Back to Home</BackButton>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '16px' }}>
           <div>

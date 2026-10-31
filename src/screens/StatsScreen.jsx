@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import './ScreenSpacing.css';
 import React, { useRef, useState } from 'react';
 import { COLORS } from '../constants';
@@ -182,20 +183,7 @@ const handleImportBackup = async (event) => {
         marginBottom: '24px',
       }}
     >
-      <button
-        onClick={onBack}
-        style={{
-          background: 'none',
-          border: 'none',
-          color: COLORS.darkTeal,
-          fontSize: '18px',
-          fontWeight: '600',
-          cursor: 'pointer',
-          marginBottom: '8px',
-        }}
-      >
-        ← Back
-      </button>
+      <BackButton onClick={onBack}>Back</BackButton>
       <h2
         style={{
           color: COLORS.darkTeal,

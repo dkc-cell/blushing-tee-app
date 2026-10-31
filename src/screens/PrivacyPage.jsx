@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { COLORS } from '../constants';
@@ -82,16 +83,7 @@ export default function PrivacyPage() {
             </span>
           </Link>
 
-          <Link
-            to="/"
-            style={{
-              color: COLORS.darkTeal,
-              textDecoration: 'none',
-              fontWeight: 600,
-            }}
-          >
-            Back Home
-          </Link>
+          <BackButton to="/">Back to Home</BackButton>
         </div>
       </header>
 

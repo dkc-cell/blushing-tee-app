@@ -134,3 +134,21 @@ Consider adding:
 | 1 file | 20+ focused files |
 
 Each screen/component is now typically 100-400 lines - much more manageable!
+
+## Public-page HTML
+
+`npm run build` creates the Vite client bundle, then renders the existing public
+React pages to HTML at build time. The homepage, Our Story, Privacy, Journal index,
+and every article have their own initial content, canonical, title, social tags,
+and structured data. The `/app` route stays client-rendered and retains its
+`noindex,nofollow` policy. Scoring and local storage are unchanged.
+
+Page components remain the source of both content and SEO options. Adding an
+article to `journalArticles` automatically adds its HTML output; update the sitemap
+when adding or removing public URLs. The non-forced Netlify SPA fallback allows
+existing generated HTML to be served while preserving app routing.
+
+Run `node scripts/check-public-html.mjs` after building to verify public content,
+route metadata, structured data, and local assets. Run `npm test` for tracker tests.
+Temporary server build files in `.prerender/` are removed after generation and are
+not published. No server runtime or new dependencies are required.

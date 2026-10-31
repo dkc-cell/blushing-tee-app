@@ -1,3 +1,4 @@
+import BackButton from '../components/BackButton';
 import './ScreenSpacing.css';
 import React, { useState } from 'react';
 import { getRoundPar } from '../utils';
@@ -163,12 +164,7 @@ const RoundCompleteScreen = ({
 
       {/* Action Buttons */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <button
-          onClick={() => handleFinish(onGoHome)}
-          style={{ width: '100%', background: `linear-gradient(90deg, ${COLORS.blush} 0%, ${COLORS.blush}CC 100%)`, color: COLORS.charcoal, padding: '20px', borderRadius: '16px', border: 'none', fontSize: '20px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
-        >
-          Back to Home
-        </button>
+        <BackButton onClick={() => handleFinish(onGoHome)} fullWidth>Back to Home</BackButton>
         <button
           onClick={() => handleFinish(onNewRound)}
           style={{ width: '100%', backgroundColor: `${COLORS.mistyBlue}4D`, color: COLORS.darkTeal, padding: '16px', borderRadius: '16px', border: 'none', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer' }}
