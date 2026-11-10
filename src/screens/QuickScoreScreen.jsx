@@ -79,9 +79,12 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
   };
 
   return <main className="quick-score" style={{ '--teal': COLORS.darkTeal, '--blush': COLORS.blush, '--mist': COLORS.mistyBlue }}>
+    <header className="qs-header">
     <BackButton onClick={onBack}>Back to Home</BackButton>
-    <section className="qs-course"><button className="qs-course-name" aria-label="Edit course name" onClick={() => { setNameDraft(courseName || ''); setModal('course'); }}>{courseName || 'Add course name'} <span aria-hidden="true">✎</span></button><div className="qs-hole-header"><h2>Hole {currentHole}</h2><button className="qs-end" disabled={Boolean(celebration)} onClick={endEarly}>{currentRound.length ? 'End Round Early' : 'Cancel Round'}</button></div><div className="qs-course-grid"><button aria-label="Edit par" onClick={() => setModal('par')}>Par <strong>{par || '--'}</strong><span className="qs-par-edit"> · Edit</span></button></div></section>
-    <EncouragingQuote hole={currentHole} style={{ margin: '20px 0' }} />
+    <section className="qs-course"><button className="qs-course-name" aria-label="Edit course name" onClick={() => { setNameDraft(courseName || ''); setModal('course'); }}>{courseName || 'Add course name'} <span aria-hidden="true">✎</span></button><div className="qs-hole-header"><h2>Hole {currentHole}</h2><button className="qs-end" disabled={Boolean(celebration)} onClick={endEarly}>{currentRound.length ? 'End Round Early' : 'Cancel Round'}</button></div><div className="qs-course-grid"><button aria-label="Edit par" onClick={() => setModal('par')}>{par ? `Par ${par}` : 'Select Par'}</button></div></section>
+    </header>
+    <EncouragingQuote hole={currentHole} style={{ margin: '24px' }} />
+    <div className="qs-scoring">
     <div className="qs-title"><h2>Score</h2><button aria-label="Score help" onClick={() => setModal('help')}>ⓘ</button></div>
     <div className="qs-counter"><button aria-label="Decrease score" disabled={inputs.score == null || inputs.score <= 1} onClick={() => change('score', inputs.score - 1)}>−</button><button className="qs-total" aria-label="Enter score manually" onClick={() => openPad('score', inputs.score)}>{inputs.score ?? '--'}</button><button aria-label="Increase score" onClick={() => change('score', Math.min(99, (inputs.score || 0) + 1))}>+</button></div>
     <p className="qs-hint">Tap + to count, or tap the score to enter</p>
@@ -92,6 +95,7 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
       {par != null && <div className="qs-stat qs-tee"><h3>{par === 3 ? 'Green hit?' : 'Fairway hit?'}</h3><div className="qs-choices">{[true, false].map(v => <button key={String(v)} aria-pressed={(par === 3 ? inputs.greenInRegulation : inputs.fairwayHit) === v} onClick={() => { const key = par === 3 ? 'greenInRegulation' : 'fairwayHit'; change(key, inputs[key] === v ? null : v); }}>{v ? '✓ Yes' : '× No'}</button>)}</div></div>}
       <div className="qs-stat"><h3>Putts</h3><div className="qs-putts"><button aria-label="Decrease putts" disabled={inputs.putts == null || inputs.putts === 0} onClick={() => change('putts', inputs.putts - 1)}>−</button><strong>{inputs.putts ?? '--'}</strong><button aria-label="Increase putts" onClick={() => change('putts', inputs.putts == null ? 1 : Math.min(99, inputs.putts + 1))}>+</button></div><button className="qs-link" aria-label="Clear putts" onClick={() => change('putts', null)}>Clear</button></div>
     </details>
+    </div>
     <footer className="qs-footer"><nav className="qs-nav" aria-label="Hole navigation"><button disabled={currentHole === 1 || Boolean(celebration)} onClick={() => setCurrentHole(currentHole - 1)}>← Previous</button><span>{currentHole} / 18</span><button disabled={Boolean(celebration)} onClick={() => save(true)}>{currentHole === 18 ? 'Save & Finish' : 'Save & Next →'}</button></nav>
     </footer>
     <RoundCelebration kind={celebration} onDismiss={finishCelebration} />
