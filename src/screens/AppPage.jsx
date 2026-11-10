@@ -331,8 +331,8 @@ setCurrentScreen('roundComplete');
     case 'chooseScoring':
       return <main style={{ maxWidth: 520, margin: 'auto', padding: 24, color: COLORS.darkTeal }}>
         <BackButton onClick={() => setCurrentScreen('selectCourse')}>Back</BackButton>
-        <h1>How would you like to score?</h1>
-        <p>Choose what works for you today.</p>
+        <h1 style={{ margin: '12px 0 20px', lineHeight: 1.25 }}>How would you like to score?</h1>
+        <p style={{ margin: '0 0 28px', lineHeight: 1.6 }}>Choose what works for you today.</p>
         {[['quick', 'Quick Score', 'Enter your total. Add fairway and putt stats if you like.'], ['detailed', 'Detailed Tracking', 'Record your tee shot, approaches, short game and putts. We calculate your score.']].map(([mode, title, description]) => <button key={mode} onClick={() => { setScoringMode(mode); localStorage.setItem('bb_scoringMode', mode); setCurrentScreen('logRound'); }} style={{ display: 'block', width: '100%', textAlign: 'left', background: mode === (localStorage.getItem('bb_scoringMode') || 'quick') ? '#f8dfe6' : '#eff8f8', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: 18, padding: 20, margin: '16px 0', color: COLORS.darkTeal, cursor: 'pointer' }}><strong style={{ display: 'block', fontSize: 24, lineHeight: 1.3 }}>{title}</strong><p style={{ fontSize: 18, lineHeight: 1.6, margin: '12px 0 0' }}>{description}</p>{mode === localStorage.getItem('bb_scoringMode') && <span style={{ display: 'block', fontSize: 16, lineHeight: 1.5, marginTop: 12 }}>Last used</span>}</button>)}
       </main>;
 
