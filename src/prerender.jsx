@@ -17,8 +17,8 @@ function TrackerShell() {
   return null;
 }
 
-export const paths = ['/', '/our-story', '/privacy', '/journal',
-  ...journalArticles.map(({ slug }) => `/journal/${slug}`), '/app'];
+export const paths = ['/', '/our-story', '/privacy', '/journal/',
+  ...journalArticles.map(({ slug }) => `/journal/${slug}/`), '/app'];
 export { applyPageSeo };
 export function render(path) {
   const metadata = { current: null };

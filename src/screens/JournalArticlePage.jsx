@@ -23,7 +23,7 @@ export default function JournalArticlePage() {
     description:
       article?.excerpt ??
       'This Blushing Birdie Journal article could not be found.',
-    path: article ? `/journal/${article.slug}` : '/journal',
+    path: article ? `/journal/${article.slug}/` : '/journal/',
     type: 'article',
     robots: article ? 'index,follow' : 'noindex,follow',
     structuredData: article
@@ -32,7 +32,7 @@ export default function JournalArticlePage() {
           {
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
-            '@id': `${absoluteUrl(`/journal/${article.slug}`)}#article`,
+            '@id': `${absoluteUrl(`/journal/${article.slug}/`)}#article`,
             headline: article.title,
             description: article.excerpt,
             datePublished: article.date,
@@ -42,7 +42,7 @@ export default function JournalArticlePage() {
               name: 'Blushing Birdie',
             },
             publisher: { '@id': `${absoluteUrl('/')}#organization` },
-            mainEntityOfPage: absoluteUrl(`/journal/${article.slug}`),
+            mainEntityOfPage: absoluteUrl(`/journal/${article.slug}/`),
             articleSection: article.category,
             about: [
               'women golfers',
@@ -93,7 +93,7 @@ export default function JournalArticlePage() {
             This article could not be found.
           </p>
 
-          <BackButton onClick={() => navigate('/journal')}>Back to Journal</BackButton>
+          <BackButton onClick={() => navigate('/journal/')}>Back to Journal</BackButton>
         </div>
       </div>
     );
@@ -108,7 +108,7 @@ export default function JournalArticlePage() {
       }}
     >
       <div style={{ maxWidth: '820px', margin: '0 auto' }}>
-        <BackButton onClick={() => navigate('/journal')}>Back to Journal</BackButton>
+        <BackButton onClick={() => navigate('/journal/')}>Back to Journal</BackButton>
 
        <article
   style={{
@@ -199,7 +199,7 @@ export default function JournalArticlePage() {
             {relatedArticles.map((item) => (
               <Link
                 key={item.slug}
-                to={`/journal/${item.slug}`}
+                to={`/journal/${item.slug}/`}
                 style={{
                   textDecoration: 'none',
                   background: '#ffffff',
@@ -248,7 +248,7 @@ export default function JournalArticlePage() {
           </div>
 
           <div style={{ marginTop: '26px' }}>
-            <BackButton onClick={() => navigate('/journal')}>Back to Journal</BackButton>
+            <BackButton onClick={() => navigate('/journal/')}>Back to Journal</BackButton>
           </div>
         </div>
       </div>

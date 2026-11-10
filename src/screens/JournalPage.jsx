@@ -10,15 +10,15 @@ export default function JournalPage() {
     title: 'The Birdie Journal - Women Golf Encouragement',
     description:
       'The Blushing Birdie Journal shares thoughtful golf encouragement, simple mindset notes, and everyday reflections for women golfers.',
-    path: '/journal',
+    path: '/journal/',
     structuredData: [
       organizationSchema,
       {
         '@context': 'https://schema.org',
         '@type': 'Blog',
-        '@id': `${absoluteUrl('/journal')}#blog`,
+        '@id': `${absoluteUrl('/journal/')}#blog`,
         name: 'The Birdie Journal by Blushing Birdie',
-        url: absoluteUrl('/journal'),
+        url: absoluteUrl('/journal/'),
         description:
           'Golf mindset, confidence, and encouragement articles from Blushing Birdie for women golfers.',
         publisher: { '@id': `${absoluteUrl('/')}#organization` },
@@ -27,7 +27,7 @@ export default function JournalPage() {
           headline: article.title,
           description: article.excerpt,
           datePublished: article.date,
-          url: absoluteUrl(`/journal/${article.slug}`),
+          url: absoluteUrl(`/journal/${article.slug}/`),
         })),
       },
     ],
@@ -187,7 +187,7 @@ export default function JournalPage() {
           {filteredArticles.map((article) => (
            <Link
                 key={article.slug}
-                to={`/journal/${article.slug}`}
+                to={`/journal/${article.slug}/`}
                 style={{
                     textDecoration: 'none',
                     display: 'flex',
