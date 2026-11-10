@@ -29,6 +29,21 @@ function HomeRoute() {
   return <HomePage />;
 }
 
+// Keep Journal navigation consistent with the slash-free URLs in our sitemap.
+// This is a client-side normalization; Netlify's CDN handles HTTP URL behavior.
+function JournalRoute({ children }) {
+  const location = useLocation();
+  if (location.pathname.length > 1 && location.pathname.endsWith('/')) {
+    return (
+      <Navigate
+        to={location.pathname.replace(/\\/+$/, '') + location.search + location.hash}
+        replace
+      />
+    );
+  }
+  return children;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -39,8 +54,8 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* NEW */}
-        <Route path="/journal" element={<JournalPage />} />
-        <Route path="/journal/:slug" element={<JournalArticlePage />} />
+        <Route path="/journal" element={<JournalRoute><JournalPage /></JournalRoute>} />
+        <Route path="/journal/:slug" element={<JournalRoute><JournalArticlePage /></JournalRoute>} />
       </Routes>
     </BrowserRouter>
   );
