@@ -24,7 +24,7 @@ export default function PrivacyPage() {
   usePageSeo({
     title: 'Privacy and Data - Blushing Birdie',
     description:
-      'How Blushing Birdie handles golf round data, local storage, and file backups.',
+      'How Blushing Birdie handles locally stored golf records, backups, usage analytics, and external services.',
     path: '/privacy',
   });
 
@@ -166,6 +166,33 @@ export default function PrivacyPage() {
             Export Backup saves your saved rounds and courses in a JSON file. Import Backup restores
             that file and replaces the saved rounds and courses on the destination device. CSV exports
             are spreadsheets for reviewing golf stats and cannot restore the app.
+          </p>
+        </section>
+
+        <section style={{ ...cardStyle, padding: '34px 30px', marginBottom: '22px' }}>
+          <h2 style={{ margin: '0 0 14px', color: COLORS.darkTeal, fontSize: '1.35rem' }}>Usage analytics</h2>
+          <p style={{ margin: '0 0 14px', color: COLORS.charcoal, lineHeight: 1.75 }}>
+            The website and tracker use Google Analytics to help us understand how people use Blushing Birdie,
+            such as which pages they visit and how they interact with the site. Google Analytics uses cookies
+            and collects usage, browser, device, and approximate location information. This is separate from
+            the rounds and courses saved in your browser; those records are not automatically attached to
+            analytics events.
+          </p>
+          <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
+            Learn more about <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">how Google uses information from sites and apps</a>.
+          </p>
+        </section>
+
+        <section style={{ ...cardStyle, padding: '34px 30px', marginBottom: '22px' }}>
+          <h2 style={{ margin: '0 0 14px', color: COLORS.darkTeal, fontSize: '1.35rem' }}>Fonts and hosting</h2>
+          <p style={{ margin: '0 0 14px', color: COLORS.charcoal, lineHeight: 1.75 }}>
+            We load fonts from Google Fonts. Your browser connects to Google to download them, which shares
+            technical information such as your IP address and browser details. Your golf records are not
+            part of these font requests.
+          </p>
+          <p style={{ margin: 0, color: COLORS.charcoal, lineHeight: 1.75 }}>
+            Netlify hosts the website and tracker and receives technical connection information needed to
+            serve the pages. Locally stored golf records are not automatically uploaded to Netlify.
           </p>
         </section>
 

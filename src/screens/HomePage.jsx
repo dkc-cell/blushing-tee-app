@@ -6,7 +6,7 @@ import { journalArticles } from '../data/journalArticles';
 import WhyIBuiltThis from '../components/WhyIBuiltThis';
 import screenHome from '../assets/images/screenHome.webp';
 import screenHole1 from '../assets/images/screenHole1.webp';
-import screenDetailed from '../assets/images/screenHole1.png';
+import screenDetailed from '../assets/images/screenDetailed.png';
 import screenStats from '../assets/images/screenStats.webp';
 import screenExport from '../assets/images/screenExport.webp';
 import {
@@ -174,6 +174,11 @@ const faqItems = [
     "answer": "Quick Score lets you enter your total score for each hole, including penalty strokes, with optional putts and fairway or par-3 green results. Those optional details do not change your entered score.\n\nDetailed Tracking records your shots and putts to calculate the hole score."
   },
   {
+    "id": "penalties",
+    "question": "How do I include penalty strokes?",
+    "answer": "In Quick Score, include any penalty strokes in the total you enter or count for the hole. Optional stats do not add strokes.\n\nIn Detailed Tracking, record the shots you play and add any applicable penalty strokes to the Approach Shots count. The app includes that count in your hole score, so it will include penalty strokes as well as actual approach shots. The water, lost-ball, and out-of-bounds switches are reminders only; they do not add strokes.\n\nThe tracker does not decide penalties or relief options. Check with your course or the Rules of Golf if you’re unsure which apply."
+  },
+  {
     "id": "par-yardage",
     "question": "Do I need to enter par and yardage?",
     "answer": "Par is required before saving each new hole. Choose 3, 4, or 5, or use a saved course to fill it in when available.\n\nYardage is optional and hidden in Quick Score. Older saved holes without par remain available; missing details stay blank in exports."
@@ -221,7 +226,7 @@ const faqItems = [
   {
     "id": "install",
     "question": "How do I add it to my Home Screen?",
-    "answer": "On iPhone: Open the app in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the app in Chrome, tap the menu (three dots), then select “Add to Home Screen.”"
+    "answer": "First open the tracker at https://blushingbirdie.com/app/ on your phone.\n\nOn iPhone: Open the tracker in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the tracker in Chrome, tap the menu (three dots), then select “Add to Home Screen.”"
   }
 ];
 
@@ -332,8 +337,8 @@ export default function HomePage() {
   {
     image: screenDetailed,
     title: 'Detailed Tracking',
-    alt: 'Detailed Tracking showing tee-shot direction and approach-shot controls',
-    text: 'Record your shots for more detail about your game.',
+    alt: 'Detailed Tracking on hole 3, par 4, showing tee-shot direction, approach shots, and chip/pitch controls',
+    text: 'Record your tee shot, approaches, chips, and putts as you play.',
   },
   {
     image: screenStats,
