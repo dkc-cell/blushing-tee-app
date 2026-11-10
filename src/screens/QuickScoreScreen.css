@@ -122,3 +122,9 @@
   .qs-nav { gap: 6px; }
   .qs-nav button { font-size: 14px; padding-inline: 6px; }
 }
+
+/* Comfortable reading rhythm in the score help dialog. */
+.qs-modal { padding: 24px; }
+.qs-modal h2 { font-size: 24px; line-height: 1.3; margin: 20px 0 16px; }
+.qs-modal p { font-size: 18px; line-height: 1.6; margin: 0 0 20px; }
+.qs-modal p:last-child { margin-bottom: 0; }

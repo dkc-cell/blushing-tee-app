@@ -53,6 +53,7 @@ const RoundCompleteScreen = ({
 
   return (
     <div style={{ minHeight: '100vh', background: `linear-gradient(135deg, ${COLORS.blush}33 0%, ${COLORS.cream} 50%, ${COLORS.mistyBlue}33 100%)`, padding: '32px 24px 80px 24px' }}>
+      <BackButton onClick={() => handleFinish(onGoHome)}>Back to Home</BackButton>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
         <div style={{ fontSize: '64px', marginBottom: '16px' }}>
@@ -127,7 +128,6 @@ const RoundCompleteScreen = ({
 
       {/* Action Buttons */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <BackButton onClick={() => handleFinish(onGoHome)} fullWidth>Back to Home</BackButton>
         <button
           onClick={() => handleFinish(onNewRound)}
           style={{ width: '100%', backgroundColor: `${COLORS.mistyBlue}4D`, color: COLORS.darkTeal, padding: '16px', borderRadius: '16px', border: 'none', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer' }}
