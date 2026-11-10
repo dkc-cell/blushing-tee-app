@@ -608,7 +608,7 @@ const LogRoundScreen = ({
           </label>
 
           <div style={{ color: COLORS.charcoal, opacity: 0.75, fontSize: '14px', marginBottom: '14px', lineHeight: 1.35 }}>
-            Doesn’t change your score. Record the extra shot using <strong>Approach Shots</strong>.
+            These reminders don’t add strokes. Include any penalty strokes in your <strong>Approach Shots</strong> count so they are included in your hole score.
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -916,9 +916,11 @@ const PenaltyTipModal = ({ type, onClose, onSuppressThisRound, onSuppressForever
         </div>
 
        <div style={{ fontSize: 16, color: COLORS.charcoal, lineHeight: 1.45 }}>
-        When a shot goes in the water, is lost, or goes out of bounds, you’ll need an <strong><em>extra shot</em></strong> to get back in play.
+        This switch is a reminder only. It does not add penalty strokes or choose a relief option for you.
        <br /><br />
-        Record that <strong><em>extra shot</em></strong> using <strong>Approach Shots</strong>.
+        Record the shots you play, and add any applicable <strong>penalty strokes</strong> to your <strong>Approach Shots</strong> count. This includes them in your hole score. The count will include those penalty strokes as well as actual approach shots.
+        <br /><br />
+        Penalties and relief options depend on the situation and any local rules. Check with your course or the Rules of Golf if you’re unsure which apply.
       </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
