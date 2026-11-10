@@ -223,7 +223,7 @@ const optionalFields = (record, keys, type) => keys.every(key => record[key] == 
 const numericMap = value => value == null || (isRecord(value) && Object.entries(value).every(([key, item]) =>
   /^(?:[1-9]|1[0-8])$/.test(key) && (item === null || item === '' || Number.isFinite(item))));
 const validBackupRound = round => isRecord(round) &&
-  optionalFields(round, ['id', 'date', 'courseName', 'highlight', 'focusNextRound'], 'string') &&
+  optionalFields(round, ['id', 'date', 'courseName', 'roundNotes', 'highlight', 'focusNextRound'], 'string') &&
   numericMap(round.customPars) && numericMap(round.customYardages) &&
   Array.isArray(round.holes) && round.holes.length <= 18 && round.holes.every(hole =>
     isRecord(hole) && Number.isFinite(hole.total) && hole.total >= 0 &&

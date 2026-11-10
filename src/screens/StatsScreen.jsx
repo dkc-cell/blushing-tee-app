@@ -641,31 +641,14 @@ const RoundDetailModal = ({
             </div>
           </div>
           
-        {/* Round Reflection */}
+          {/* Display current notes and preserve older saved reflections. */}
           <div style={{ backgroundColor: `${COLORS.mistyBlue}1A`, borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
-            <h4 style={{ margin: '0 0 12px 0', color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>
-              🌸 Round Reflection
-            </h4>
-
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 'bold', color: COLORS.charcoal, marginBottom: '4px' }}>
-                Highlight
-              </div>
-              <div style={{ fontSize: '14px', color: COLORS.charcoal, lineHeight: 1.4, opacity: round.highlight ? 1 : 0.65 }}>
-                {round.highlight || 'No highlight saved yet.'}
-              </div>
-            </div>
-
-            <div>
-              <div style={{ fontSize: '12px', fontWeight: 'bold', color: COLORS.charcoal, marginBottom: '4px' }}>
-                Focus next round
-              </div>
-              <div style={{ fontSize: '14px', color: COLORS.charcoal, lineHeight: 1.4, opacity: round.focusNextRound ? 1 : 0.65 }}>
-                {round.focusNextRound || 'No focus saved yet.'}
-              </div>
+            <h4 style={{ margin: '0 0 12px 0', color: COLORS.darkTeal, fontSize: '16px', fontWeight: 'bold' }}>Round Notes</h4>
+            <div style={{ fontSize: '14px', color: COLORS.charcoal, lineHeight: 1.5, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+              {[round.roundNotes, round.highlight && `Highlight: ${round.highlight}`, round.focusNextRound && `Focus next round: ${round.focusNextRound}`].filter(Boolean).join('\n\n') || 'No notes saved.'}
             </div>
           </div>
- 
+
           {/* Hole Breakdown */}
           <h4 style={{ color: COLORS.darkTeal, fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>Hole-by-Hole Breakdown</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

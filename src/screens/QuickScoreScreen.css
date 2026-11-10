@@ -36,7 +36,6 @@
 .qs-putts strong { font-size: 40px; }
 .qs-nav { display: grid; grid-template-columns: 1fr .85fr 1fr; align-items: center; gap: 8px; margin-top: 24px; text-align: center; font-size: 14px; }
 .qs-nav button { background: #eff8f8; border: 1px solid var(--mist); border-radius: 16px; min-height: 64px; padding: 10px 8px; font-weight: 600; }
-.qs-end { display: block; margin: 12px auto 0; font-size: 14px !important; }
 .qs-error { color: #8f2948; }
 .qs-overlay { position: fixed; inset: 0; background: #0007; display: flex; justify-content: center; align-items: center; padding: 16px; z-index: 5000; }
 .qs-modal { background: white; border-radius: 24px; padding: 20px; max-width: 420px; width: 100%; max-height: 90dvh; overflow: auto; }
@@ -76,7 +75,6 @@
 .qs-nav { margin: 0; grid-template-columns: 1fr 48px 1.25fr; gap: 6px; font-size: 13px; }
 .qs-nav button { min-height: 52px; padding: 6px; border-radius: 12px; font-size: 14px; }
 .qs-nav button:last-child { background: #f8dfe6; }
-.qs-end { margin: 0 auto; min-height: 44px; font-size: 14px !important; }
 .qs-error { font-size: 14px; margin: 6px 0; }
 .qs-modal input { display: block; width: 100%; font-size: 16px; padding: 12px; border: 2px solid var(--mist); border-radius: 10px; margin-top: 12px; }
 @media (max-width: 360px) {
@@ -93,3 +91,40 @@
 }
 
 .qs-stats-note { margin: 0 0 12px; line-height: 1.5; }
+
+.qs-hole-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+.qs-hole-header h2 { margin: 0; font-size: 28px; }
+.quick-score .qs-end { padding: 8px 16px; background: #acc8c84d; color: var(--teal); border: 0; border-radius: 12px; font-size: 16px; font-weight: 600; min-height: 44px; }
+.qs-course-grid { grid-template-columns: 1fr; justify-items: start; }
+.qs-course-grid > button { background: var(--blush); border: 0; border-radius: 8px; padding: 8px 16px; }
+
+/* Shared visual rhythm with Detailed Tracking. */
+.quick-score { max-width: none; margin: 0; padding: 0 0 calc(120px + env(safe-area-inset-bottom)); background: #FFF9F5; }
+.qs-header { background: #fff; padding: 20px 24px; box-shadow: 0 2px 4px #0000001a; }
+.qs-course { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.quick-score .qs-course-name { min-height: 32px; font-size: 15px !important; font-weight: 500 !important; margin: 0 0 8px; }
+.qs-hole-header { margin: 0 0 8px; align-items: flex-start; }
+.qs-hole-header h2 { font-size: 32px; font-weight: 700; }
+.qs-course-grid { margin-bottom: 16px; }
+.qs-course-grid > button { font-size: 16px; font-weight: 700; box-shadow: 0 2px 6px #0000001a; }
+.qs-scoring { padding: 0 24px; }
+.qs-title { justify-content: flex-start; margin-top: 0; margin-bottom: 16px; }
+.qs-title h2 { font-size: 24px; }
+.qs-counter { max-width: 500px; margin-inline: auto; }
+.qs-stats { margin-top: 24px; }
+.qs-footer { left: 0; transform: none; max-width: none; padding: 16px 24px max(16px, env(safe-area-inset-bottom)); box-shadow: 0 -2px 10px #0000001a; }
+.qs-nav { grid-template-columns: 1fr auto 1fr; gap: 12px; }
+.qs-nav button { background: white; border: 2px solid var(--mist); border-radius: 16px; min-height: 64px; font-size: 18px; padding: 12px; }
+.qs-nav button:last-child { background: white; }
+@media (max-width: 360px) {
+  .qs-hole-header { gap: 8px; }
+  .quick-score .qs-end { padding-inline: 10px; font-size: 14px; }
+  .qs-nav { gap: 6px; }
+  .qs-nav button { font-size: 14px; padding-inline: 6px; }
+}
+
+/* Comfortable reading rhythm in the score help dialog. */
+.qs-modal { padding: 24px; }
+.qs-modal h2 { font-size: 24px; line-height: 1.3; margin: 20px 0 16px; }
+.qs-modal p { font-size: 18px; line-height: 1.6; margin: 0 0 20px; }
+.qs-modal p:last-child { margin-bottom: 0; }

@@ -1,7 +1,8 @@
+import EncouragingQuote from '../components/EncouragingQuote';
 import BackButton from '../components/BackButton';
 import React, { useEffect, useState, useRef } from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import { COLORS, ENCOURAGING_QUOTES } from '../constants';
+import { COLORS } from '../constants';
 import { NumberPad, QuickCounter } from '../components';
 import {
   isHoleDraftMeaningful,
@@ -96,7 +97,6 @@ const LogRoundScreen = ({
     // Celebration overlay (Birdie / Eagle / HIO)
 
 
-  const randomQuote = ENCOURAGING_QUOTES[currentHole % ENCOURAGING_QUOTES.length];
   const isHoleRecorded = recordedHoles.has(currentHole);
   const recordedData = currentRound.find(h => h.hole === currentHole);
 
@@ -315,11 +315,7 @@ const LogRoundScreen = ({
         </div>
 
         {/* Quote */}
-        <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.mistyBlue}33 100%)`, margin: '24px', padding: '20px', borderRadius: '16px' }}>
-          <p style={{ color: COLORS.darkTeal, fontSize: '20px', textAlign: 'center', fontStyle: 'italic', fontWeight: '500', margin: 0 }}>
-            {randomQuote}
-          </p>
-        </div>
+        <EncouragingQuote hole={currentHole} style={{ margin: '24px' }} />
 
         {/* Setup Form */}
         <div style={{ padding: '0 24px' }}>
@@ -510,11 +506,7 @@ const LogRoundScreen = ({
       </div>
 
       {/* Quote */}
-      <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}33 0%, ${COLORS.mistyBlue}33 100%)`, margin: '24px', padding: '20px', borderRadius: '16px' }}>
-        <p style={{ color: COLORS.darkTeal, fontSize: '20px', textAlign: 'center', fontStyle: 'italic', fontWeight: '500', margin: 0 }}>
-          {randomQuote}
-        </p>
-      </div>
+      <EncouragingQuote hole={currentHole} style={{ margin: '24px' }} />
 
       {/* Hole Recap (if recorded) */}
       {isHoleRecorded && recordedData && !editingHole && (
