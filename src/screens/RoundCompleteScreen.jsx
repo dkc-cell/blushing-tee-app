@@ -18,8 +18,7 @@ const RoundCompleteScreen = ({
   const [showSaveCourseModal, setShowSaveCourseModal] = useState(false);
   const [courseName, setCourseName] = useState('');
   
-  const [highlight, setHighlight] = useState('');
-  const [focusNextRound, setFocusNextRound] = useState('');
+  const [roundNotes, setRoundNotes] = useState('');
   
   const totalScore = currentRound.reduce((sum, hole) => sum + hole.total, 0);
   const totalPar = getRoundPar(currentRound);
@@ -45,14 +44,8 @@ const RoundCompleteScreen = ({
   };
   
   const handleFinish = (nextAction) => {
-    const hasReflection = highlight.trim() || focusNextRound.trim();
-
-    // Save reflection if we have an id + at least one field filled out
-    if (lastCompletedRoundId && onSaveReflection && hasReflection) {
-      onSaveReflection(lastCompletedRoundId, {
-        highlight: highlight.trim(),
-        focusNextRound: focusNextRound.trim()
-      });
+    if (lastCompletedRoundId && onSaveReflection && roundNotes.trim()) {
+      onSaveReflection(lastCompletedRoundId, { roundNotes: roundNotes.trim() });
     }
 
     if (typeof nextAction === 'function') nextAction();
@@ -100,48 +93,18 @@ const RoundCompleteScreen = ({
         </div>
       </div>
 
-      {/* Quote */}
-      <div style={{ background: `linear-gradient(90deg, ${COLORS.blush}4D 0%, ${COLORS.mistyBlue}4D 100%)`, borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
-        <p style={{ color: COLORS.darkTeal, fontSize: '20px', textAlign: 'center', fontStyle: 'italic', margin: 0 }}>
-          "Every round is progress. Celebrate how far you've come! 🌸"
-        </p>
-      </div>
-      {/* Round Reflection */}
-      <div className="round-reflection" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
-        <h3 style={{ color: COLORS.darkTeal, fontWeight: 'bold', fontSize: '20px', marginTop: 0, marginBottom: '8px' }}>
-          🌸 Round Reflection
-        </h3>
-        <p style={{ color: COLORS.charcoal, fontSize: '16px', marginTop: 0, marginBottom: '16px' }}>
-          Capture a win and one gentle focus for next round.
-        </p>
-
-        <div style={{ marginBottom: '14px' }}>
-          <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '6px', fontSize: '14px' }}>
-            Highlight
-          </label>
-          <textarea
-            value={highlight}
-            onChange={(e) => setHighlight(e.target.value)}
-            placeholder="Something that felt good today…"
-            rows={2}
-            maxLength={140}
-            style={{ width: '100%', padding: '12px', fontSize: '16px', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '12px', fontFamily: 'inherit', color: COLORS.charcoal, resize: 'vertical' }}
-          />
-        </div>
-
-        <div>
-          <label style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', marginBottom: '6px', fontSize: '14px' }}>
-            Focus next round
-          </label>
-          <textarea
-            value={focusNextRound}
-            onChange={(e) => setFocusNextRound(e.target.value)}
-            placeholder="One small thing to build on next time…"
-            rows={2}
-            maxLength={140}
-            style={{ width: '100%', padding: '12px', fontSize: '16px', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '12px', fontFamily: 'inherit', color: COLORS.charcoal, resize: 'vertical' }}
-          />
-        </div>
+      {/* Optional round notes */}
+      <div className="round-notes" style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', marginBottom: '24px' }}>
+        <label htmlFor="round-notes" style={{ display: 'block', color: COLORS.darkTeal, fontWeight: 'bold', fontSize: '20px', marginBottom: '12px' }}>Round Notes</label>
+        <textarea
+          id="round-notes"
+          value={roundNotes}
+          onChange={(e) => setRoundNotes(e.target.value)}
+          placeholder="Add notes, a highlight, or something you’d like to work on next round."
+          rows={4}
+          maxLength={2000}
+          style={{ boxSizing: 'border-box', width: '100%', padding: '12px', fontSize: '16px', border: `2px solid ${COLORS.mistyBlue}`, borderRadius: '12px', fontFamily: 'inherit', color: COLORS.charcoal, resize: 'vertical' }}
+        />
       </div>
 
       {/* Save Course Option */}

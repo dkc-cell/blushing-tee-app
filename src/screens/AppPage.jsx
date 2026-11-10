@@ -201,7 +201,7 @@ const saved = addRound({
 setLastCompletedRoundId(saved.id);
 setCurrentScreen('roundComplete');
   };
-  // Save round reflection (highlight + focusNextRound)
+  // Save optional round notes while retaining older reflection fields
 // Ensure we update the FULL round object so it persists correctly
   const handleSaveReflection = (roundId, reflection) => {
   const existing = rounds.find(r => r.id === roundId);
@@ -209,6 +209,9 @@ setCurrentScreen('roundComplete');
 
   const updatedRound = {
     ...existing,
+    roundNotes: typeof reflection?.roundNotes === 'string'
+      ? reflection.roundNotes
+      : existing.roundNotes || '',
     highlight: typeof reflection?.highlight === 'string'
       ? reflection.highlight
       : existing.highlight || '',
