@@ -1,3 +1,4 @@
+import EncouragingQuote from '../components/EncouragingQuote';
 import BackButton from '../components/BackButton';
 import React, { useEffect, useRef, useState } from 'react';
 import { COLORS } from '../constants';
@@ -80,6 +81,7 @@ export default function QuickScoreScreen({ currentHole, setCurrentHole, currentR
   return <main className="quick-score" style={{ '--teal': COLORS.darkTeal, '--blush': COLORS.blush, '--mist': COLORS.mistyBlue }}>
     <BackButton onClick={onBack}>Back to Home</BackButton>
     <section className="qs-course"><button className="qs-course-name" aria-label="Edit course name" onClick={() => { setNameDraft(courseName || ''); setModal('course'); }}>{courseName || 'Add course name'} <span aria-hidden="true">✎</span></button><div className="qs-course-grid"><div>Hole <strong>{currentHole}</strong></div><button aria-label="Edit par" onClick={() => setModal('par')}>Par <strong>{par || '--'}</strong><span className="qs-par-edit"> · Edit</span></button></div></section>
+    <EncouragingQuote hole={currentHole} style={{ margin: '20px 0' }} />
     <div className="qs-title"><h2>Score</h2><button aria-label="Score help" onClick={() => setModal('help')}>ⓘ</button></div>
     <div className="qs-counter"><button aria-label="Decrease score" disabled={inputs.score == null || inputs.score <= 1} onClick={() => change('score', inputs.score - 1)}>−</button><button className="qs-total" aria-label="Enter score manually" onClick={() => openPad('score', inputs.score)}>{inputs.score ?? '--'}</button><button aria-label="Increase score" onClick={() => change('score', Math.min(99, (inputs.score || 0) + 1))}>+</button></div>
     <p className="qs-hint">Tap + to count, or tap the score to enter</p>

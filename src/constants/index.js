@@ -17,11 +17,24 @@ export const COLORS = {
 
 // Encouraging quotes for the round logging screen
 export const ENCOURAGING_QUOTES = [
-  "Every swing is a step forward 🩷",
-  "Breathe in the moment, enjoy the game 🩷",
-  "Progress over perfection ✨",
-  "You're exactly where you need to be 🌿",
-  "Celebrate the small wins today 🩷"
+  "Confidence, one swing at a time.",
+  "Progress over perfection.",
+  "Celebrate the small wins today.",
+  "There’s joy in simply playing.",
+  "Enjoy the company. Enjoy the game.",
+  "Learning is part of playing.",
+  "Take a breath. Find your rhythm.",
+  "Keep a little kindness for yourself.",
+  "You bring more than your score.",
+  "Today’s game is yours to enjoy.",
+  "You don’t have to prove anything.",
+  "Some days, showing up is progress.",
+  "Enjoy being out here today.",
+  "Small improvements are worth a smile.",
+  "Let confidence grow in its time.",
+  "Trust the practice you’ve put in.",
+  "You can begin again right here.",
+  "Take the good moments with you."
 ];
 
 // Local storage keys
