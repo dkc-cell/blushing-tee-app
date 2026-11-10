@@ -154,9 +154,9 @@ test.each([1, 2, 3])('tapping quick score %i celebration advances without a seco
     click('Save & Next →');
     act(() => container.querySelector('.birdie-overlay').click());
     expect(container.querySelector('.birdie-overlay')).toBeNull();
-    expect(container.querySelector('.qs-course-grid').textContent).toContain('Hole 2');
+    expect(container.querySelector('.qs-hole-header h2').textContent).toContain('Hole 2');
     act(() => vi.advanceTimersByTime(5000));
-    expect(container.querySelector('.qs-course-grid').textContent).toContain('Hole 2');
+    expect(container.querySelector('.qs-hole-header h2').textContent).toContain('Hole 2');
     expect(recorded).toHaveBeenCalledTimes(1);
   } finally { vi.useRealTimers(); }
 });

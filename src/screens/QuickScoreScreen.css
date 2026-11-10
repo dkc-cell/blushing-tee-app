@@ -36,7 +36,6 @@
 .qs-putts strong { font-size: 40px; }
 .qs-nav { display: grid; grid-template-columns: 1fr .85fr 1fr; align-items: center; gap: 8px; margin-top: 24px; text-align: center; font-size: 14px; }
 .qs-nav button { background: #eff8f8; border: 1px solid var(--mist); border-radius: 16px; min-height: 64px; padding: 10px 8px; font-weight: 600; }
-.qs-end { display: block; margin: 12px auto 0; font-size: 14px !important; }
 .qs-error { color: #8f2948; }
 .qs-overlay { position: fixed; inset: 0; background: #0007; display: flex; justify-content: center; align-items: center; padding: 16px; z-index: 5000; }
 .qs-modal { background: white; border-radius: 24px; padding: 20px; max-width: 420px; width: 100%; max-height: 90dvh; overflow: auto; }
@@ -76,7 +75,6 @@
 .qs-nav { margin: 0; grid-template-columns: 1fr 48px 1.25fr; gap: 6px; font-size: 13px; }
 .qs-nav button { min-height: 52px; padding: 6px; border-radius: 12px; font-size: 14px; }
 .qs-nav button:last-child { background: #f8dfe6; }
-.qs-end { margin: 0 auto; min-height: 44px; font-size: 14px !important; }
 .qs-error { font-size: 14px; margin: 6px 0; }
 .qs-modal input { display: block; width: 100%; font-size: 16px; padding: 12px; border: 2px solid var(--mist); border-radius: 10px; margin-top: 12px; }
 @media (max-width: 360px) {
@@ -93,3 +91,9 @@
 }
 
 .qs-stats-note { margin: 0 0 12px; line-height: 1.5; }
+
+.qs-hole-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+.qs-hole-header h2 { margin: 0; font-size: 28px; }
+.quick-score .qs-end { padding: 8px 16px; background: #acc8c84d; color: var(--teal); border: 0; border-radius: 12px; font-size: 16px; font-weight: 600; min-height: 44px; }
+.qs-course-grid { grid-template-columns: 1fr; justify-items: start; }
+.qs-course-grid > button { background: var(--blush); border: 0; border-radius: 8px; padding: 8px 16px; }
