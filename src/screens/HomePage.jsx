@@ -6,7 +6,7 @@ import { journalArticles } from '../data/journalArticles';
 import WhyIBuiltThis from '../components/WhyIBuiltThis';
 import screenHome from '../assets/images/screenHome.webp';
 import screenHole1 from '../assets/images/screenHole1.webp';
-import screenDetailed from '../assets/images/screenHole1.png';
+import screenDetailed from '../assets/images/screenDetailed.png';
 import screenStats from '../assets/images/screenStats.webp';
 import screenExport from '../assets/images/screenExport.webp';
 import {
@@ -226,7 +226,7 @@ const faqItems = [
   {
     "id": "install",
     "question": "How do I add it to my Home Screen?",
-    "answer": "On iPhone: Open the app in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the app in Chrome, tap the menu (three dots), then select “Add to Home Screen.”"
+    "answer": "First open the tracker at https://blushingbirdie.com/app/ on your phone.\n\nOn iPhone: Open the tracker in Safari, tap the Share icon, then choose “Add to Home Screen.”\n\nOn Android: Open the tracker in Chrome, tap the menu (three dots), then select “Add to Home Screen.”"
   }
 ];
 
@@ -337,8 +337,8 @@ export default function HomePage() {
   {
     image: screenDetailed,
     title: 'Detailed Tracking',
-    alt: 'Detailed Tracking showing tee-shot direction and approach-shot controls',
-    text: 'Record your shots for more detail about your game.',
+    alt: 'Detailed Tracking on hole 3, par 4, showing tee-shot direction, approach shots, and chip/pitch controls',
+    text: 'Record your tee shot, approaches, chips, and putts as you play.',
   },
   {
     image: screenStats,
