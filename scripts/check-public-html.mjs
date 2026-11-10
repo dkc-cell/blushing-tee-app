@@ -6,6 +6,17 @@ const site = 'https://blushingbirdie.com';
 const sitemap = new JSDOM(await readFile('public/sitemap.xml', 'utf8'), { contentType: 'text/xml' });
 const paths = [...sitemap.window.document.querySelectorAll('loc')].map(node => new URL(node.textContent).pathname);
 const titles = new Set();
+const assertJournalUrl = (value) => {
+  if (typeof value !== 'string' || !value.startsWith(`${site}/journal`)) return;
+  const pathname = new URL(value).pathname;
+  assert.ok(pathname.endsWith('/'), `Journal URL must end in a slash: ${value}`);
+};
+const checkSchemaUrls = (value) => {
+  if (Array.isArray(value)) value.forEach(checkSchemaUrls);
+  else if (value && typeof value === 'object') Object.values(value).forEach(checkSchemaUrls);
+  else assertJournalUrl(value);
+};
+paths.forEach(path => assertJournalUrl(site + path));
 for (const path of [...new Set([...paths, '/app'])]) {
   const dom = new JSDOM(await readFile(`build${path === '/' ? '' : path}/index.html`, 'utf8'));
   const doc = dom.window.document;
@@ -16,6 +27,11 @@ for (const path of [...new Set([...paths, '/app'])]) {
   assert.ok(!titles.has(doc.title), `Duplicate title: ${path}`);
   titles.add(doc.title);
   const schemas = [...doc.querySelectorAll('script[type="application/ld+json"]')].map(node => JSON.parse(node.textContent));
+  schemas.forEach(checkSchemaUrls);
+  for (const anchor of doc.querySelectorAll('a[href]')) {
+    const url = new URL(anchor.getAttribute('href'), site + path);
+    if (url.origin === site) assertJournalUrl(url.href);
+  }
   const ids = schemas.map(schema => schema['@id']).filter(Boolean);
   assert.equal(ids.length, new Set(ids).size, `Duplicate schema entity: ${path}`);
   if (path === '/app') {
@@ -25,7 +41,7 @@ for (const path of [...new Set([...paths, '/app'])]) {
     assert.equal(doc.querySelectorAll('h1').length, 1, path);
     assert.ok(doc.getElementById('root').textContent.length > 300, `Missing content: ${path}`);
     assert.equal(doc.querySelector('meta[name="robots"]').content, 'index,follow');
-    if (path.startsWith('/journal/')) {
+    if (path.startsWith('/journal/') && path !== '/journal/') {
       const article = schemas.find(schema => schema['@type'] === 'BlogPosting');
       assert.ok(article, path);
       assert.equal(article.mainEntityOfPage, site + path);

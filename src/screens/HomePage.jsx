@@ -866,7 +866,7 @@ const toggleItem = (id) => {
   {journalArticles.slice(0, 3).map((article) => (
     <Link
       key={article.slug}
-      to={`/journal/${article.slug}`}
+      to={`/journal/${article.slug}/`}
       style={{
         textDecoration: 'none',
         display: 'flex',
@@ -930,7 +930,7 @@ const toggleItem = (id) => {
 
     <div style={{ marginTop: '28px' }}>
   <Link
-    to="/journal"
+    to="/journal/"
     style={{
       display: 'inline-block',
       background: COLORS.darkTeal,
@@ -1023,7 +1023,7 @@ const toggleItem = (id) => {
       Try the App
     </Link>
     <span>•</span>
-    <Link to="/journal" style={footerLinkStyle}>
+    <Link to="/journal/" style={footerLinkStyle}>
       Journal
     </Link>
     <span>•</span>
